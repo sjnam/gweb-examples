@@ -1,5 +1,22 @@
 # GWEB examples
 
+## Building
+
+A [Makefile](Makefile) builds any example by its name (the `.w` basename):
+
+```sh
+make ziptree   # ziptree.w -> ziptree.go (+ any @( ) files) + ziptree.pdf
+make           # show usage
+make clean     # remove all generated files, keeping the .w/.ch sources
+```
+
+Build one example at a time (there is no `make all`): nearly every tangled
+`.go` is a `package main` with its own `main()`, so emitting them into one
+directory at once would make Go refuse to compile (`main` redeclared).
+
+The TeX engine is chosen automatically — **luatex** for Korean documents (those
+with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
+
 * [wc.w](wc.w) — a literate word-count program; its tangled
   output matches the system `wc`. It also shows `@f` setting a user type in bold.
 * [pmap.w](pmap.w) — a generic concurrent `map` over a slice,
@@ -80,6 +97,18 @@
   floating-point arithmetic. When adding the $1/n^2$ terms, precise rational
   number operations are required, and a brute-force approach that simply cycles
   through all $2^{79}$ subsets is impossible.
+* [ziptree.w](ziptree.w) — the **zip tree** of Tarjan, Levy,
+  and Timmel: a randomized BST that is max-heap-ordered by a geometric random
+  *rank* (ties favoring the smaller key), updated by *unzipping* and *zipping*
+  search paths instead of rotations. Implements the paper's recursive insert,
+  zip, and delete as a library, then derives two memory-savers: an *arena*
+  (index-based, byte rank, free list) that halves node size and cuts a
+  million-node build from ~1M allocations to ~40, and a *pseudo-random rank*
+  variant that drops the rank field entirely (computing it from the key). The
+  `@(zip_test.go@>` test file (run with `go test`) reproduces the paper's
+  Figure 1 exactly, cross-checks all three representations, fuzz-checks the
+  BST/heap invariants, and benchmarks allocations. Korean (typeset with
+  **luatex**).
 
 ### Korean (and other non-English) documentation
 
