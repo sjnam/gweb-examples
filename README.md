@@ -80,3 +80,27 @@
   floating-point arithmetic. When adding the $1/n^2$ terms, precise rational
   number operations are required, and a brute-force approach that simply cycles
   through all $2^{79}$ subsets is impossible.
+
+### Korean (and other non-English) documentation
+
+The woven output can be written in Korean by processing it with **`luatex`**
+(not `pdftex`) and putting one line in the `.w` file's limbo:
+
+```tex
+\input kotexgweb.tex
+```
+
+[tex/kotexgweb.tex](tex/kotexgweb.tex) loads [luatexko](https://ctan.org/pkg/luatexko)
+and selects the Noto Serif/Sans CJK KR fonts (edit the `\sethangulfont` lines to
+change typefaces), translates gweave's fixed wording into Korean, and supplies a
+LuaTeX PDF back end so that blue cross-reference links and the PDF outline
+(bookmark) pane work, with Korean bookmark titles. Then:
+
+```sh
+gweave foo.w           # -> foo.tex
+luatex foo.tex         # -> foo.pdf   (kotexgweb.tex on TEXINPUTS)
+```
+
+gweave needs no flag; all the human-readable text it emits goes through macros
+(`\GU`, `\GNused`, `\Gsectionword`, …) that `kotexgweb.tex` overrides, so the same
+mechanism localizes to any language — write your own `\input` file modelled on it.
