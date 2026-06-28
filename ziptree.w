@@ -4,6 +4,7 @@
 @s Rand int
 @s T int
 @s Builder int
+@s B int
 
 @* 들어가며.
 {\it Zip tree\/}는 Tarjan, Levy, Timmel이 소개한 {\it 무작위 이진
@@ -244,7 +245,7 @@ const nilIdx = -1 // 빈 자식을 가리키는 파수꾼
 
 type anode struct {
 	key         int32
-	left, right int32 // 자식의 첨자 (nilIdx면 없음)
+	left, right int32 // 자식의 첨자 (|nilIdx|면 없음)
 	rank        uint8
 }
 
