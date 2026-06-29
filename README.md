@@ -19,8 +19,6 @@ with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
 
 * [wc.w](wc.w) — a literate word-count program; its tangled
   output matches the system `wc`. It also shows `@f` setting a user type in bold.
-* [pmap.w](pmap.w) — a generic concurrent `map` over a slice,
-  exercising generics, goroutines, channels, and `sync.WaitGroup`.
 * [seq.w](seq.w) — a tiny lazy-sequence library (`Map`,
   `Filter`, `Take` over infinite Fibonacci numbers), showing off the Go features
   C has no answer to: first-class functions and closures, anonymous functions,
@@ -47,10 +45,6 @@ with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
 * [convmod.w](convmod.w) — Library Checker's *Convolution
   (mod 998244353)*: polynomial multiplication in O(n log n) via the **number
   theoretic transform** (NTT). Korean (typeset with **luatex**).
-* [intersect.w](intersect.w) — Codeforces 1093E *Intersection
-  of Permutations*: each value becomes a 2-D point, reducing the queries to
-  rectangle counting with point updates — a **Fenwick tree of Fenwick trees**
-  with offline coordinate compression. Korean (typeset with **luatex**).
 * [suffixautomaton.w](suffixautomaton.w) — an exposition of the
   **suffix automaton** (after cp-algorithms): the online O(n) construction with
   suffix links and the clone/split step, applied to counting distinct

@@ -1,4 +1,5 @@
 @i types.w
+@s T int
 
 \def\title{Squinting at Power Series}
 

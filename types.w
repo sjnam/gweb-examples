@@ -6,8 +6,6 @@
 @d MinInt64
 
 % types
-@s T int
-@s B int
 @s Seq int
 @s Rat int
 @s Rand int

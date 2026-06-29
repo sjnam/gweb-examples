@@ -1,4 +1,6 @@
 @i types.w
+@s T int
+@s B int
 
 \input kotexgweb.tex
 \input supp-pdf
