@@ -29,10 +29,19 @@ import (
 	"strconv"
 )
 
-@<멈출 때까지 걸리는 날수를 구한다@>
+type plant struct {
+	pesticide int // 살충제 양
+	dies      int // 죽는 날 (0이면 죽지 않음)
+}
 
 func main() {
-	@<입력을 읽어 답을 출력한다@>
+	@<입력을 읽는다@>
+
+	var stack []plant
+	ans := 0
+
+	@<멈출 때까지 걸리는 날수를 구한다@>
+	fmt.Printf("\n%d\n", ans)
 }
 
 @* 며칠 만에 멈추는가.
@@ -54,21 +63,12 @@ $i$가 죽는 날은 {\it 사이에 낀 식물들이 죽는 날의 최댓값보�
 |x|보다 약한 이웃이므로 |x|는 그 최댓값에 하루를 더한 날에 죽는다. 각 식물이 한
 번 들어갔다 한 번 나오므로 전체는 $O(n)$이다.
 @<멈출 때까지 걸리는 날수를 구한다@>=
-func poisonousPlants(p []int) int {
-	type plant struct {
-		pesticide int // 살충제 양
-		dies      int // 죽는 날 (0이면 죽지 않음)
-	}
-	var stack []plant
-	ans := 0
-	for _, x := range p {
-		day := 0
-		@<자신 이상인 왼쪽 이웃들을 걷어내며 죽는 날의 최댓값을 모은다@>
-		@<죽는 날을 정한다@>
-		ans = max(ans, day)
-		stack = append(stack, plant{x, day})
-	}
-	return ans
+for _, x := range p {
+	day := 0
+	@<자신 이상인 왼쪽 이웃들을 걷어내며 죽는 날의 최댓값을 모은다@>
+	@<죽는 날을 정한다@>
+	ans = max(ans, day)
+	stack = append(stack, plant{x, day})
 }
 
 @ 스택이 증가 순서이므로, 꼭대기가 |x| 이상인 동안 떼어내면 끼어 있던 강한 식물이
@@ -91,7 +91,7 @@ if len(stack) > 0 {
 @* 입출력.
 입력은 |n|과 |n|개의 살충제 양이다. 그루 수가 많을 수 있어 버퍼를 키운 단어
 스캐너로 읽는다.
-@<입력을 읽어 답을 출력한다@>=
+@<입력을 읽는다@>=
 sc := bufio.NewScanner(os.Stdin)
 sc.Buffer(make([]byte, 1<<20), 1<<26)
 sc.Split(bufio.ScanWords)
@@ -106,7 +106,5 @@ p := make([]int, n)
 for i := range p {
 	p[i] = readInt()
 }
-
-fmt.Println(poisonousPlants(p))
 
 @* 찾아보기.

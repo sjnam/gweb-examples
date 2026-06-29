@@ -29,9 +29,6 @@ with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
   pipeline worlds: lazy `iter.Seq` transforms and a fan-out of channel workers,
   joined by two boundary adapters, with first-error cancellation flowing across
   both. Uses range-over-func and a pocket `errgroup`.
-* [hangul.w](hangul.w) — a short Fibonacci program written in
-  Korean, demonstrating `\input kotexgweb.tex`. Typeset it with **luatex**:
-  `make -C examples NAME=hangul TEXENGINE=luatex` (or `make example`).
 * [slidingmax.w](slidingmax.w) — LeetCode's *Sliding Window
   Maximum*, solved in O(n) with a **monotonic deque**. A Korean literate essay
   (typeset with **luatex**, like `hangul.w`).

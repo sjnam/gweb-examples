@@ -29,10 +29,20 @@ import (
 	"strconv"
 )
 
-@<슬라이딩 윈도우 최댓값을 구하는 함수@>
-
 func main() {
-	@<입력을 읽어 답을 출력한다@>
+	@<입력을 읽는다@>
+
+	dq := make([]int, 0, len(nums))  // 후보들의 첨자, 값이 앞에서 뒤로 감소
+	res := make([]int, 0, len(nums)) // 각 창의 최댓값
+	@<슬라이딩 윈도우 최댓값을 구하는 함수@>
+
+	for i, v := range res {
+		if i > 0 {
+			fmt.Print(" ")
+		}
+		fmt.Print(v)
+	}
+	fmt.Println()
 }
 
 @* 단조 덱.
@@ -48,16 +58,11 @@ func main() {
 새 첨자를 뒤에 붙인다. 각 첨자는 평생 한 번 들어갔다 한 번 나오므로, 모든 덱
 연산을 합쳐도 $O(n)$이다.
 @<슬라이딩 윈도우 최댓값을 구하는 함수@>=
-func maxSlidingWindow(nums []int, k int) []int {
-	dq := make([]int, 0, len(nums))  // 후보들의 첨자, 값이 앞에서 뒤로 감소
-	res := make([]int, 0, len(nums)) // 각 창의 최댓값
-	for i, x := range nums {
-		@<창을 벗어난 앞쪽 첨자를 버린다@>
-		@<자신보다 작은 꼬리를 버린다@>
-		dq = append(dq, i)
-		@<창이 다 차면 최댓값을 적는다@>
-	}
-	return res
+for i, x := range nums {
+	@<창을 벗어난 앞쪽 첨자를 버린다@>
+	@<자신보다 작은 꼬리를 버린다@>
+	dq = append(dq, i)
+	@<창이 다 차면 최댓값을 적는다@>
 }
 
 @ 현재 창은 첨자 구간 $[\,i-k+1,\;i\,]$이다. 맨 앞 첨자가 이 구간의 왼쪽 밖,
@@ -86,7 +91,7 @@ if i >= k-1 {
 @* 입출력.
 입력은 |n|과 |k|, 그리고 |n|개의 정수다. 수가 많을 수 있으니 버퍼를 키운 단어
 단위 스캐너로 읽는다. 답은 공백으로 띄운 한 줄이다.
-@<입력을 읽어 답을 출력한다@>=
+@<입력을 읽는다@>=
 sc := bufio.NewScanner(os.Stdin)
 sc.Buffer(make([]byte, 1<<20), 1<<26)
 sc.Split(bufio.ScanWords)
@@ -102,13 +107,5 @@ nums := make([]int, n)
 for i := range nums {
 	nums[i] = readInt()
 }
-
-for i, v := range maxSlidingWindow(nums, k) {
-	if i > 0 {
-		fmt.Print(" ")
-	}
-	fmt.Print(v)
-}
-fmt.Println()
 
 @* 찾아보기.

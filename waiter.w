@@ -31,11 +31,16 @@ import (
 	"strconv"
 )
 
-@<처음 |q|개의 소수를 만든다@>
-@<접시를 나누어 답을 만든다@>
-
 func main() {
-	@<입력을 읽어 답을 출력한다@>
+	@<입력을 읽는다@>
+
+	answers := make([]int, 0, len(number))
+	@<접시를 나누어 답을 만든다@>
+
+	fmt.Println()
+	for _, v := range answers {
+		fmt.Fprintln(out, v)
+	}
 }
 
 @* 소수 만들기.
@@ -43,24 +48,21 @@ $q$번째 소수까지 있으면 된다. |q|가 커야 $1200$ 안팎이고 그 �
 않으니, 정교한 체 없이 시험 나눗셈으로 충분하다. 이미 찾은 소수들로만 후보를
 나눠 보되, 어떤 소수의 제곱이 후보를 넘어서면 더 볼 것이 없으므로 멈춘다.
 @<처음 |q|개의 소수를 만든다@>=
-func firstPrimes(q int) []int {
-	primes := make([]int, 0, q)
-	for cand := 2; len(primes) < q; cand++ {
-		isPrime := true
-		for _, p := range primes {
-			if p*p > cand {
-				break
-			}
-			if cand%p == 0 {
-				isPrime = false
-				break
-			}
+primes := make([]int, 0, q)
+for cand := 2; len(primes) < q; cand++ {
+	isPrime := true
+	for _, p := range primes {
+		if p*p > cand {
+			break
 		}
-		if isPrime {
-			primes = append(primes, cand)
+		if cand%p == 0 {
+			isPrime = false
+			break
 		}
 	}
-	return primes
+	if isPrime {
+		primes = append(primes, cand)
+	}
 }
 
 @* 접시 나누기.
@@ -68,20 +70,16 @@ func firstPrimes(q int) []int {
 위에서부터 꺼낸다''는 말은 슬라이스를 뒤에서 앞으로 훑는다는 뜻이 된다. 각 차례마다
 현재 더미를 두 더미로 가르고, 나누어떨어진 쪽을 답에 옮긴다.
 @<접시를 나누어 답을 만든다@>=
-func waiter(number []int, q int) []int {
-	primes := firstPrimes(q)
-	answers := make([]int, 0, len(number))
-	a := number
-	for i := 0; i < q; i++ {
-		p := primes[i]
-		var b, next []int
-		@<더미 |a|를 |p|로 |b|와 |next|로 가른다@>
-		@<|b|를 맨 위에서부터 답에 적는다@>
-		a = next
-	}
-	@<남은 더미 |a|를 맨 위에서부터 답에 붙인다@>
-	return answers
+@<처음 |q|개의 소수를 만든다@>
+a := number
+for i := 0; i < q; i++ {
+	p := primes[i]
+	var b, next []int
+	@<더미 |a|를 |p|로 |b|와 |next|로 가른다@>
+	@<|b|를 맨 위에서부터 답에 적는다@>
+	a = next
 }
+@<남은 더미 |a|를 맨 위에서부터 답에 붙인다@>
 
 @ 맨 위 |a[len(a)-1]|부터 아래로 내려가며, $p$로 나누어떨어지는 접시는 |b|에,
 나머지는 |next|에 얹는다. 두 더미 모두 ``꺼낸 순서대로 쌓이므로'' 역시 마지막
@@ -110,7 +108,7 @@ for j := len(a) - 1; j >= 0; j-- {
 @* 입출력.
 접시가 최대 오만 장이라 입력은 버퍼를 키운 단어 스캐너로, 출력은 버퍼 쓰기로
 처리한다.
-@<입력을 읽어 답을 출력한다@>=
+@<입력을 읽는다@>=
 sc := bufio.NewScanner(os.Stdin)
 sc.Buffer(make([]byte, 1<<20), 1<<26)
 sc.Split(bufio.ScanWords)
@@ -129,8 +127,5 @@ for i := range number {
 
 out := bufio.NewWriter(os.Stdout)
 defer out.Flush()
-for _, v := range waiter(number, q) {
-	fmt.Fprintln(out, v)
-}
 
 @* 찾아보기.
