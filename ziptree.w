@@ -1,12 +1,9 @@
+@i types.w
+
 \input kotexgweb.tex
 \input supp-pdf
 \def\title{Zip Trees}
 \datethis
-
-@s Rand int
-@s T int
-@s Builder int
-@s B int
 
 @** 들어가며.
 {\it 짚트리}(zip tree)는 Tarjan, Levy, Timmel이 소개한 {\it 무작위 이진

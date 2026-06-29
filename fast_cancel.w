@@ -1,6 +1,6 @@
-\def\title{Fast Cancel}
+@i types.w
 
-@s WaitGroup int
+\def\title{Fast Cancel}
 
 @* First Error Cancellation.
 Runs 10 goroutines in parallel where each finishes after a random delay (1–9999 ms).

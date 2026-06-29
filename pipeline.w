@@ -1,10 +1,6 @@
-\def\title{A Hybrid Pipeline}
+@i types.w
 
-@s Seq int
-@s Context int
-@s WaitGroup int
-@s Once int
-@s CancelFunc int
+\def\title{A Hybrid Pipeline}
 
 @* Introduction.
 Go gives us two rather different ways to build a {\it pipeline}, and they each shine

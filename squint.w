@@ -1,7 +1,6 @@
-\def\title{Squinting at Power Series}
+@i types.w
 
-@s Rat int
-@s Context int
+\def\title{Squinting at Power Series}
 
 @* Introduction.
 A power series

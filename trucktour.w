@@ -1,6 +1,7 @@
+@i types.w
+
 \input kotexgweb.tex
 \def\title{트럭 투어}
-
 \def\itm#1 {\penalty-50\smallskip\hangindent 2em\noindent#1\unskip
   \quad}
 
@@ -29,10 +30,9 @@ import (
 	"strconv"
 )
 
-@<완주 가능한 출발점을 찾는다@>
-
 func main() {
-	@<입력을 읽어 답을 출력한다@>
+	@<입력을 읽는다@>
+	@<완주 가능한 출발점을 찾는다@>
 }
 
 @* 왜 한 번만 훑으면 되는가.
@@ -55,16 +55,14 @@ $j+1$로 건너뛰어도 좋다.
 순간 출발점을 그다음 주유소로 옮기고 탱크를 비운다. 마지막으로 정해진 출발점이
 실제로 완주 가능하다는 것은 첫째 사실($\sum d_i\ge0$)이 보장한다. 시간은 $O(n)$이다.
 @<완주 가능한 출발점을 찾는다@>=
-func truckTour(petrol, distance []int) int {
-	start, tank, total := 0, 0, 0
-	for i := range petrol {
-		d := petrol[i] - distance[i]
-		tank += d
-		total += d
-		@<탱크가 음수가 되면 다음 주유소에서 다시 시작한다@>
-	}
-	@<완주 가능한 출발점을 돌려준다@>
+start, tank, total := 0, 0, 0
+for i := range petrol {
+	d := petrol[i] - distance[i]
+	tank += d
+	total += d
+	@<탱크가 음수가 되면 다음 주유소에서 다시 시작한다@>
 }
+@<완주 가능한 출발점을 출력한다@>
 
 @ 지금 출발점 |start|에서부터 |i|번까지 누적한 연료가 |tank|다. 이것이 음수가 되면
 방금 본 까닭으로 |start|부터 |i|까지는 모두 후보에서 탈락하므로, 출발점을 |i+1|로
@@ -78,16 +76,16 @@ if tank < 0 {
 @ |total|은 전체 순연료의 합이다. 이것이 음수이면 완주 가능한 출발점이 없다는
 뜻이므로 |-1|을 돌려준다(이 문제에서는 답이 보장되어 일어나지 않는다). 그렇지
 않으면 마지막에 정해진 |start|가 곧 답이다.
-@<완주 가능한 출발점을 돌려준다@>=
+@<완주 가능한 출발점을 출력한다@>=
 if total < 0 {
-	return -1
+	start = -1
 }
-return start
+fmt.Println(start)
 
 @* 입출력.
 입력은 |n|, 그리고 줄마다 두 정수 $a_i$, $b_i$다. 연료와 거리가 십억까지, 주유소가
 십만 개까지이지만 그 합도 |int|(64비트)에 넉넉히 들어간다.
-@<입력을 읽어 답을 출력한다@>=
+@<입력을 읽는다@>=
 sc := bufio.NewScanner(os.Stdin)
 sc.Buffer(make([]byte, 1<<20), 1<<26)
 sc.Split(bufio.ScanWords)
@@ -104,7 +102,5 @@ for i := 0; i < n; i++ {
 	petrol[i] = readInt()
 	distance[i] = readInt()
 }
-
-fmt.Println(truckTour(petrol, distance))
 
 @* 찾아보기.

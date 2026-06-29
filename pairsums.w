@@ -1,7 +1,6 @@
-\def\title{Pair Sums}
+@i types.w
 
-@d os.Stdin
-@d math.MinInt64
+\def\title{Pair Sums}
 
 @* Introduction.
 Define the {\it value\/} of an array to be the sum, over every pair of positions

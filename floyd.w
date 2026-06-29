@@ -1,3 +1,5 @@
+@i types.w
+
 \def\title{Floyd's Partition Problem}
 
 @* Introduction.

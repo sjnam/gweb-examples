@@ -1,3 +1,5 @@
+@i types.w
+
 \input kotexgweb.tex
 \def\title{합성곱 (mod 998244353)}
 

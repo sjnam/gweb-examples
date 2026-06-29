@@ -1,3 +1,5 @@
+@i types.w
+
 @* Introduction.
 {\it Topswops\/} is a game of patience invented by John~H. Conway. Shuffle a
 packet of cards numbered $1$ through $n$ into a pile, face up, and then repeat

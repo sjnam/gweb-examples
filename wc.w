@@ -1,3 +1,5 @@
+@i types.w
+
 @* Introduction.
 This is the GWEB version of the classic \.{wc} word-counting program, modeled on
 the example that accompanies CWEB. It reads each file named on the command line

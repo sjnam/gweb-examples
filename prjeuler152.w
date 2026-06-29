@@ -1,3 +1,5 @@
+@i types.w
+
 \def\sq#1{{1\over#1^2}}
 
 @* Introduction. Project Euler Problem 152 asks:

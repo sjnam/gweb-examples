@@ -1,3 +1,5 @@
+@i types.w
+
 \input kotexgweb.tex
 \def\title{슬라이딩 윈도우 최댓값}
 

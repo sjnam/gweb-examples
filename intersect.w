@@ -1,3 +1,5 @@
+@i types.w
+
 \input kotexgweb.tex
 \def\title{순열의 교집합}
 

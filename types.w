@@ -1,0 +1,20 @@
+% constants
+@d Stdin
+@d Stdout
+@d Stderr
+@d ScanWords
+@d MinInt64
+
+% types
+@s T int
+@s B int
+@s Seq int
+@s Rat int
+@s Rand int
+@s Builder int
+@s Reader int
+@s Writer int
+@s Once int
+@s Context int
+@s WaitGroup int
+@s CancelFunc int

@@ -1,6 +1,6 @@
-\def\title{Lazy Sequences in Go}
+@i types.w
 
-@s Seq int
+\def\title{Lazy Sequences in Go}
 
 @* Introduction.
 This example builds a tiny library of {\it lazy sequences\/} and uses it to print

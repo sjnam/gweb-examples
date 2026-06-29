@@ -1,3 +1,5 @@
+@i types.w
+
 \def\title{Topswops, Forwards}
 
 @* Introduction.
