@@ -66,8 +66,8 @@ beginfig(1);
   numeric ya, yb;
   ya := -1.3*dy;  yb := -2.3*dy;
   drawarrow (8.7*dx, ya) -- (11.3*dx, ya);
-  label.top("Insert K", (10*dx, ya));
+  label.top(btex Insert K etex, (10*dx, ya));
   drawarrow (11.3*dx, yb) -- (8.7*dx, yb);
-  label.bot("Delete K", (10*dx, yb));
+  label.bot(btex Delete K etex, (10*dx, yb));
 endfig;
 end.
