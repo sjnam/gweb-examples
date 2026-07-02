@@ -9,11 +9,11 @@ of $n$ cards,
 $$f(n)=\hbox{the largest score among all $n!$ permutations of $\{1,\ldots,n\}$}$$
 --- but by opposite strategies. The companion runs the game {\it backwards\/} from
 its ending position; this one runs it {\it forwards\/}, and prunes hard. (For the
-rules of topswops and the meaning of a {\it score}, see \.{topswops.w}.) It is a Go
+rules of topswops and the meaning of a {\it score\/}, see \.{topswops.w}.) It is a Go
 transcription of Knuth's \.{CWEB} program \.{topswops-fwd.w}.
 
 The forward idea is bolder than the backward one. Rather than fix a starting deal
-and play it, we play with a deck whose cards are mostly {\it unknown}, deciding a
+and play it, we play with a deck whose cards are mostly {\it unknown\/}, deciding a
 card's value only at the moment the game first turns it face up on top. Each such
 decision is a branch in a search tree, and --- crucially --- a sharp upper bound
 lets us abandon most branches early. This is what lets the forward search reach
@@ -25,8 +25,9 @@ an explicit state machine with five labels: \.{advance} steps down to the next
 candidate slot; \.{tryit} picks a candidate and tests feasibility and the bound;
 \.{infeas} handles a rejected candidate, trying another slot or backing up;
 \.{backup} pops one level; and \.{nextv} moves on to the next candidate, restoring
-the saved deck. A snapshot |s[l]| of the deck and the running counts |d[l]|, |h[l]| are saved at
-each level so that backtracking is a plain assignment --- and here Go helps,
+the saved deck. A snapshot |s[l]| of the deck, the step count |d[l]|, and the
+boundary |h[l]| of the unknown region are saved at each level so that
+backtracking is a plain assignment --- and here Go helps,
 because its arrays are values: saving and restoring a deck is just |s[l] = a| and
 |a = s[l]|, where C needed an explicit copy. The array |profile| tallies how many
 nodes are visited at each depth, a useful gauge of how well the bound is working.
@@ -218,17 +219,20 @@ j = n - l
 goto advance
 
 @ A leaf gives us the {\it order\/} in which values were chosen, |p|, not the
-opening deal itself. To recover the deal we replay the game's flips in reverse onto
-a fresh placeholder deck |b|: each chosen value, fed back through the inverse flip,
-lands in the position it must have occupied at the start, filling in |bb|. We print
-the score, the reconstructed opening permutation, and (after \.{->\ 1}) the settled
-tail of the final deck as a check.
+opening deal itself. This score matches or beats every prior one, so first we
+raise the record and print it; then we start a fresh placeholder deck |b| to
+recover the opening deal from |p|.
 @<Reconstruct and print the winning deal@>=
 score[n] = c
 fmt.Printf("%d:", c)
 for k = 1; k <= n; k++ {
 	b[k-1] = -k
 }
+
+@ To recover the deal we replay the game's flips in reverse onto |b|: each
+chosen value, fed back through the inverse flip, lands in the position it must
+have occupied at the start, filling in |bb|.
+@<Reconstruct and print the winning deal@>=
 for k = 1; k <= n; k++ {
 	for b[0] > 0 {
 		j = b[0]
@@ -245,6 +249,10 @@ for k = 1; k <= n; k++ {
 	bb[-b[0]-1] = p[k-1]
 	b[0] = p[k-1]
 }
+
+@ Finally we print the reconstructed opening permutation, and (after
+\.{->\ 1}) the settled tail of the final deck as a check.
+@<Reconstruct and print the winning deal@>=
 for k = 0; k < n; k++ {
 	fmt.Printf(" %d", bb[k])
 }

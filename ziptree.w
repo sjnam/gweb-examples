@@ -68,7 +68,7 @@ type zipTree struct {
 
 @ 랭크는 {\it 평균 1인 기하분포}에서 뽑는다. 곧 랭크가 음이 아닌 정수 |k|일
 확률이 $1/2^{k+1}$이다($k=0$이 절반, $k=1$이 사분의 일, $\ldots$). 왜 하필 이
-분포일까? 노드의 갯수 |n|이 $2^{h+1}-1$개인 {\it 완전} 이진 트리에서 높이가 |k|인 노드의
+분포일까? 노드의 개수 |n|이 $2^{h+1}-1$개인 {\it 완전} 이진 트리에서 높이가 |k|인 노드의
 비율이 꼭 $1/2^{k+1}$이기 때문이다. 새 노드에 이 분포대로 ``높이''에 해당하는
 랭크를 매기고 랭크로 힙 순서를 지키면, 완전 트리의 층 구조를 기댓값으로 흉내 내게
 된다. 게다가 가장 큰 랭크조차 거의 확실히 $\lg n + O(1)$을 넘지 않아, 랭크를
@@ -263,8 +263,7 @@ func newArenaTree(rng *rand.Rand) *arenaTree {
 
 @ 노드를 만들 때는 비워 둔 슬롯이 있으면 거기에 덮어쓰고, 없으면 슬라이스를 한 칸
 늘린다. 삭제된 슬롯은 |free|에 쌓아 두었다가 재활용하므로, 쓰는 메모리는 {\it
-동시에 살아 있는} 노드 수에 비례하지 지금껏 넣은 총수에 비례하지 않는다. 랭크는
-바이트로 뽑고, 검색은 첨자를 따라가는 것 말고는 포인터판과 같다.
+동시에 살아 있는} 노드 수에 비례하지 지금껏 넣은 총수에 비례하지 않는다.
 @<인덱스 기반 아레나@>=
 func (t *arenaTree) alloc(key int32, rank uint8) int32 {
 	x := anode{key: key, left: nilIdx, right: nilIdx, rank: rank}
@@ -280,6 +279,8 @@ func (t *arenaTree) alloc(key int32, rank uint8) int32 {
 
 func (t *arenaTree) freeNode(i int32) { t.free = append(t.free, i) }
 
+@ 랭크는 바이트로 뽑는다. 뽑는 법 자체는 포인터판과 같다.
+@<인덱스 기반 아레나@>=
 func (t *arenaTree) randomRank() uint8 {
 	k := uint8(0)
 	for t.rng.Intn(2) == 1 {
@@ -288,6 +289,8 @@ func (t *arenaTree) randomRank() uint8 {
 	return k
 }
 
+@ 검색은 첨자를 따라가는 것 말고는 포인터판과 같다.
+@<인덱스 기반 아레나@>=
 func (t *arenaTree) Contains(key int32) bool {
 	for x := t.root; x != nilIdx; {
 		switch n := t.nodes[x]; {
@@ -335,6 +338,8 @@ func (t *arenaTree) insert(x, root int32) int32 {
 	return root
 }
 
+@ 바깥에서 부르는 |Insert|도 마찬가지다.
+@<인덱스 기반 아레나@>=
 func (t *arenaTree) Insert(key int32) {
 	if t.Contains(key) {
 		return
@@ -387,6 +392,7 @@ func (t *arenaTree) deleteNode(key, root int32) int32 {
 	return root
 }
 
+@ @<인덱스 기반 아레나@>=
 func (t *arenaTree) Delete(key int32) {
 	if !t.Contains(key) {
 		return
@@ -403,7 +409,7 @@ func (t *arenaTree) Delete(key int32) {
 키의 의사난수 함수로 매번 {\it 계산}하는 길(논문 4절)도 있는데, 이는 더 강한
 독립성 가정을 요구한다.
 
-@* 랭크를 저장하지 않기.
+@** 랭크를 저장하지 않기.
 방금 말한 ``한 걸음 더''를 실제로 디뎌 보자. 랭크는 무작위이기만 하면 되고 키마다
 {\it 고정}이면 되므로, 굳이 노드에 담지 않고 {\it 키의 의사난수 함수}로 그때그때
 계산해도 된다(Aragon과 Seidel의 착상, 논문 4절). 그러면 노드에서 랭크 필드가
@@ -492,7 +498,7 @@ func (t *prfTree) Insert(key int) {
 	t.root = t.insert(&pnode{key: key}, t.root)
 }
 
-@ 지핑과 삭제도 마찬가지로 |t.rank|를 부른다.
+@ 지핑은 |t.rank|를 부르는 것 말고는 저장-랭크판과 같다.
 @<의사난수 랭크 트리@>=
 func (t *prfTree) zip(x, y *pnode) *pnode {
 	if x == nil {
@@ -509,6 +515,8 @@ func (t *prfTree) zip(x, y *pnode) *pnode {
 	return x
 }
 
+@ 삭제도 마찬가지다.
+@<의사난수 랭크 트리@>=
 func (t *prfTree) deleteNode(key int, root *pnode) *pnode {
 	if key == root.key {
 		return t.zip(root.left, root.right)
@@ -529,6 +537,7 @@ func (t *prfTree) deleteNode(key int, root *pnode) *pnode {
 	return root
 }
 
+@ @<의사난수 랭크 트리@>=
 func (t *prfTree) Delete(key int) {
 	if !t.Contains(key) {
 		return
