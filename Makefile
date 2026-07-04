@@ -33,8 +33,6 @@ $(NAMES): %: %.go %.pdf
 	$(GTANGLE) $<
 
 # Weave + 조판: <name>.w -> <name>.tex -> <name>.pdf
-# 같은 이름의 <name>.mp 그림이 있으면 mpost로 <name>.1 을 만들어 둔다(supp-pdf의
-# \convertMPtoPDF 로 본문에 그대로 끼운다 — pdftex/luatex 양쪽에서 동작).
 %.pdf: %.w
 	$(GWEAVE) $<
 	@if [ -f $*.mp ]; then echo ">> mptopdf $*.mp"; mptopdf $*.mp; fi
