@@ -37,12 +37,12 @@ $(NAMES): %: %.go %.pdf
 # \convertMPtoPDF 로 본문에 그대로 끼운다 — pdftex/luatex 양쪽에서 동작).
 %.pdf: %.w
 	$(GWEAVE) $<
-	@if [ -f $*.mp ]; then echo ">> mpost $*.mp"; mpost $*.mp; fi
+	@if [ -f $*.mp ]; then echo ">> mptopdf $*.mp"; mptopdf $*.mp; fi
 	@if grep -q kotexgweb $<; then eng=luatex; else eng=pdftex; fi; \
 	echo ">> $$eng $*.tex"; $$eng $*.tex </dev/null
 
 # 원본(.w, .ch)만 남기고 모든 생성물(go/tex/pdf/로그·인덱스, 빌드된 실행파일) 삭제.
 clean:
 	rm -f *.go *.tex *.log *.toc *.pdf *.idx *.scn *.dvi *.out
-	rm -f *.1 *.mpx *.t1 *.mps   # MetaPost 산출물 (.mp 원본은 남김)
+	rm -f *.1 *-1.pdf *.mpx *.t1 *.mps   # MetaPost 산출물 (.mp 원본은 남김)
 	rm -f $(NAMES)

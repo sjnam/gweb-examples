@@ -3,7 +3,6 @@
 @s B int
 
 \input kotexgweb.tex
-\input supp-pdf
 \def\title{Zip Trees}
 \datethis
 
@@ -642,7 +641,7 @@ func checkInvariants(x *node, lo, hi, prank int, isLeft bool) string {
 \.{go test -v}로 돌리면 트리가 눈에 보인다.
 
 \medskip
-\centerline{\convertMPtoPDF{ziptree.1}{1}{1}}
+\centerline{\pdfpic{ziptree-1.pdf}}
 \centerline{그림 1: 랭크 3을 받은 키 \.{K}의 삽입(언지핑)과 삭제(지핑).}
 \medskip
 @<그림 1 재현 테스트@>=
