@@ -75,7 +75,9 @@ with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
   substrings. Korean (typeset with **luatex**).
 * [topswops.w](topswops.w) — Conway's *topswops* game, solved
   by A. Pepperdine's backward search (run the game in reverse from its ending
-  state). An essay-style port of Knuth's CWEB `topswops.w`.
+  state). A Korean literate essay retelling of Knuth's CWEB `topswops.w`, with
+  MetaPost figures (a sample game, and the complete backward search tree for
+  n=3) and a proof of Conway's halting argument. Typeset with **luatex**.
 * [topswops_fwd.w](topswops_fwd.w) — the same game solved
   *forwards*: a branch-and-bound search with placeholder cards and an `f(m)`
   pruning bound, written as a `goto` state machine. A port of Knuth's CWEB

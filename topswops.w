@@ -1,54 +1,107 @@
 @i types.w
 
-@* Introduction.
-{\it Topswops\/} is a game of patience invented by John~H. Conway. Shuffle a
-packet of cards numbered $1$ through $n$ into a pile, face up, and then repeat
-one move for as long as you can: read the number $k$ on the top card, and if
-$k>1$, turn the top $k$ cards over as a single block. The game ends the instant
-a~$1$ comes to the top.
+\input kotexgweb.tex
+\def\title{톱스웝스}
 
-With $n=3$, for instance, the deal $3\,1\,2$ plays out as
-$$3\,1\,2\;\longrightarrow\;2\,1\,3\;\longrightarrow\;1\,2\,3,$$
-ending after two flips. (First the top card~$3$ reverses all three cards; then
-the top card~$2$ reverses the top two, and the $1$ surfaces.)
+@* 들어가며.
+{\it 톱스웝스}(topswops)는 존 콘웨이(John H. Conway)가 고안한 혼자 하는 카드
+게임이다. 규칙은 딱 하나다. $1$부터 $n$까지 적힌 카드를 아무렇게나 섞어 숫자가
+보이게 쌓아 놓고, {\it 맨 위 카드의 숫자가 $k$이면($k>1$) 위에서 $k$장을
+통째로 한 덩어리로 뒤집는다}를 할 수 있을 때까지 되풀이한다. $1$이 맨 위에
+나타나면 게임 끝이다.
 
-A short argument of Conway's shows that the game always halts, so the number of
-flips it takes --- the {\it score\/} of the starting permutation --- is a
-well-defined number. The natural question is how large that score can get:
-$$f(n)=\hbox{the largest score among all $n!$ permutations of $\{1,\ldots,n\}$.}$$
-These numbers grow briskly. The first of them, $f(1),f(2),\ldots$, are
+백문이 불여일견이니 $n=3$, 시작 패 $3\,1\,2$로 한 판 두어 보자.
+
+\medskip
+\centerline{\pdfpic{topswops-1.pdf}}
+\smallskip
+\centerline{그림 1: $3\,1\,2$의 한 판. 색칠한 부분이 이번 수에 통째로 뒤집히는
+덩어리이고, 화살표의 숫자는 뒤집는 장수다.}
+\medskip
+
+맨 위가 $3$이니 석 장을 몽땅 뒤집어 $2\,1\,3$이 되고, 이제 맨 위가 $2$라 두
+장을 뒤집으면 $1$이 올라와서 끝. 두 수 만에 끝났으므로 시작 패 $3\,1\,2$의
+{\it 점수}(score)는 $2$라고 말한다.
+
+카드 뭉치를 위에서부터 덩어리째 뒤집는 놀이라니, {\it 팬케이크 정렬}이
+떠올랐다면 제대로 본 것이다. 접시에 쌓인 팬케이크를 주걱으로 위에서 몇 장씩
+뒤집어 크기순으로 만드는 그 문제는 빌 게이츠가 남긴 단 한 편의 학술 논문
+주제로 유명하다. 다만 톱스웝스는 성격이 다르다. 몇 장을 뒤집을지 내가 고르는
+게 아니라 맨 위 카드가 시키는 대로 해야 하니, 솜씨를 부릴 여지라곤 없이 처음
+패가 운명을 정하는 참을성(patience) 게임이다.
+
+게임이 반드시 끝난다는 것은 다음 절에서 보이기로 하고 일단 받아들이면, 모든
+시작 패는 저마다 점수를 가진다. 그러면 궁금한 것은 하나다. 점수는 얼마나
+커질 수 있을까?
+$$f(n)=\hbox{$\{1,\ldots,n\}$의 $n!$가지 순열 가운데 가장 큰 점수.}$$
+이 수는 성큼성큼 자란다. 첫 항 $f(1),f(2),\ldots$는
 $$0,\;1,\;2,\;4,\;7,\;10,\;16,\;22,\;30,\;38,\;51,\;65,\;80,\;101,\;113,\;114$$
-(this is sequence \.{A000375} in the {\sl On-Line Encyclopedia of Integer
-Sequences\/}), and they are known only for small~$n$.
+이고({\sl 온라인 정수열 사전}(OEIS)의 수열 \.{A000375}), 작은 $n$에서만 알려져
+있다. 심심풀이 게임치고는 어엿한 미해결 문제인 셈이다.
 
-@ How can we find $f(n)$, and a permutation that achieves it, without playing all
-$n!$ games? This program uses the elegant idea of A.~Pepperdine ({\sl
-Mathematical Gazette\/} {\bf 73} (1989), 131--133): {\it run the game
-backwards.}
+@ 게임이 반드시 끝난다는 콘웨이의 논증은 짧고 아름다워서 그냥 지나치기 아깝다.
+자리를 위에서부터 $1,2,\ldots,n$으로 세고, 카드 $k$가 자리 $k$에 있으면 그
+카드가 {\it 제자리}에 있다고 하자. 제자리 카드들의 번호를 모아
+$$N=\sum_{\hbox{제자리인 카드 }k}2^k$$
+을 만들면, 이 수는 한 수 둘 때마다 반드시 커진다. 왜 그런가. 맨 위 카드가
+$k>1$이라 위 $k$장을 뒤집으면 카드 $k$는 자리 $k$에 내려앉아 비트 $2^k$가 새로
+켜진다 --- 방금까지 $k$는 자리 $1$에 있었으니 분명 꺼져 있던 비트다. 자리
+$k$보다 아래는 손대지 않으니 더 큰 비트들은 그대로고, 위쪽 자리들에서 꺼지는
+비트를 다 합쳐도 $2^2+\cdots+2^{k-1}<2^k$이다. 얻는 쪽이 잃는 쪽보다 크다.
+$N$은 $2^{n+1}$ 아래에 갇힌 채 수마다 커지니 게임은 유한하다. 덤으로 점수가
+$2^{n+1}$을 넘지 못한다는 --- 후하디후한 --- 상계까지 공짜로 얻는다.
 
-Instead of starting from a deal and playing forward, start from the unique
-{\it ending\/} position --- a~$1$ on top --- and undo moves. Undoing one move at
-a time, in every possible way, grows a tree of permutations whose depth is
-exactly the score: a permutation reached at depth~$l$ is one from which the
-forward game takes exactly $l$ flips to finish. The deepest leaf we can reach
-therefore has score $f(n)$, and the search is a plain depth-first walk of that
-tree. It does no pruning, so it is simple to write but slows down sharply as $n$
-grows; here we take $n=15$.
+@* 거꾸로 풀기.
+$f(15)$가 알고 싶다고 $15!\approx1.3$조 가지 시작 패를 모두 두어 볼 수는 없는
+노릇이다. 이 프로그램이 쓰는 페퍼딘(A.~Pepperdine)의 발상은 이렇다({\sl
+Mathematical Gazette\/} {\bf 73} (1989), 131--133): 전진 게임의 골칫거리는
+출발점이 $n!$가지나 된다는 것인데, {\it 끝자리}는 어떤가? 규칙상 게임은 $1$이
+맨 위에 온 순간 끝나므로, 그 많은 판이 죄다 ``$1$이 맨 위''인 자리에서 끝난다.
+출발점은 조 단위인데 도착점은 사실상 하나. 그렇다면 도착점에 서서 {\it 게임을
+거꾸로 돌리자.}
 
-This is a Go transcription of Knuth's \.{CWEB} program \.{topswops.w}, which used
-a |goto|-driven backtrack. Go's arrays are values, not pointers, so the
-per-level snapshots that the original kept by hand are made for us, for free, by
-ordinary argument passing.
+마지막 수를 되돌리면 끝나기 한 수 전의 자리가 나온다. 되돌리는 방법이 여러
+가지면 자리도 여러 개 나오고, 각각에서 또 되돌리면 두 수 전의 자리들이 나온다.
+이렇게 끝자리를 뿌리로 삼는 나무가 자란다. 되돌리기 한 번은 전진 한 수와
+정확히 맞바뀌므로, 깊이 $l$에서 만나는 자리는 전진 게임이 정확히 $l$수 만에
+끝나는 자리, 곧 점수 $l$짜리 순열이다. 그러니 $f(n)$은 이 나무에서 가장 깊은
+잎의 깊이일 뿐이고, 탐색은 나무를 깊이 우선으로 걷는 것이 전부다.
 
-@ The search begins at the ending position: card~$1$ on top, every other position
-undecided, and nothing yet marked used. That permutation has score~$0$.
+\medskip
+\centerline{\pdfpic{topswops-2.pdf}}
+\smallskip
+\centerline{그림 2: $n=3$의 역방향 탐색 나무 전부. 간선의 숫자는 되돌린
+뒤집기의 장수다.}
+\medskip
+
+그림 2가 $n=3$의 나무 {\it 전부}다. 왼쪽 가지를 따라 내려가 보자. 뿌리는
+끝자리 ``$1\,\cdot\,\cdot$''인데, 점은 ``그 자리에 무슨 카드가 있는지 아직
+모름(정할 필요도 없었음)''이라는 뜻이다. 마지막 수가 {\it 두 장} 뒤집기였다고
+가정해 보자. 두 장을 뒤집으면 맨 위 카드가 위에서 둘째 자리로 가니, 그 수의
+주인공인 카드 $2$가 지금 둘째 자리에 있어야 한다. 마침 둘째 자리는 미정이므로
+``$2$가 있었다''고 정하면 되고, 위 두 장을 도로 뒤집으면 $2\,1\,\cdot$ ---
+점수 $1$짜리 자리다. 여기서 또 석 장 뒤집기를 되돌리면(셋째 자리가 미정이니
+$3$을 정해 넣고 도로 뒤집는다) $3\,1\,2$, 점수 $2$. 이제는 둘째 자리에 $2$도
+셋째 자리에 $3$도 없어 더 되돌릴 수 없으니 잎이다. 과연 그림 1에서 두 수
+버티던 바로 그 패다. 오른쪽 가지도 마찬가지로 읽으면, 가장 깊은 잎이 깊이
+$2$에 있으므로 $f(3)=2$.
+
+이 탐색은 가지치기를 전혀 하지 않는다. 그래서 짜기는 쉽지만 $n$이 커지면
+급격히 느려진다. 여기서는 원문대로 $n=15$를 쓴다. 가지치기로 무장하고 더 큰
+$n$을 노리는 {\it 전진} 탐색은 짝꿍 프로그램 \.{topswops\_fwd.w}가 맡는다.
+이 글은 Knuth의 \.{CWEB} 프로그램 \.{topswops.w}를 Go로 옮긴 것이다. 원문은
+|goto|로 짠 백트래킹이었지만, Go의 배열은 포인터가 아니라 값이어서 원문이 층층이
+손수 챙기던 스냅숏이 보통의 인자 전달만으로 공짜로 생긴다.
+
+@ 탐색은 끝자리에서 시작한다. 카드 $1$이 맨 위, 나머지 자리는 전부 미정,
+아직 어떤 카드도 쓰이지 않았다. 이 자리의 점수는 $0$이다.
 @c
 package main
 
 import "fmt"
 
-@<Data and global state@>@;
-@<The backward search@>@;
+@<자료와 전역 상태@>@;
+@<역방향 탐색@>@;
 
 func main() {
 	var start perm
@@ -56,48 +109,55 @@ func main() {
 	search(0, start, perm{})
 }
 
-@ The deck size~$n$ must be at most~$15$, so that a |perm| --- an array of $16$
-bytes, one spare --- can hold both a permutation and, elsewhere, a $0/1$ ``used''
-map. A value of~$0$ in a permutation means ``undecided.'' The global |best|
-remembers the greatest depth reached so far, so that we print a permutation only
-when its score sets a new record.
-@<Data and global state@>=
+@ 덱 크기 |n|은 $15$ 이하라야 한다. 그래야 $16$바이트 배열 |perm| 하나가
+순열을 담기에도(15칸에 한 칸 여유), 카드 값 $1\ldots15$를 첨자로 쓰는 $0/1$
+사용 표를 담기에도 알맞다. 순열에서 값 $0$은 ``미정''을 뜻한다. 전역 |best|는
+지금껏 도달한 최대 깊이를 기억해서, 신기록을 세우는 순열만 출력하게 해 준다.
+@<자료와 전역 상태@>=
 const n = 15
 type perm [16]byte
 var best = -1
 
-@ |search| is the heart of the matter. Its argument |cur| is a permutation of
-score~$l$; |used| flags the card values already committed. For every flip length
-$k+1$ that {\it could\/} have been the last forward move, it reconstructs the
-previous permutation and recurses one level deeper.
-@<The backward search@>=
+@ |search|가 이 프로그램의 심장이다. 인자 |cur|는 점수 $l$의 순열이고, |used|는
+이미 자리를 확정한 카드 값들의 표다. 마지막 전진 수가 ``$k+1$장 뒤집기''였을
+수 있는 모든 $k$에 대해 직전 순열을 복원하고 한 층 더 내려간다.
+@<역방향 탐색@>=
 func search(l int, cur, used perm) {
 	for k := 1; k < n; k++ {
-		@<Skip |k| unless flipping $k+1$ cards could have produced |cur|@>@;
-		@<Build the previous permutation |prev|@>@;
-		@<Note a record, then recurse@>@;
+		@<$k+1$장 뒤집기로 |cur|가 나올 수 없으면 건너뛴다@>@;
+		@<직전 순열 |prev|를 만든다@>@;
+		@<신기록이면 알리고, 한 층 더 판다@>@;
 	}
 }
 
-@* Undoing a flip.
-To walk backwards we must invert a forward move. Number the positions
-$0,1,\ldots,n-1$ from the top. A forward move on a permutation~$p$ whose top card
-is $v=p[0]$ reverses positions $0$ through $v-1$; afterwards the card that was on
-top, namely~$v$, sits at position $v-1$.
+@* 뒤집기 되돌리기.
+그림 2를 걸을 때 우리는 두 가지를 아무렇지 않게 해치웠다. ``이 수가 마지막
+수였을 수 있나''를 판정했고, 되었다 싶으면 패를 도로 뒤집었다. 이제 그 둘을
+정확히 따져 보자. 열쇠는 {\it 같은 구간을 두 번 뒤집으면 제자리}라는, 너무나
+당연해서 오히려 지나치기 쉬운 사실이다.
 
-Run that in reverse. Suppose the last forward move flipped the top $k+1$ cards
-(so $v=k+1$). Then the permutation~$prev$ {\it before\/} the move is obtained from
-the current permutation~$cur$ by reversing positions $0$ through~$k$ again, and
-its top card must be $k+1$. Because reversing sends the old top to position~$k$,
-this move could have produced~$cur$ only if
+지금부터는 프로그램과 맞춰 자리를 위에서부터 $0,1,\ldots,n-1$로 센다. 전진
+수는 맨 위 카드 $v=p[0]$을 읽어 자리 $0$부터 $v-1$까지를 반전하고, 그 결과
+맨 위에 있던 카드 $v$는 자리 $v-1$에 앉는다.
+
+이제 거꾸로. 어떤 자리 |cur|에서 ``마지막 수는 위 $k+1$장 뒤집기였다''고
+가정하면, 그 수의 주인공, 곧 직전 자리의 맨 위 카드는 $v=k+1$이었고 반전 뒤
+자리 $k$에 앉았다. 그러니 지금 |cur|의 자리 $k$에 카드 $k+1$이 있어야만 한다:
 $$cur[k]=k+1.$$
-That single equation is the whole feasibility test for ``the previous move
-flipped $k+1$ cards.''
+이 한 줄짜리 등식이 가능성 검사의 전부다. 검사를 통과했다면 되돌리기는 쉽다.
+반전은 두 번 하면 제자리이므로, 자리 $0$부터 $k$까지를 한 번 더 반전하면 직전
+순열이 고스란히 복원된다. 그 맨 위는 물론 $k+1$이다.
 
-@ Here is the feasibility test derived above. If position~$k$ is undecided we may
-commit it to $k+1$, unless that value is already spoken for; if it is decided, it
-must already equal $k+1$.
-@<Skip |k| unless flipping $k+1$ cards could have produced |cur|@>=
+그림 1을 {\it 오른쪽에서 왼쪽으로} 읽으면 이 모두가 눈에 보인다. $2\,1\,3$의
+마지막 수가 두 장 뒤집기였을 수 있을까? 그랬다면 자리 $1$에 카드 $2$가 있어야
+하는데 실제로는 $1$이 있다 --- 탈락. 석 장 뒤집기라면? 자리 $2$에 카드 $3$ ---
+있다! 위 석 장을 도로 뒤집으면 $3\,1\,2$, 과연 그림 1의 왼쪽 패다.
+
+@ 방금의 검사에 미정 자리라는 갈래 하나만 더하면 코드가 된다. 자리 $k$가
+미정이면 카드 $k+1$이 거기 있었다고 지금 정하면 된다 --- 단, 그 값이 이미
+다른 데 쓰였다면 안 된다. 자리 $k$가 정해져 있다면 그 값이 정확히 $k+1$일
+때만 통과다.
+@<$k+1$장 뒤집기로 |cur|가 나올 수 없으면 건너뛴다@>=
 switch {
 case cur[k] == 0:
 	if used[k+1] != 0 {
@@ -107,29 +167,33 @@ case cur[k] != byte(k+1):
 	continue
 }
 
-@* Partial permutations.
-A subtle economy makes the search far smaller. Many positions of a deal are never
-looked at before the game ends; their values cannot affect the score, so there is
-no reason to commit to them. We therefore work with {\it partial\/} permutations,
-writing a~$0$ for ``not yet decided,'' and we fill in a position only when undoing
-a move forces a specific card to have been there.
+@* 부분 순열.
+탐색을 눈에 띄게 줄여 주는 알뜰한 장치를 짚고 가자. 한 판이 진행되는 동안
+패의 많은 자리는 끝까지 한 번도 읽히지 않는다. 읽히지 않는 자리의 값은 점수에
+아무 영향을 주지 못하니, 미리 정해 두는 것은 낭비다. 그래서 우리는 ``아직
+미정''을 $0$으로 적는 {\it 부분} 순열을 다루고, 되돌리기가 특정 카드를 특정
+자리에 강요할 때에만 값을 채운다. 그림 2의 점들이 바로 이 $0$들이다.
 
-The only bookkeeping this needs is to avoid using one card value twice. A second
-array, |used|, records which values have already been placed as the top card of
-some earlier (deeper) state; position~$0$'s eternal~$1$ is implicit. When undoing
-a flip of $k+1$ cards we must put card $k+1$ on top, so:
+이 장치에 필요한 장부는 ``한 카드를 두 번 쓰지 말 것'' 하나뿐이다. 둘째 배열
+|used|가 어느 값이 이미 (더 깊은) 이전 자리의 맨 위 카드로 확정되었는지
+기록한다. 자리 $0$을 영원히 지키는 $1$은 굳이 적지 않는다. $k+1$장 뒤집기를
+되돌릴 때는 카드 $k+1$을 맨 위에 놓아야 하므로:
 
-\item{$\bullet$} if position~$k$ of~$cur$ is still undecided, we are free to say
-that card $k+1$ sat there --- {\it provided\/} $k+1$ has not been used elsewhere;
-\item{$\bullet$} if position~$k$ already holds a value, the move is reversible
-only when that value is exactly $k+1$.
+\smallskip
+\item{$\bullet$} |cur|의 자리 $k$가 아직 미정이면 카드 $k+1$이 거기 있었다고
+정해도 된다 --- 단, $k+1$이 다른 데 쓰이지 않았을 때만;
+\item{$\bullet$} 자리 $k$에 이미 값이 있으면, 그 값이 정확히 $k+1$일 때만
+되돌릴 수 있다.
+\smallskip
 
-\noindent A position left $0$ at the end is a genuinely free slot: any of the
-unused card values may go there.
+\noindent 끝까지 $0$으로 남은 자리는 진짜 자유석이다. 아직 쓰이지 않은 어느
+카드를 놓아도 점수는 같다.
 
-@ Reversing positions $0$ through~$k$ of~$cur$, and setting the recovered top card
-to $k+1$, yields the earlier permutation. Card $k+1$ is now used.
-@<Build the previous permutation |prev|@>=
+@ |cur|의 자리 $0$부터 $k$까지를 반전하고 맨 위를 $k+1$로 놓으면 직전 순열이
+된다. 자리 $k$가 미정($0$)이었을 수도 있으므로, 반전에 맡기지 않고 |prev[0]|에
+$k+1$을 직접 써 넣는다 --- 이것이 곧 ``카드 $k+1$이 있었다고 정한다''이다.
+카드 $k+1$은 이제 사용 중이다.
+@<직전 순열 |prev|를 만든다@>=
 prev := cur
 for j := 1; j <= k; j++ {
 	prev[j] = cur[k-j]
@@ -139,23 +203,28 @@ prev[0] = byte(k + 1)
 nextUsed := used
 nextUsed[k+1] = 1
 
-@ |prev| has score $l+1$. Whenever we first reach a new record depth we print the
-permutation that achieves it; then we keep digging.
-@<Note a record, then recurse@>=
+@ |prev|의 점수는 $l+1$이다. 새 기록 깊이에 처음 닿을 때마다 그 순열을
+출력하고, 계속 더 판다.
+@<신기록이면 알리고, 한 층 더 판다@>=
 if l >= best {
 	best = l
-	@<Report a record permutation@>@;
+	@<신기록 순열을 출력한다@>@;
 }
 search(l+1, prev, nextUsed)
 
-@ Finally, the reporter. It prints the score and the $n$ cards of a
-record-setting permutation; a~$0$ marks a free position, which the reader may fill
-with any unused value.
-@<Report a record permutation@>=
+@ 마지막으로 보고 담당이다. 신기록 순열의 점수와 카드 $n$장을 찍는데, $0$은
+자유석 표시니 남은 아무 카드나 채워 읽으면 된다. |n|을 $3$으로 줄여 돌리면
+\smallskip
+\centerline{\.{1: 2 1 0}\qquad\.{2: 3 1 2}\qquad\.{2: 2 3 1}}
+\smallskip
+\noindent 이 차례로 나온다 --- 그림 2의 나무를 왼쪽 가지부터 걸은 순서
+그대로다. $n=15$로 두면 한참을 달리며 기록을 차츰 갈아치우다 끝내
+$f(15)=113$에 다다른다.
+@<신기록 순열을 출력한다@>=
 fmt.Printf("%d:", l+1)
 for j := range n {
 	fmt.Printf(" %d", prev[j])
 }
 fmt.Println()
 
-@* Index.
+@* 찾아보기.
