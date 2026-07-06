@@ -1,6 +1,6 @@
 @i types.w
 
-\input kotexgweb.tex
+\input kotexgweb
 \def\title{접미 오토마톤}
 \def\itm#1 {\penalty-50\smallskip\hangindent 2em\noindent{#1}\unskip
   \quad}

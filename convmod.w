@@ -1,6 +1,6 @@
 @i types.w
 
-\input kotexgweb.tex
+\input kotexgweb
 \def\title{합성곱 (mod 998244353)}
 
 @* 들어가며.

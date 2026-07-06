@@ -1,6 +1,6 @@
 @i types.w
 
-\input kotexgweb.tex
+\input kotexgweb
 \def\title{흐르는 중앙값}
 
 @d Stdin

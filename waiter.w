@@ -1,6 +1,6 @@
 @i types.w
 
-\input kotexgweb.tex
+\input kotexgweb
 \def\title{웨이터}
 
 @* 들어가며.

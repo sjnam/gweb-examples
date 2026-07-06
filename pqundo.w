@@ -1,6 +1,6 @@
 @i types.w
 
-\input kotexgweb.tex
+\input kotexgweb
 \def\title{우선순위 큐 undo 트릭}
 
 @* 들어가며.

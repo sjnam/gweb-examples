@@ -1,4 +1,4 @@
-\input kotexgweb.tex
+\input kotexgweb
 
 @* 위에서 읽어 위로 뒤집어 얹는 놀이.
 {\it 톱스웝스\/}는 존 콘웨이(John H. Conway)가 고안한 혼자 하는 카드

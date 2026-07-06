@@ -2,7 +2,7 @@
 @s T int
 @s B int
 
-\input kotexgweb.tex
+\input kotexgweb
 \def\title{Zip Trees}
 \datethis
 
