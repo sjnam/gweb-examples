@@ -80,8 +80,9 @@ with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
   n=3) and a proof of Conway's halting argument. Typeset with **luatex**.
 * [topswops_fwd.w](topswops_fwd.w) — the same game solved
   *forwards*: a branch-and-bound search with placeholder cards and an `f(m)`
-  pruning bound, written as a `goto` state machine. A port of Knuth's CWEB
-  `topswops-fwd.w`.
+  pruning bound, written as a `goto` state machine. A Korean literate essay
+  retelling of Knuth's CWEB `topswops-fwd.w`, with MetaPost figures (the
+  five-label state machine, and the pruning bound). Typeset with **luatex**.
 * [trucktour.w](trucktour.w) — HackerRank's *Truck Tour* (the
   circular gas-station problem), solved in O(n) by a greedy single pass; the
   essay explains *why* one pass suffices. Korean (typeset with **luatex**).

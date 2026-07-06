@@ -1,58 +1,60 @@
-@i types.w
+\input kotexgweb
 
-\def\title{Topswops, Forwards}
+@* 앞으로 두되, 카드는 나중에 정한다.
+이 글은 \.{topswops.w}의 짝꿍이다. 두 프로그램이 계산하는 것은 같다 --- 콘웨이의
+{\it 톱스웝스\/} 게임이 $n$장짜리 덱에서 버틸 수 있는 최대 뒤집기 횟수
+$$f(n)=\hbox{$\{1,\ldots,n\}$의 $n!$가지 순열 가운데 가장 큰 점수}$$
+--- 지만 전략은 정반대다. 짝꿍은 게임의 {\it 끝\/}자리에서 거꾸로 걸었고, 이
+글은 {\it 앞으로\/} 두면서 사정없이 가지를 친다. (게임의 규칙과 점수가 무엇인지는
+\.{topswops.w}를 보라.) Knuth의 \.{CWEB} 프로그램 \.{topswops-fwd.w}를 Go로
+옮긴 것이다.
 
-@* Introduction.
-This is a companion to \.{topswops.w}. Both programs compute the same quantity ---
-the largest number of flips that Conway's {\it topswops\/} game can take on a deck
-of $n$ cards,
-$$f(n)=\hbox{the largest score among all $n!$ permutations of $\{1,\ldots,n\}$}$$
---- but by opposite strategies. The companion runs the game {\it backwards\/} from
-its ending position; this one runs it {\it forwards\/}, and prunes hard. (For the
-rules of topswops and the meaning of a {\it score\/}, see \.{topswops.w}.) It is a Go
-transcription of Knuth's \.{CWEB} program \.{topswops-fwd.w}.
+전진 발상은 역방향 발상보다 한층 대담하다. 시작 패를 정해 놓고 두는 것이
+아니라, 대부분이 {\it 백지\/}인 덱으로 게임을 두다가, 게임이 어떤 카드를 처음으로
+맨 위에 뒤집어 올리는 바로 그 순간에야 그 카드의 값을 정한다. 미리 다 정하지
+않고 꼭 필요해질 때 정하는, 말하자면 게으른 결정이다. 그런 결정 하나하나가
+탐색 나무의 가지가 되고 --- 결정적으로 --- 날카로운 상계 하나가 가지 대부분을
+일찍 포기하게 해 준다. 역방향 탐색보다 훨씬 큰 $n$까지 갈 수 있는 것은 이
+덕분이다. 원문은 $n=16$에서 돈다.
 
-The forward idea is bolder than the backward one. Rather than fix a starting deal
-and play it, we play with a deck whose cards are mostly {\it unknown\/}, deciding a
-card's value only at the moment the game first turns it face up on top. Each such
-decision is a branch in a search tree, and --- crucially --- a sharp upper bound
-lets us abandon most branches early. This is what lets the forward search reach
-much larger~$n$ than the backward one; the original runs at $n=16$.
+@* 탐색의 생김새.
+재귀는 원문 그대로 재귀 함수가 아니라 딱지(label) 다섯 개짜리 명시적 상태
+기계로 짰다. \.{advance}는 다음 후보 자리로 한 칸 내려가고, \.{tryit}은 후보
+하나를 골라 가능성과 상계를 검사하며, \.{infeas}는 퇴짜맞은 후보의 뒤처리(다른
+자리를 시도하거나 물러남)를, \.{backup}은 한 레벨 후퇴를, \.{nextv}는 저장해 둔
+덱을 복원하며 다음 후보로 넘어가는 일을 맡는다.
+\smallskip
+\centerline{\pdfpic{topswops_fwd-1.pdf}}
+\smallskip
+\centerline{그림 1: |main|의 상태 기계. \.{tryit}의 세 갈래(descend/leaf/reject)가
+탐색의 심장 박동이다.}
+\smallskip
+레벨마다 덱의 스냅숏 |s[l]|과 걸음 수 |d[l]|, 미지 영역의 경계 |h[l]|을 저장해
+두므로 백트래킹은 대입 한 번이면 된다 --- 여기서 Go가 도와준다. Go의 배열은
+값이어서 덱의 저장과 복원이 그저 |s[l] = a|와 |a = s[l]|이다. C였다면 명시적
+복사가 필요했다. 배열 |profile|은 깊이마다 방문한 노드 수를 세는데, 상계가
+얼마나 일을 잘하는지 가늠하는 좋은 잣대다.
 
-@ %* The shape of the search.
-The recursion is written, as in the original, not with a recursive function but as
-an explicit state machine with five labels: \.{advance} steps down to the next
-candidate slot; \.{tryit} picks a candidate and tests feasibility and the bound;
-\.{infeas} handles a rejected candidate, trying another slot or backing up;
-\.{backup} pops one level; and \.{nextv} moves on to the next candidate, restoring
-the saved deck. A snapshot |s[l]| of the deck, the step count |d[l]|, and the
-boundary |h[l]| of the unknown region are saved at each level so that
-backtracking is a plain assignment --- and here Go helps,
-because its arrays are values: saving and restoring a deck is just |s[l] = a| and
-|a = s[l]|, where C needed an explicit copy. The array |profile| tallies how many
-nodes are visited at each depth, a useful gauge of how well the bound is working.
-
-The whole search lives in |main|. After setting up the placeholder deck it threads
-through the five labelled states until it backs all the way out, then prints the
-node profile.
+탐색 전체는 |main| 안에 산다. 백지 덱을 차린 뒤 다섯 딱지 사이를 누비다가
+끝까지 물러나면 노드 통계를 찍는다.
 @c
 package main
 
 import "fmt"
 
-@<The known records, and the deck size@>@;
-@<The global search state@>@;
+@<알려진 기록들과 덱 크기@>@;
+@<전역 탐색 상태@>@;
 
 func main() {
 	var j, k, l, t, c int
-	@<Set up the placeholder deck and the first level@>@;
+	@<백지 덱과 첫 레벨을 차린다@>@;
 
 advance:
 	j--
 tryit:
-	@<Choose a candidate and reject it unless it can still beat the record@>@;
-	@<Play the game forward as far as the settled cards allow@>@;
-	@<At a leaf record a champion deal; otherwise descend one level@>@;
+	@<후보를 고르고, 기록을 넘볼 수 없으면 버린다@>@;
+	@<확정된 카드가 허락하는 데까지 앞으로 둔다@>@;
+	@<잎이면 우승 패를 기록하고, 아니면 한 층 내려간다@>@;
 infeas:
 	if j != 0 {
 		goto advance
@@ -60,39 +62,47 @@ infeas:
 backup:
 	l--
 nextv:
-	@<Step to the next candidate, or back up; at the root, finish@>@;
+	@<다음 후보로 가거나 물러난다; 뿌리면 끝낸다@>@;
 }
 
-@* The bound that makes it practical.
-Here is the key observation. At any node, the cards still unknown form, among
-themselves, a {\it smaller topswops puzzle}: whatever else happens, the flips still
-to come can number at most $f(m)$, where $m$ is how many cards remain unknown. So
-if |c| steps have been taken and the best deal found so far has score~$r$, then
-this node is worth pursuing only when
-$$c + f(m)\ \ge\ r.$$
-Otherwise no descendant can beat the record, and we prune the whole subtree.
+@* 실용을 만드는 상계.
+핵심 관찰은 이렇다. 어느 노드에서든 아직 백지인 카드들은 저희끼리 {\it 더 작은
+톱스웝스 퍼즐\/}을 이룬다. 앞으로 무슨 일이 벌어지든, 백지가 $m$장 남았다면
+남은 뒤집기는 많아야 $f(m)$번이다. 그러니 지금까지 |c|걸음을 걸었고 여태 찾은
+최고 기록이 $r$이라면, 이 노드를 파 볼 가치가 있는 것은
+$$c+f(m)\;\ge\;r$$
+일 때뿐이다. 아니라면 어떤 후손도 기록을 넘지 못하니, 부분 나무를 통째로
+버린다.
 
-The bound feeds on itself: the smaller answers $f(0),f(1),\ldots$ are exactly the
-table |score[0]|, |score[1]|, $\ldots$ that we know in advance. We seed |score|
-with the published values and keep |score[n]| as the running record~$r$, raising it
-each time a better leaf turns up. Tighter records prune harder, so good deals found early pay
-for themselves many times over.
+\medskip
+\centerline{\pdfpic{topswops_fwd-2.pdf}}
+\smallskip
+\centerline{그림 2: 걸어온 $c$걸음에 남은 최선 $f(m)$을 더해도 기록 $r$에 닿지
+못하면, 이 가지는 파 볼 가치가 없다.}
+\medskip
 
-@ The deck size~|n| is at most~$16$. The original uses $16$, whose search space is
-so vast the program effectively never finishes; lower |n| to watch it complete and
-to check the answers against the table below. |score| holds the known records
-$f(0),\ldots,f(16)$ (sequence \.{A000375}); $score[n]$ doubles as the current
-target, and $score[m]$ for $m<n$ is the pruning bound.
-@<The known records, and the deck size@>=
+이 상계는 제 몸을 먹고 자란다. 작은 답 $f(0),f(1),\ldots$가 바로 우리가 미리
+아는 표 |score[0]|, |score[1]|, $\ldots$이고, |score[n]|은 달리는 기록 $r$로
+삼아 더 좋은 잎이 나올 때마다 올린다. 기록이 빡빡할수록 가지치기가 매워지니,
+일찍 찾은 좋은 패는 제 밥값을 두고두고 한다.
+
+@ 덱 크기 |n|은 많아야 $16$이다. |score|는 수열 \.{A000375}의 값들로 미리
+채운다. $m\le15$인 $score[m]$은 확정된 $f(m)$이라 가지치기 상계 노릇을 하고,
+마지막 칸 $score[16]=114$는 확정값이 아니라 Knuth가 탐색을 출발시킬 때의 기록,
+곧 과녁이다. 실제로 $n=16$으로 돌리면 몇 초 만에 $118$짜리, $121$짜리 패를
+찾아내며 과녁을 갈아치우는 광경을 볼 수 있다 --- 오늘날 OEIS에는 $f(16)=139$로
+올라 있다. 다만 탐색 공간이 하도 넓어 완주는 사실상 불가능하다. |n|을 낮추면
+끝까지 도는 모습을 구경할 수 있다. 이를테면 $7$로 낮추면 금세 $f(7)=16$을
+찾아내고 끝난다.
+@<알려진 기록들과 덱 크기@>=
 var n int = 16
 var score = []int{0, 0, 1, 2, 4, 7, 10, 16, 22, 30, 38, 51, 65, 80, 101, 113, 114}
 
-@ The state machine carries its working storage in package-level arrays, so that a
-|goto| never jumps across a declaration. |a| is the live deck; |s[l]| snapshots it
-at level~|l|; |d[l]| and |h[l]| are the step count and the boundary of the unknown
-region saved there. |p| and |v| drive the candidate enumeration, and |b|, |bb|
-serve only when reconstructing a winning deal.
-@<The global search state@>=
+@ 상태 기계는 작업 저장소를 패키지 전역 배열로 든다. |goto|가 선언을 건너뛰는
+일이 없게 하기 위해서다. |a|는 살아 있는 덱이고, |s[l]|은 레벨 |l|의 스냅숏,
+|d[l]|과 |h[l]|은 거기 저장된 걸음 수와 미지 영역의 경계다. |p|와 |v|는 후보
+열거를 굴리고, |b|, |bb|는 우승 패를 복원할 때만 쓴다.
+@<전역 탐색 상태@>=
 var (
 	p, v, h, b, bb [16]int
 	s              [16][16]int
@@ -100,28 +110,25 @@ var (
 	d, profile     [16]int
 )
 
-@* A deck of placeholders.
-The deck |a| holds $n$ slots. A slot is either a {\it settled\/} card, a positive
-value in $1\ldots n$, or an {\it unknown}, a negative {\it placeholder\/} $-i$
-standing for ``the $i$th card we have not yet committed to.'' We start with
-everything unknown:
-$$a = (-1,\,-2,\,\ldots,\,-(n-1),\,0).$$
-Now play forward. To flip the top $v$ cards we need to know $v$, the top card's
-value; as long as the top is settled we keep flipping and counting steps. The
-moment an {\it unknown\/} card reaches the top, the game cannot proceed until we
-say what that card is --- so we stop and {\it branch}, trying each still-available
-value in turn. Committing a value may settle several cards at once (the flip that
-follows shuffles them into place), and the game runs on until the next unknown
-surfaces, or until a~$1$ appears and the game ends.
+@* 백지 카드 한 벌.
+덱 |a|에는 자리 $n$개가 있다. 자리 하나는 {\it 확정\/}된 카드, 곧 $1\ldots n$의
+양수이거나, {\it 백지\/}, 곧 ``아직 정체를 정하지 않은 $i$번째 카드''를 나타내는
+음수 $-i$다. 시작은 전부 백지다:
+$$a=(-1,\,-2,\,\ldots,\,-(n-1),\,0).$$
+이제 앞으로 둔다. 위 $v$장을 뒤집으려면 맨 위 카드의 값 $v$를 알아야 하니, 맨
+위가 확정 카드인 동안은 계속 뒤집으며 걸음을 센다. {\it 백지\/}가 맨 위로 올라오는
+순간 게임은 그 카드가 무엇인지 정하기 전에는 나아갈 수 없다 --- 그래서 멈춰
+서서 {\it 가지를 친다.\/} 아직 안 쓰인 값들을 차례로 하나씩 넣어 보는 것이다.
+값을 하나 정하면 그에 딸린 뒤집기가 여러 장을 한꺼번에 제자리에 앉히기도 하고,
+게임은 다음 백지가 올라오거나 $1$이 나타나 끝날 때까지 계속 굴러간다.
 
-A node of the search tree is thus a partially-decided deck together with the
-number of steps the game has taken so far; its children are the legal values for
-the unknown now on top. A leaf is a fully-decided deck --- a genuine starting
-permutation --- whose step count is a candidate for the record.
+그러니 탐색 나무의 노드는 부분적으로 정해진 덱과 지금껏 걸은 걸음 수의 짝이고,
+그 자식들은 맨 위에 올라온 백지에 넣어 볼 수 있는 값들이다. 잎은 전부 정해진
+덱 --- 진짜 시작 순열 --- 이고, 그 걸음 수가 기록의 도전자다.
 
-@ Initially every card is an unknown placeholder, the candidate pool |p| lists the
-values $2,3,\ldots,n,1$, and we are about to choose the top card of level~$1$.
-@<Set up the placeholder deck and the first level@>=
+@ 처음엔 카드가 모두 백지이고, 후보 풀 |p|는 값 $2,3,\ldots,n,1$을 늘어놓으며,
+우리는 레벨 $1$의 맨 위 카드를 고르기 직전이다.
+@<백지 덱과 첫 레벨을 차린다@>=
 for k = 1; k < n; k++ {
 	p[k-1] = k + 1
 	a[k-1] = -k
@@ -134,27 +141,25 @@ l = 1
 s[l] = a
 j = n - 1
 
-@* Enumerating the choices.
-When an unknown surfaces we must try every value not yet placed, each exactly once.
-The program does this with an inversion-table scheme of the kind Knuth uses for
-{\it genlex\/} permutation generation: the array |p| keeps the values chosen so far
-in $p[0\ldots l-1]$ and the still-available ones after them, the array |v| records,
-for each level, which candidate was taken, and moving from one candidate to the
-next costs a single swap. We never build a permutation from scratch; we edit the
-previous one. The details are terse --- this is faithful to Knuth's original --- but
-the effect is simple: at level |l| the loop sweeps an index |j| down through the
-remaining candidates, the feasibility-and-bound test filters them, and |v| and |p|
-let us undo a choice to reach the next.
+@* 후보를 하나씩 대 보기.
+백지가 올라오면 아직 놓이지 않은 값을 하나도 빠짐없이, 정확히 한 번씩 넣어
+봐야 한다. 프로그램은 이를 Knuth가 {\it genlex\/} 순열 생성에 쓰는
+역전표(inversion table)식 장부로 해낸다. 배열 |p|는 $p[0\ldots l-1]$에 여태
+고른 값들을, 그 뒤에 아직 남은 값들을 담고, 배열 |v|는 레벨마다 몇째 후보를
+골랐는지 적으며, 한 후보에서 다음 후보로 넘어가는 비용은 맞바꿈 한 번이다.
+순열을 매번 처음부터 짓지 않고 직전 것을 고쳐 쓰는 것이다. 세부는 간결한데
+--- 원문에 충실했다 --- 효과는 단순하다. 레벨 |l|에서 첨자 |j|가 남은 후보들을
+아래로 훑고, 가능성-상계 검사가 그들을 거르며, |v|와 |p| 덕에 선택을 물러
+다음 후보로 갈 수 있다.
 
-@ At |tryit| we take the next candidate value |k| from the pool. Two cheap tests
-can reject it without any work. First, a card may not be assigned the value of the
-placeholder now on top (that would make the move a no-op against itself). Second
-comes the branch-and-bound test of section~3: the unknown region has size |t| (or,
-in the boundary case |k == t|, size |k-t| after skipping the run of already-settled
-cards), and unless the steps so far plus the best the remainder could yield, $c +
-score[\cdot]$, can match the record, we give up on |k|. A surviving candidate is
-recorded in |v| and swapped to the front of the chosen prefix of |p|.
-@<Choose a candidate and reject it unless it can still beat the record@>=
+@ \.{tryit}에서 풀의 다음 후보 값 |k|를 집는다. 값싼 검사 둘이 일도 하기 전에
+후보를 떨굴 수 있다. 첫째, 지금 맨 위에 있는 백지의 번호와 같은 값은 줄 수
+없다(그 수는 저 자신을 상대로 한 헛수가 된다). 둘째가 3절의 분기한정 검사다.
+미지 영역의 크기는 |t|인데(경계 사례 |k == t|에서는 이미 확정된 연속 구간을
+건너뛴 |k-t|), 지금까지의 걸음에 남은 구간이 낼 수 있는 최선을 더한
+$c+score[\cdot]$가 기록에 못 미치면 |k|를 포기한다. 살아남은 후보는 |v|에
+적히고 |p|의 고른-앞부분으로 맞바꿔 들어간다.
+@<후보를 고르고, 기록을 넘볼 수 없으면 버린다@>=
 k = p[n-2-j]
 if k == -a[0] {
 	goto infeas
@@ -174,13 +179,12 @@ v[l] = j
 p[n-2-j] = p[l-1]
 p[l-1] = k
 
-@ Having committed the surfaced card to |k|, we play the game forward. Each pass
-flips the top |k| cards --- the old top moves to position $k-1$, the old position
-$k-1$ becomes the new top, and the cards between are reversed --- and then reads the
-new top. While that top is a settled (positive) value we keep going, counting a
-step each time; the instant it is an unknown ($\le 0$) we stop, the next branch
-point reached.
-@<Play the game forward as far as the settled cards allow@>=
+@ 올라온 카드를 |k|로 확정했으니 앞으로 둔다. 한 바퀴마다 위 |k|장을 뒤집는데
+--- 옛 맨 위는 자리 $k-1$로 가고, 옛 자리 $k-1$이 새 맨 위가 되며, 사이
+카드들은 반전된다 --- 그러고는 새 맨 위를 읽는다. 그 맨 위가 확정(양수)인
+동안은 걸음을 세며 계속 가고, 백지($\le0$)가 올라오는 순간 멈춘다. 다음
+분기점에 도착한 것이다.
+@<확정된 카드가 허락하는 데까지 앞으로 둔다@>=
 for {
 	a[0] = a[k-1]
 	a[k-1] = k
@@ -196,16 +200,15 @@ for {
 	c++
 }
 
-@ One node is now done. If we are at the deepest level, every card is settled and
-the deck is a real starting permutation; should its score |c| match or beat the
-record we record it (raising the bar for everyone after). Otherwise we descend:
-shrink the boundary |t| past the cards already in their final place, save the deck
-and counts for this new level, and loop back to |advance|.
-@<At a leaf record a champion deal; otherwise descend one level@>=
+@ 노드 하나가 끝났다. 가장 깊은 레벨이라면 카드가 모두 확정됐고 덱은 진짜 시작
+순열이다. 그 점수 |c|가 기록과 같거나 넘으면 기록해 둔다(그리고 뒤에 올 모두의
+눈높이를 올려놓는다). 아니면 내려간다. 이미 최종 자리에 앉은 카드들을 지나도록
+경계 |t|를 줄이고, 새 레벨의 덱과 계수들을 저장한 뒤 \.{advance}로 돈다.
+@<잎이면 우승 패를 기록하고, 아니면 한 층 내려간다@>=
 profile[l]++
 if l == n-1 {
 	if c >= score[n] {
-		@<Reconstruct and print the winning deal@>@;
+		@<우승 패를 복원해 출력한다@>@;
 	}
 	goto nextv
 }
@@ -218,21 +221,19 @@ h[l] = t
 j = n - l
 goto advance
 
-@ A leaf gives us the {\it order\/} in which values were chosen, |p|, not the
-opening deal itself. This score matches or beats every prior one, so first we
-raise the record and print it; then we start a fresh placeholder deck |b| to
-recover the opening deal from |p|.
-@<Reconstruct and print the winning deal@>=
+@ 잎이 주는 것은 값들을 {\it 고른 순서\/} |p|이지 시작 패 자체가 아니다. 이
+점수는 지금까지의 어느 기록에도 뒤지지 않으니, 먼저 기록을 올리고 점수를 찍은
+다음, 시작 패를 복원할 새 백지 덱 |b|를 차린다.
+@<우승 패를 복원해 출력한다@>=
 score[n] = c
 fmt.Printf("%d:", c)
 for k = 1; k <= n; k++ {
 	b[k-1] = -k
 }
 
-@ To recover the deal we replay the game's flips in reverse onto |b|: each
-chosen value, fed back through the inverse flip, lands in the position it must
-have occupied at the start, filling in |bb|.
-@<Reconstruct and print the winning deal@>=
+@ 패를 복원하려면 게임의 뒤집기들을 |b| 위에 거꾸로 재생한다. 고른 값 하나하나가
+역뒤집기를 타고 저마다 시작 때 있었어야 할 자리에 내려앉아 |bb|를 채운다.
+@<우승 패를 복원해 출력한다@>=
 for k = 1; k <= n; k++ {
 	for b[0] > 0 {
 		j = b[0]
@@ -250,9 +251,9 @@ for k = 1; k <= n; k++ {
 	b[0] = p[k-1]
 }
 
-@ Finally we print the reconstructed opening permutation, and (after
-\.{->\ 1}) the settled tail of the final deck as a check.
-@<Reconstruct and print the winning deal@>=
+@ 끝으로 복원한 시작 순열을 찍고, 검산 삼아 (\.{->\ 1} 뒤에) 마지막 덱의 확정된
+꼬리도 찍는다.
+@<우승 패를 복원해 출력한다@>=
 for k = 0; k < n; k++ {
 	fmt.Printf(" %d", bb[k])
 }
@@ -262,14 +263,13 @@ for k = 1; k < n; k++ {
 }
 fmt.Printf("\n")
 
-@ The |infeas| and |backup| labels in |main| handle the two ways forward progress
-can stall: a rejected candidate (try the next slot, or back up if none remain) and
-the end of a level (pop). The |nextv| state ties them together. If this level's
-candidates are exhausted ($v[l]=0$) we undo its swap and back up further; otherwise
-we restore the saved deck and the previous swap and jump to |tryit| with the next
-candidate. When the backing-up reaches the root, the search is over and we print the
-node counts.
-@<Step to the next candidate, or back up; at the root, finish@>=
+@ |main|의 \.{infeas}와 \.{backup} 딱지는 전진이 멎는 두 경우를 처리한다. 후보가
+퇴짜맞은 경우(다음 자리를 시도하고, 남은 자리가 없으면 물러난다)와 한 레벨이
+끝난 경우(팝)다. \.{nextv} 상태가 그 둘을 묶는다. 이 레벨의 후보가
+바닥났으면($v[l]=0$) 그 맞바꿈을 무르고 더 물러나고, 아니면 저장해 둔 덱과 직전
+맞바꿈을 복원해 다음 후보와 함께 \.{tryit}으로 뛴다. 물러나기가 뿌리에 닿으면
+탐색이 끝난 것이니, 깊이마다 몇 개의 노드를 방문했는지 찍는다.
+@<다음 후보로 가거나 물러난다; 뿌리면 끝낸다@>=
 if v[l] == 0 {
 	t = p[l-1]
 	p[l-1] = p[n-2]
@@ -285,7 +285,7 @@ if l != 0 {
 	goto tryit
 }
 for k = range n {
-	fmt.Printf("%9d nodes at level %d.\n", profile[k], k)
+	fmt.Printf("깊이 %2d: 노드 %9d개\n", k, profile[k])
 }
 
-@* Index.
+@* 찾아보기.
