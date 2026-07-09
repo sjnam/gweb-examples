@@ -1,8 +1,10 @@
 @i types.w
-@s T int
-@s B int
+@s testing.T int
+@s testing.B int
 
 \input kotexgweb
+\input pdfpic
+
 \def\title{Zip Trees}
 \datethis
 
