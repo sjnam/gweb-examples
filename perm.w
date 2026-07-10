@@ -75,7 +75,7 @@ func NewDefaultGenerator() *PermutationGenerator {
 \+$S\leftarrow\{\}$\cr
 \+$size\leftarrow0$\cr
 \+\bf while $size<m$ do\cr
-\+\quad&$t\leftarrow{\it rand\_int}(1,n)$\cr
+\+\quad&$t\leftarrow{\it rand\_int\/}(1,n)$\cr
 \+&\bf if $t\not\in S$ then\cr
 \+&\quad& insert $t$ in $S$\cr
 \+&&$size\leftarrow size+1$\cr}
@@ -89,12 +89,12 @@ Floyd는 전혀 다른 생각을 한다. $N$이 10이고 $M$이 5라고 하자. 
 그러면 같은 방식으로 1에서 8까지에서 3개를 뽑고나서 9를 적절히 추가한다. 즉 재귀 알고리즘이 되는데 형태는 다음과 같다.
 \begindisplay
 \vbox{
-\+\bf function ${\it sample}(m,n)$\cr
+\+\bf function ${\it sample\/}(m,n)$\cr
 \+\quad& \bf if $m=0$ then\cr
 \+&\quad&{\bf return} $\{\}$\cr
 \+&\bf else\cr
-\+&& $S\leftarrow{\it sample}(m-1,n-1)$\cr
-\+&& $t\leftarrow{\it rand\_int}(1,n)$\cr
+\+&& $S\leftarrow{\it sample\/}(m-1,n-1)$\cr
+\+&& $t\leftarrow{\it rand\_int\/}(1,n)$\cr
 \+&&\bf if $t \not\in S$ then\cr
 \+&&\quad&insert $t$ in $S$\cr
 \+&&\bf else\cr

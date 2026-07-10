@@ -28,6 +28,10 @@ with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
   √1…√50 into two nearly-equal halves. A worked literate solution
   (meet-in-the-middle search, Gray-code enumeration, compensated summation, and
   a `math/big` verification).
+* [intersect.w](intersect.w) — Codeforces 1093E *Intersection
+  of Permutations*: each value becomes a 2-D point, reducing the queries to
+  rectangle counting with point updates — a **Fenwick tree of Fenwick trees**
+  with offline coordinate compression. Korean (typeset with **luatex**).
 * [pairsums.w](pairsums.w) — HackerRank's *Pair Sums*: the
   largest pair-product sum over all subarrays. The identity value = (S²−Q)/2
   and a prefix-sum twist turn it into the upper envelope of a family of lines,
@@ -43,6 +47,8 @@ with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
   pipeline worlds: lazy `iter.Seq` transforms and a fan-out of channel workers,
   joined by two boundary adapters, with first-error cancellation flowing across
   both. Uses range-over-func and a pocket `errgroup`.
+* [pmap.w](pmap.w) — a generic concurrent `map` over a slice,
+  exercising generics, goroutines, channels, and `sync.WaitGroup`.
 * [poison.w](poison.w) — HackerRank's *Poisonous Plants*:
   how many days until no plant dies, in O(n) with an increasing stack that gives
   each plant its day of death. Korean (typeset with **luatex**).

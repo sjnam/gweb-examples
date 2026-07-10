@@ -1,4 +1,5 @@
 \input kotexgweb
+\input pdfpic
 
 @* 앞으로 두되, 카드는 나중에 정한다.
 이 글은 \.{topswops.w}의 짝꿍이다. 두 프로그램이 계산하는 것은 같다 --- 콘웨이의
