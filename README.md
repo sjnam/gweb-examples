@@ -32,6 +32,13 @@ with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
   largest pair-product sum over all subarrays. The identity value = (S²−Q)/2
   and a prefix-sum twist turn it into the upper envelope of a family of lines,
   solved with a **Li Chao tree** in O(n log n).
+* [perm.w](perm.w) — **Floyd's random-sampling algorithm**
+  (from Bentley's *More Programming Pearls*): draw M distinct integers from
+  1…N uniformly in O(M), every subset equally likely, without the collision
+  retries of the naive approach. A Korean literate essay building a small
+  `perm` library (plus a channel-based generator) with an extensive
+  `@(perm_test.go@>` suite — properties, reproducibility, distribution, and
+  benchmarks. Typeset with **luatex**.
 * [pipeline.w](pipeline.w) — a tutorial that bridges Go's two
   pipeline worlds: lazy `iter.Seq` transforms and a fan-out of channel workers,
   joined by two boundary adapters, with first-error cancellation flowing across

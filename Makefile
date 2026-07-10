@@ -39,8 +39,10 @@ $(NAMES): %: %.go %.pdf
 	@if grep -q kotexgweb $<; then eng=luatex; else eng=pdftex; fi; \
 	echo ">> $$eng $*.tex"; $$eng $*.tex </dev/null
 
-# 원본(.w, .ch)만 남기고 모든 생성물(go/tex/pdf/로그·인덱스, 빌드된 실행파일) 삭제.
+# 생성물만 삭제한다. 소스(.w, .ch, .mp, 그리고 손으로 쓴 pdfpic.tex 같은 .tex)는
+# 남긴다. 특히 woven 출력만 골라 지운다: `*.tex`로 싹 지우면 pdfpic.tex 같은 소스
+# .tex 까지 날아가므로, .w 에 대응하는 <name>.tex 만 지운다.
 clean:
-	rm -f *.go *.tex *.log *.toc *.pdf *.idx *.scn *.dvi *.out
+	rm -f *.go $(WFILES:.w=.tex) *.log *.toc *.pdf *.idx *.scn *.dvi *.out
 	rm -f *.1 *-1.pdf *.2 *-2.pdf *.mpx *.t1 *.mps   # MetaPost 산출물 (.mp 원본은 남김)
 	rm -f $(NAMES)
