@@ -1,5 +1,5 @@
 \input kotexgweb
-\input pdfpic
+\input pic
 
 \def\title{TOPSWOPS\_\,FWD}
 
@@ -27,7 +27,7 @@ $$f(n)=\hbox{$\{1,\ldots,n\}$의 $n!$가지 순열 가운데 가장 큰 점수}$
 자리를 시도하거나 물러남)를, \.{backup}은 한 레벨 후퇴를, \.{nextv}는 저장해 둔
 덱을 복원하며 다음 후보로 넘어가는 일을 맡는다.
 \smallskip
-\centerline{\pdfpic{topswops_fwd-1.pdf}}
+\centerline{\pic{topswops_fwd-1.pdf}}
 \smallskip
 \centerline{그림 1: |main|의 상태 기계. \.{tryit}의 세 갈래(descend/leaf/reject)가
 탐색의 심장 박동이다.}
@@ -78,7 +78,7 @@ $$c+f(m)\;\ge\;r$$
 버린다.
 
 \medskip
-\centerline{\pdfpic{topswops_fwd-2.pdf}}
+\centerline{\pic{topswops_fwd-2.pdf}}
 \smallskip
 \centerline{그림 2: 걸어온 $c$걸음에 남은 최선 $f(m)$을 더해도 기록 $r$에 닿지
 못하면, 이 가지는 파 볼 가치가 없다.}
