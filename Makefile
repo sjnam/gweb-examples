@@ -44,5 +44,5 @@ $(NAMES): %: %.go %.pdf
 # .tex 까지 날아가므로, .w 에 대응하는 <name>.tex 만 지운다.
 clean:
 	rm -f *.go $(WFILES:.w=.tex) *.log *.toc *.pdf *.idx *.scn *.dvi *.out
-	rm -f *.1 *-1.pdf *.2 *-2.pdf *.mpx *.t1 *.mps   # MetaPost 산출물 (.mp 원본은 남김)
+	rm -f *.[0-9]* *.mpx *.mps
 	rm -f $(NAMES)
