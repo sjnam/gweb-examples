@@ -1,7 +1,6 @@
 @i types.w
 
 \input kotexgweb
-\def\title{웨이터}
 
 @* 들어가며.
 해커랭크의 {\it 웨이터\/} 문제다. 번호가 적힌 접시 여러 개가 하나의 더미에 쌓여

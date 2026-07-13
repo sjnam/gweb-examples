@@ -1,7 +1,7 @@
 @i types.w
 
 \input kotexgweb
-\def\title{우선순위 큐 undo 트릭}
+\def\title{우선순위 큐 UNDO 트릭}
 
 @* 들어가며.
 코드포스 603E 문제다. 정점 |n|개의 그래프에 가중치 간선이 하나씩 |m|번 더해진다.

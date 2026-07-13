@@ -5,7 +5,7 @@
 \input kotexgweb
 \input pdfpic
 
-\def\title{Zip Trees}
+\def\title{ZIP TREE}
 \datethis
 
 @** 들어가며.

@@ -1,6 +1,6 @@
 @i types.w
 
-\def\title{Pair Sums}
+\def\title{PAIR SUMS}
 
 @* Introduction.
 Define the {\it value\/} of an array to be the sum, over every pair of positions

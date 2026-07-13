@@ -1,6 +1,8 @@
 \input kotexgweb
 \input pdfpic
 
+\def\title{TOPSWOPS\_\,FWD}
+
 @* 앞으로 두되, 카드는 나중에 정한다.
 이 글은 \.{topswops.w}의 짝꿍이다. 두 프로그램이 계산하는 것은 같다 --- 콘웨이의
 {\it 톱스웝스\/} 게임이 $n$장짜리 덱에서 버틸 수 있는 최대 뒤집기 횟수
