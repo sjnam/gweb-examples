@@ -8,7 +8,7 @@ at a different job.
 
 The first is the {\it sequential, lazy\/} world of {\bf iterators}. Since Go~1.23 a
 function can be ranged over with |for v := range s|, and a chain of |map| and
-|filter| stages composes into a single pull-driven loop --- no buffering, no
+|filter| stages composes into a single pull-driven loop---no buffering, no
 goroutines, nothing computed until the consumer asks for it. It is wonderfully
 simple to reason about, but it runs on one thread.
 
@@ -116,7 +116,7 @@ func withContext(ctx context.Context) (*errGroup, context.Context) {
 }
 
 @ |Go| launches a worker. If it returns an error, |once| ensures that only the very
-first failure is recorded and only it cancels the context --- later failures (often
+first failure is recorded and only it cancels the context---later failures (often
 just |ctx.Err()| from the cancellation itself) are ignored. |Wait| blocks for all
 workers, then cancels so nothing is left running, and reports the saved error.
 (|wg.Go| is the Go~1.25 shorthand for ``add one, run the function, mark done.'')
@@ -157,7 +157,7 @@ func seqToChan[V any](ctx context.Context, s iter.Seq[V]) <-chan V {
 }
 
 @ |chanToSeq| goes the other way, presenting a channel as a cancellable
-|iter.Seq| --- the ``or-done'' pattern. The returned sequence yields values as they
+|iter.Seq|---the ``or-done'' pattern. The returned sequence yields values as they
 arrive, and ends when either the channel closes or the |done| signal fires, so the
 downstream sequential transforms can simply range over it.
 @<The two boundary adapters@>=
@@ -178,7 +178,7 @@ func chanToSeq[V any](done <-chan struct{}, c <-chan V) iter.Seq[V] {
 
 @* The parallel stage.
 |parallelMap| is the expensive middle of the pipeline. It starts |workers|
-goroutines that all range over the same input channel |in| --- that shared receive
+goroutines that all range over the same input channel |in|---that shared receive
 is the {\it fan-out}: whichever worker is free grabs the next job. Each applies
 |work| and forwards the result on |out|, and the error group ties their fates
 together.
@@ -267,7 +267,7 @@ func run(label string, failOn int) {
 }
 
 @ The source is purely sequential: the ids $1\ldots12$ with the multiples of five
-removed. Being an |iter.Seq|, nothing here runs yet --- it is a recipe the feeder
+removed. Being an |iter.Seq|, nothing here runs yet---it is a recipe the feeder
 will pull on.
 @<Build the input sequence@>=
 ids := filterSeq(mapSeq(count(12), func(i int) int { return i + 1 }),
@@ -283,7 +283,7 @@ out, errc := parallelMap(ctx, 4, jobs, func(ctx context.Context, id int) (Result
 
 @ Crossing back, |chanToSeq| presents the results as a sequence again, so a final
 sequential |filterSeq| keeps only the high scores. Ranging over |kept| is what
-actually drives the entire machine --- pulling here pulls jobs through the workers,
+actually drives the entire machine---pulling here pulls jobs through the workers,
 which pulls values from the feeder, which pulls the source iterator. Results arrive
 in worker-completion order, so we sort before reporting.
 @<Filter and collect the results@>=
@@ -305,7 +305,7 @@ fmt.Printf("    kept %d results: %v\n", len(got), got)
 The happy path lets every document succeed: with four workers and about nine jobs
 the scoring takes roughly three rounds of 100\thinspace ms. The cancel path makes
 document~7 fail; its error cancels the context, the other workers and the feeder
-stop where they are, and the run ends early --- a first-error shutdown rippling
+stop where they are, and the run ends early---a first-error shutdown rippling
 across both worlds.
 @<Entry point@>=
 func main() {
