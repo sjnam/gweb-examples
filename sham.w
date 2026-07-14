@@ -1,4 +1,4 @@
-@i ../../types.w
+@i types.w
 \datethis
 
 @* Symmetric Hamiltonian Cycles.
