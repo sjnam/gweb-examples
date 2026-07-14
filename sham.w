@@ -1,4 +1,4 @@
-@i types.w
+@i ../../types.w
 
 \def\title{Symmetric Hamiltonian Cycles}
 
@@ -30,9 +30,9 @@ package main
 import (
 	"fmt"
 	"log"
-@#
-	gbbasic "github.com/sjnam/go-sgb/gb-basic"
-	gbgraph "github.com/sjnam/go-sgb/gb-graph"
+	@#
+	"github.com/sjnam/go-sgb/gbbasic"
+	"github.com/sjnam/go-sgb/gbgraph"
 )
 
 // We use the GraphBase types directly, under shorter names.
@@ -81,7 +81,7 @@ N := g.N
 for i := int64(0); N-1-i > i; i++ {
 	v := &g.Vertices[i]
 	for a := range v.AllArcs() {
-		tip := gbgraph.VertexIndex(g, a.Tip)
+		tip := g.Index(a.Tip)
 		u := N - 1 - tip // index of the tip's mate
 		if u > tip {
 			a.Len = 0
@@ -126,7 +126,7 @@ n := int(g.N)
 deg := make([]int64, n)
 taken := make([]bool, n)
 ark := make([]*Arc, n)
-id := func(v *Vertex) int { return int(gbgraph.VertexIndex(g, v)) }
+id := func(v *Vertex) int { return int(g.Index(v)) }
 
 @<Remove self-loops@>
 
@@ -209,7 +209,7 @@ done:
 @<Set up the search state@>=
 n := int(g.N)
 tmax := n - 1
-id := func(v *Vertex) int { return int(gbgraph.VertexIndex(g, v)) }
+id := func(v *Vertex) int { return int(g.Index(v)) }
 var v, u *Vertex
 var aa, yy *Arc
 var d int64
