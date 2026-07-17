@@ -51,8 +51,8 @@ SAM의 상태는 부분문자열들을 {\it 끝위치 집합\/}(endpos)으로 �
 @<상태와 자동자@>=
 type state struct {
 	length int          // 이 상태가 품은 가장 긴 문자열의 길이
-	link   int          // 접미 링크 (시작 상태는 -1)
-	next   map[byte]int // 글자 -> 다음 상태
+	link   int          // 접미 링크 (시작 상태는 $-1$)
+	next   map[byte]int // 글자 $\rightarrow$ 다음 상태
 }
 
 type sam struct {
