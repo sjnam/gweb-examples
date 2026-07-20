@@ -17,9 +17,6 @@ directory at once would make Go refuse to compile (`main` redeclared).
 The TeX engine is chosen automatically — **luatex** for Korean documents (those
 with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
 
-* [convmod.w](convmod.w) — Library Checker's *Convolution
-  (mod 998244353)*: polynomial multiplication in O(n log n) via the **number
-  theoretic transform** (NTT). Korean (typeset with **luatex**).
 * [fast_cancel.w](fast_cancel.w) — It shows a complementary pattern
   useful in any concurrent Go program: how to propagate a first-error signal to all
   sibling goroutines cleanly.
@@ -32,6 +29,15 @@ with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
   of Permutations*: each value becomes a 2-D point, reducing the queries to
   rectangle counting with point updates — a **Fenwick tree of Fenwick trees**
   with offline coordinate compression. Korean (typeset with **luatex**).
+* [ntt.w](ntt.w) — a friendly guide to the **fast Fourier
+  transform** and its integer cousin, the **number theoretic transform**: the
+  evaluate–multiply–interpolate detour, why squaring folds the roots of unity
+  so the problem halves, bit reversal and the butterfly network, the inverse
+  transform, what NTT actually needs from a ring (and why
+  998244353 = 119·2²³+1), and the surprising history from Gauss (1805) to
+  Harvey–van der Hoeven (2021). Three MetaPost figures. The working program it
+  builds toward solves Library Checker's *Convolution (mod 998244353)* —
+  polynomial multiplication in O(n log n). Korean (**luatex**).
 * [pairsums.w](pairsums.w) — HackerRank's *Pair Sums*: the
   largest pair-product sum over all subarrays. The identity value = (S²−Q)/2
   and a prefix-sum twist turn it into the upper envelope of a family of lines,
