@@ -2,6 +2,14 @@
 % insertion and deletion of key K (assigned rank 3).
 % Companion figure for ziptree.w; build with: mptopdf ziptree.mp  (-> ziptree-1.pdf)
 
+% mptopdf runs mpost with --tex=latex, so a LaTeX preamble here lets
+% btex...etex carry Korean (and spaces, which bare cmr10 labels cannot).
+verbatimtex
+\documentclass{article}
+\usepackage{kotex}
+\begin{document}
+etex
+
 beginfig(1);
   numeric dx, dy, rr, xs;
   dx := 15; dy := 26; rr := 7.5; xs := 12*dx;
@@ -66,8 +74,8 @@ beginfig(1);
   numeric ya, yb;
   ya := -1.3*dy;  yb := -2.3*dy;
   drawarrow (8.7*dx, ya) -- (11.3*dx, ya);
-  label.top(btex Insert K etex, (10*dx, ya));
+  label.top(btex $K$ 삽입 etex, (10*dx, ya));
   drawarrow (11.3*dx, yb) -- (8.7*dx, yb);
-  label.bot(btex Delete K etex, (10*dx, yb));
+  label.bot(btex $K$ 삭제 etex, (10*dx, yb));
 endfig;
 end.
