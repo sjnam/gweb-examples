@@ -144,45 +144,6 @@ and every PDF here is generated, so you will not find one until you build it.
   Figure 1 exactly, cross-checks all three representations, fuzz-checks the
   BST/heap invariants, and benchmarks allocations. Korean (typeset with
   **luatex**).
-
-### Korean (and other non-English) documentation
-
-The woven output can be written in Korean by processing it with **`luatex`**
-(not `pdftex`) and putting one line in the `.w` file's limbo:
-
-```tex
-\input kotexgweb
-```
-
-`kotexgweb.tex` ships with [GWEB](https://github.com/sjnam/gweb) itself, not with
-these examples; installing GWEB puts it on your `TEXINPUTS`. It loads
-[luatexko](https://ctan.org/pkg/luatexko) and selects the Noto Serif/Sans CJK KR
-fonts (edit the `\sethangulfont` lines to change typefaces), translates gweave's
-fixed wording into Korean, and supplies a LuaTeX PDF back end so that blue
-cross-reference links and the PDF outline (bookmark) pane work, with Korean
-bookmark titles. Then:
-
-```sh
-gweave foo.w           # -> foo.tex
-luatex foo.tex         # -> foo.pdf   (kotexgweb.tex on TEXINPUTS)
-```
-
-gweave needs no flag; all the human-readable text it emits goes through macros
-(`\GU`, `\GNused`, `\Gsectionword`, …) that `kotexgweb.tex` overrides, so the same
-mechanism localizes to any language — write your own `\input` file modelled on it.
-
-## Collections
-
-Everything above is a standalone `.w` in this directory. The two subdirectories
-below are different: each is a *collection* of programs circling one technique,
-with its own `README.md` (Korean), `Makefile`, and `go.mod`. Build them from
-inside the directory, not with the top-level Makefile:
-
-```sh
-cd cht && make          # tangle + typeset all four
-make tangle             # just the .go, if you only want to run them
-```
-
 * [cdq-dc/](cdq-dc/) — **CDQ divide and conquer**, the offline technique that
   splits not the problem but the *set of pairs*, letting an earlier half pay its
   contribution forward to a later one. One axis per weapon: sorting, divide and
@@ -209,3 +170,43 @@ make tangle             # just the .go, if you only want to run them
     encrypted by the previous answer), which seals off CDQ and coordinate
     compression and leaves the Li Chao tree standing alone, in its home problem
     of segment insertion.
+* [guitar-tuner/](guitar-tuner/) — a guitar tuner that reads the Mac's
+  microphone and shows the pitch on a needle gauge in real time. Pitch detection
+  is a **from-scratch implementation of the YIN algorithm** with no DSP library:
+  difference function, cumulative mean normalization, absolute threshold, and
+  parabolic interpolation, wrapped in high-pass pre-filtering, attack-transient
+  suppression, median smoothing and octave-error correction. Audio capture uses
+  [malgo](https://github.com/gen2brain/malgo) (miniaudio). Its own
+  [README](guitar-tuner/README.md) has the details; unlike the two collections
+  above, this one is a single program cut into three documents.
+  * `pitch/` — the pure core, knowing nothing of microphones or screens: the
+    detection pipeline behind `pitch.Stream`, plus open-string music theory.
+  * `tuner.w` — the console frontend, a chromatic gauge drawn in the terminal.
+  * `gui/` — a second frontend in a [Gio](https://gioui.org) native window,
+    sharing that same core.
+
+### Korean (and other non-English) documentation
+
+The woven output can be written in Korean by processing it with **`luatex`**
+(not `pdftex`) and putting one line in the `.w` file's limbo:
+
+```tex
+\input kotexgweb
+```
+
+`kotexgweb.tex` ships with [GWEB](https://github.com/sjnam/gweb) itself, not with
+these examples; installing GWEB puts it on your `TEXINPUTS`. It loads
+[luatexko](https://ctan.org/pkg/luatexko) and selects the Noto Serif/Sans CJK KR
+fonts (edit the `\sethangulfont` lines to change typefaces), translates gweave's
+fixed wording into Korean, and supplies a LuaTeX PDF back end so that blue
+cross-reference links and the PDF outline (bookmark) pane work, with Korean
+bookmark titles. Then:
+
+```sh
+gweave foo.w           # -> foo.tex
+luatex foo.tex         # -> foo.pdf   (kotexgweb.tex on TEXINPUTS)
+```
+
+gweave needs no flag; all the human-readable text it emits goes through macros
+(`\GU`, `\GNused`, `\Gsectionword`, …) that `kotexgweb.tex` overrides, so the same
+mechanism localizes to any language — write your own `\input` file modelled on it.
