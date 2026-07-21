@@ -39,6 +39,10 @@ Only sources are tracked: the `.w`/`.ch` programs, the MetaPost figures
 (`*.mp`), and the hand-written `pic.tex`. Every `.go`
 and every PDF here is generated, so you will not find one until you build it.
 
+The entries below that name a directory rather than a `.w` are separate
+projects, each with its own `README.md`, `Makefile` and `go.mod`. This Makefile
+does not reach into them — build those from inside (`cd life-game && make`).
+
 * [fast_cancel.w](fast_cancel.w) — It shows a complementary pattern
   useful in any concurrent Go program: how to propagate a first-error signal to all
   sibling goroutines cleanly.
@@ -184,6 +188,15 @@ and every PDF here is generated, so you will not find one until you build it.
   * `tuner.w` — the console frontend, a chromatic gauge drawn in the terminal.
   * `gui/` — a second frontend in a [Gio](https://gioui.org) native window,
     sharing that same core.
+* [life-game/](life-game/) — Conway's **Game of Life** in the terminal, with no
+  graphics library whatsoever: if a Go board was enough for Conway, ANSI escape
+  codes are enough for us. The universe is a torus, so a glider walking off one
+  edge returns from the other — and Gosper's gun is eventually shot down by its
+  own stream. A single `.w` that is equally a program and an essay, titled after
+  Laozi's *heaven and earth are not benevolent*: Conway tuning the rules with
+  stones on a tea table, the $50 bet the glider gun settled, and Conway's
+  late-life "I hate the Game of Life". `demos/` holds recordings made with
+  [vhs](https://github.com/charmbracelet/vhs).
 
 ### Korean (and other non-English) documentation
 
