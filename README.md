@@ -1,5 +1,23 @@
 # GWEB examples
 
+[GWEB](https://github.com/sjnam/gweb) is a literate programming system for Go,
+modeled closely on Knuth and Levy's **CWEB**. You write one `.w` file that
+interleaves TeX prose with Go code, and two tools read it in opposite
+directions: `gtangle` extracts the compilable `.go` for the machine, `gweave`
+typesets a cross-referenced document for people. The program and the essay
+explaining it are not two artifacts kept in sync — they are one file.
+
+This repository collects programs written that way. The range is deliberate:
+tutorials on what Go itself can do (range-over-func iterators, channel
+pipelines, generics), expositions of algorithms worth understanding (zip trees,
+suffix automata, the FFT), contest problems from HackerRank, Codeforces,
+LeetCode, Library Checker and Project Euler, and ports of Knuth's own CWEB
+programs. Most of the recent ones are written as Korean essays.
+
+They are here to show what GWEB looks like when actually used — and, one hopes,
+to be worth reading on their own. Start with the PDF a `.w` weaves into; that is
+the side meant for human eyes.
+
 ## Building
 
 A [Makefile](Makefile) builds any example by its name (the `.w` basename):
