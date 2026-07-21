@@ -17,6 +17,10 @@ directory at once would make Go refuse to compile (`main` redeclared).
 The TeX engine is chosen automatically — **luatex** for Korean documents (those
 with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
 
+Only sources are tracked: the `.w`/`.ch` programs, the MetaPost figures
+(`*.mp`), and the hand-written `pic.tex`. Every `.go`
+and every PDF here is generated, so you will not find one until you build it.
+
 * [fast_cancel.w](fast_cancel.w) — It shows a complementary pattern
   useful in any concurrent Go program: how to propagate a first-error signal to all
   sibling goroutines cleanly.
@@ -132,11 +136,13 @@ The woven output can be written in Korean by processing it with **`luatex`**
 \input kotexgweb
 ```
 
-[tex/kotexgweb.tex](tex/kotexgweb.tex) loads [luatexko](https://ctan.org/pkg/luatexko)
-and selects the Noto Serif/Sans CJK KR fonts (edit the `\sethangulfont` lines to
-change typefaces), translates gweave's fixed wording into Korean, and supplies a
-LuaTeX PDF back end so that blue cross-reference links and the PDF outline
-(bookmark) pane work, with Korean bookmark titles. Then:
+`kotexgweb.tex` ships with [GWEB](https://github.com/sjnam/gweb) itself, not with
+these examples; installing GWEB puts it on your `TEXINPUTS`. It loads
+[luatexko](https://ctan.org/pkg/luatexko) and selects the Noto Serif/Sans CJK KR
+fonts (edit the `\sethangulfont` lines to change typefaces), translates gweave's
+fixed wording into Korean, and supplies a LuaTeX PDF back end so that blue
+cross-reference links and the PDF outline (bookmark) pane work, with Korean
+bookmark titles. Then:
 
 ```sh
 gweave foo.w           # -> foo.tex
@@ -146,3 +152,42 @@ luatex foo.tex         # -> foo.pdf   (kotexgweb.tex on TEXINPUTS)
 gweave needs no flag; all the human-readable text it emits goes through macros
 (`\GU`, `\GNused`, `\Gsectionword`, …) that `kotexgweb.tex` overrides, so the same
 mechanism localizes to any language — write your own `\input` file modelled on it.
+
+## Collections
+
+Everything above is a standalone `.w` in this directory. The two subdirectories
+below are different: each is a *collection* of programs circling one technique,
+with its own `README.md` (Korean), `Makefile`, and `go.mod`. Build them from
+inside the directory, not with the top-level Makefile:
+
+```sh
+cd cht && make          # tangle + typeset all four
+make tangle             # just the .go, if you only want to run them
+```
+
+* [cdq-dc/](cdq-dc/) — **CDQ divide and conquer**, the offline technique that
+  splits not the problem but the *set of pairs*, letting an earlier half pay its
+  contribution forward to a later one. One axis per weapon: sorting, divide and
+  conquer, Fenwick tree.
+  * `flower/` — Luogu P3810, 3-D partial order. The technique in general: what
+    it is, when it applies, O(n log n log k), and what it costs you.
+  * `inv/` — Luogu P3157, dynamic inversions. Promoting *time* to an axis.
+  * `stars/` — POJ 2352, star levels. Two axes only, so the input does the
+    sorting and even the Fenwick tree disappears — the technique at its barest.
+  * `robin/` — LightOJ 1112. An aside giving the Fenwick tree, silent third
+    axis of the other three, the stage to itself.
+* [cht/](cht/) — the **convex hull trick**: quadratic DP transitions reread as
+  lines, and the lower envelope of those lines. A companion to `cdq-dc/`, walking
+  down the same ladder as monotonicity is taken away one rung at a time.
+  * `frog/` — AtCoder EDPC Z, *Frog 3*. The technique in general; both slopes
+    and queries monotone, so a deque holds the hull and the whole thing is O(n).
+  * `bridge/` — CEOI 2017 *Building Bridges*. Both monotonicities broken, so a
+    **Li Chao tree** replaces the deque — and comparing values instead of
+    intersections retires the 128-bit arithmetic.
+  * `cash/` — NOI 2007 *Cash*, the problem CDQ divide and conquer was
+    introduced with. The two collections meet here: recursion over time, merging
+    upward in x, slopes distributed downward.
+  * `segment/` — HEOI 2013 *Segment*. Forced online (coordinates arrive
+    encrypted by the previous answer), which seals off CDQ and coordinate
+    compression and leaves the Li Chao tree standing alone, in its home problem
+    of segment insertion.
