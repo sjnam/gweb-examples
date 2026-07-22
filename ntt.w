@@ -15,7 +15,7 @@
 \def\beginitems{\smallskip\begingroup\parindent=2.5em}
 \def\enditems{\par\endgroup\smallskip}
 
-@* 들어가며.
+@** FFT.
 다항식 두 개를 정의대로 곱하면 계수 개수의 제곱에 비례하는 시간이 든다.
 {\it 고속 푸리에 변환\/}(Fast Fourier Transform, FFT)은 이것을 $O(n\log n)$으로
 끌어내린다. 비결은 곱셈 자체를 잘하는 데 있지 않다. 곱셈이 거저나 다름없어지는 자리로 다항식을
@@ -200,7 +200,7 @@ $$\sum_{t=0}^{n-1}r^t={r^n-1\over r-1}={0\over r-1}=0$$
 쓰고, 마지막에 $n$으로 나누면\/} 그만이다. 코드가 |invert| 플래그 하나로 두 방향을
 겸하는 이유가 이것이다.
 
-@* 정수 위의 FFT: NTT.
+@** 정수 위의 FTT: NTT.
 여기까지는 복소수 이야기였다. 그런데 $\omega=e^{2\pi i/n}$은 무리수라 컴퓨터에서는
 부동소수로 다뤄야 하고, 그러면 오차가 쌓인다. 우리 문제는 계수가 $10^9$에 이르고
 $n$이 백만 규모라 중간 값이 $10^{24}$ 근처까지 갈 수 있는데, {\tt double}의 가수는
