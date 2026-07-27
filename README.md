@@ -43,6 +43,14 @@ The entries below that name a directory rather than a `.w` are separate
 projects, each with its own `README.md`, `Makefile` and `go.mod`. This Makefile
 does not reach into them — build those from inside (`cd life-game && make`).
 
+* [back-pdi.w](back-pdi.w) — Knuth's **back-pdi**: find every
+  *perfect digital invariant* of order m — an integer equal to the sum of the
+  m-th powers of its own digits, like 153 = 1³ + 5³ + 3³. A backtrack that picks
+  the digits in nonincreasing order and prunes hard with sharp lower/upper
+  bounds, over a binary-coded-decimal bignum that needs only addition (the
+  +6 / −6 carry trick, with a worked figure). A Go/GWEB port of Knuth's CWEB
+  program; its node counts match the original exactly. Korean (typeset with
+  **luatex**), one MetaPost figure.
 * [fast_cancel.w](fast_cancel.w) — It shows a complementary pattern
   useful in any concurrent Go program: how to propagate a first-error signal to all
   sibling goroutines cleanly.
