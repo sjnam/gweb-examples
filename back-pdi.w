@@ -1,9 +1,7 @@
-@i types.w
-
 \input kotexgweb
 \input pic
 
-\def\title{완전 자릿수 불변수 (뒤로 백트래킹)}
+\def\title{완전 자릿수 불변수}
 
 % 그림 설명. \centerline과 달리 길면 여러 줄로 접힌다.
 \def\figcap#1{\smallskip{\narrower\noindent #1\par}\medskip}
@@ -25,7 +23,7 @@ $$\pi_m x=x$$
 푸는 대목(\.{TAOCP} 연습문제 7.1.3--100)이 곁들여 있어 옮길 맛이 났다. 원문의
 논평을 충실히 따르되, 어투는 내 식으로 풀어 썼다.
 
-@ 먼저 그런 $x$의 자릿수가 기껏해야 $m+1$개임을 어렵지 않게 보일 수 있다.
+먼저 그런 $x$의 자릿수가 기껏해야 $m+1$개임을 어렵지 않게 보일 수 있다.
 $10^p\le x<10^{p+1}$이면 $x$는 $p+1$자리인데, $p>m$일 때는
 $$\pi_m x\le(p+1)9^m<10^{p+1}\hbox{이 아니라}\quad\pi_m x<10^p\le x$$
 가 되어 $\pi_m x=x$가 될 수 없다. 사실의 핵심은 $(m+1)9^m<10^{m+1}$이라는 부등식
@@ -37,6 +35,7 @@ $$9\ge x_1\ge x_2\ge\cdots\ge x_{m+1}\ge0$$
 약 25억 가지다. 하지만 아래에서 세울 상$\cdot$하계는 그보다 훨씬 매섭게 가지를
 쳐 낸다.
 
+@ 프로그램의 구조는 다음과 같다.
 @c
 package main
 
@@ -51,7 +50,9 @@ const (
 	maxdigs = 1 + maxm/15 // 다중정밀 수 하나가 차지하는 8바이트 워드 수
 )
 
-@<전역 상태@>@;
+var (
+	@<전역 변수@>
+)
 @<보조 루틴@>@;
 
 func main() {
@@ -70,22 +71,20 @@ func main() {
 	}
 }
 
-@ 전역 상태는 대부분 레벨을 첨자로 갖는 큰 배열이다. |goto|가 선언을 건너뛰지
+@ 전역 변수는 대부분 레벨을 첨자로 갖는 큰 배열이다. |goto|가 선언을 건너뛰지
 못하는 Go의 제약 때문에, 탐색이 쓰는 작업 배열은 패키지 전역으로 둔다. 레벨 |l|은
 $1$부터 $m+2$까지 갈 수 있으므로 배열은 |maxm+3|칸으로 넉넉히 잡았다.
-@<전역 상태@>=
-var (
-	m       int   // 명령줄에서 받는 거듭제곱 차수
-	mdigs   int   // 다중정밀 산술이 실제로 쓰는 워드 수
-	vbose   int   // 얼마나 수다스럽게 굴 것인가
-	count   int   // 지금까지 찾은 해의 수
-	nodes   int64 // 방문한 탐색 노드 수
-	mems    int64 // 헤아린 계산기 이용 횟수(mem)
-	thresh  int64 = 10000000000 // 다음 중간 보고 시점
-	profile [maxm + 3]int64
-)
+@<전역 변수@>=
+m       int   // 명령줄에서 받는 거듭제곱 차수
+mdigs   int   // 다중정밀 산술이 실제로 쓰는 워드 수
+vbose   int   // 얼마나 수다스럽게 굴 것인가
+count   int   // 지금까지 찾은 해의 수
+nodes   int64 // 방문한 탐색 노드 수
+mems    int64 // 헤아린 계산기 이용 횟수(mem)
+thresh  int64 = 10000000000 // 다음 중간 보고 시점
+profile [maxm + 3]int64
 
-@ 원문의 |argc<2 || sscanf(...)!=1|처럼, 인자가 없는 경우와 숫자로 못 읽는 경우를
+@ 원문의 |argc<2|${} \lor {}$|sscanf(...)!=1|처럼, 인자가 없는 경우와 숫자로 못 읽는 경우를
 한 조건으로 묶어 사용법 안내를 한 번만 둔다.
 @<커맨드라인을 처리한다@>=
 var perr error
@@ -214,11 +213,9 @@ for k = 1; k < 10; k++ {
 	}
 }
 
-@ @<전역 상태@>=
-var (
-	table [maxm + 2][10][maxdigs]uint64 // 미리 계산한 $j\cdot k^m$의 표
-	z     [maxdigs]uint64               // 큰 수를 담는 임시 버퍼
-)
+@ @<전역 변수@>=
+table [maxm + 2][10][maxdigs]uint64 // 미리 계산한 $j\cdot k^m$의 표
+z     [maxdigs]uint64               // 큰 수를 담는 임시 버퍼
 
 @ 다중정밀 수 |num|의 자리 |p|(니블 하나)를 꺼내는 짧은 도우미다.
 @<보조 루틴@>=
@@ -383,18 +380,16 @@ $m+2$까지 오른다. 그래서 $m$이 |maxm|이면 |sig[m+2]|를 비롯한 접
 감을 알면서도 나란한 이 배열들의 크기는 미처 맞추지 못한 듯하다. (작은 |maxm|으로
 $m=|maxm|$을 돌려 보면 엉뚱한 해가 쏟아진다.) 여기서는 모두 |maxm+3|으로 통일해
 그 경계 넘침을 없앴다.
-@<전역 상태@>=
-var (
-	dist   [maxm + 3][16]int
-	pdist  [maxm + 3][16]int
-	a      [maxm + 3][maxdigs]uint64
-	b      [maxm + 3][maxdigs]uint64
-	sig    [maxm + 3][maxdigs]uint64
-	x      [maxm + 3]int
-	rsave  [maxm + 3]int
-	tsave  [maxm + 3]int
-	pdsave [maxm + 3]int
-)
+@<전역 변수@>=
+dist   [maxm + 3][16]int
+pdist  [maxm + 3][16]int
+a      [maxm + 3][maxdigs]uint64
+b      [maxm + 3][maxdigs]uint64
+sig    [maxm + 3][maxdigs]uint64
+x      [maxm + 3]int
+rsave  [maxm + 3]int
+tsave  [maxm + 3]int
+pdsave [maxm + 3]int
 
 @ 뿌리 레벨에서는 |b2|를 정말 하고 싶지 않아서, 초기화가 끝나면 곧장 |b3|으로 뛴다.
 @<자료 구조를 초기화한다@>=
