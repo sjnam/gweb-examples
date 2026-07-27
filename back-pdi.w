@@ -7,35 +7,32 @@
 \def\figcap#1{\smallskip{\narrower\noindent #1\par}\medskip}
 
 @* 들어가며.
-어릴 적 $153$이라는 수를 처음 만났을 때의 놀라움을 기억한다.
-$$153=1^3+5^3+3^3.$$
-제 자릿수를 저마다 세제곱해 더하면 도로 제자신이 되는 수라니. 이런 수를
-{\it 완전 자릿수 불변수\/}(perfect digital invariant, PDI)라 부른다. 차수 $m$의
-PDI란, 십진 표기의 각 자릿수를 $m$제곱해 모두 더하는 연산 $\pi_m$에 대해
-$$\pi_m x=x$$
-를 만족하는 정수 $x$다. 이 프로그램은 주어진 $m$에 대해 그런 $x$를 {\it 남김없이\/}
+이 글은 Knuth의 \.{CWEB} 프로그램 \.{back-pdi}를\.{GWEB}으로 옮긴 것이다.
+백트래킹의 좋은 예제인 데다, 자리올림만 있으면 되는 다중정밀 산술을 비트 기교로
+푸는 대목(TAOCP의 연습문제 7.1.3--100)이 곁들여 있어 옮길 맛이 났다. 원문의
+논평을 충실히 따르되, 어투는 내 식으로 풀어 썼다.
+
+$153$은 제 자릿수를 저마다 세제곱해 더하면 도로 제자신이 되는 놀라운 수이다.
+$153=1^3+5^3+3^3.$ 이런 수를 {\it 완전 자릿수 불변수\/}(perfect digital
+invariant, PDI)라 부른다. 차수 $m$의 PDI란, 십진 표기의 각 자릿수를 $m$제곱해
+모두 더하는 연산 $\pi_m$에 대해 $\pi_m x=x$를 만족하는 정수 $x$다.
+이 프로그램은 주어진 $m$에 대해 그런 $x$를 {\it 남김없이\/}
 찾는다. (자릿수의 개수가 마침 $m$과 같은 특별한 경우---$153$처럼---만 따로
 {\it 암스트롱 수\/}라 부르기도 하지만, 여기서 찾는 것은 지수 $m$을 고정한 더 넓은
 가족이다.)
 
-이 글은 Knuth의 \.{CWEB} 프로그램 \.{back-pdi}를 Go와 \.{GWEB}으로 옮긴 것이다.
-백트래킹의 좋은 예제인 데다, 자리올림만 있으면 되는 다중정밀 산술을 비트 기교로
-푸는 대목(\.{TAOCP} 연습문제 7.1.3--100)이 곁들여 있어 옮길 맛이 났다. 원문의
-논평을 충실히 따르되, 어투는 내 식으로 풀어 썼다.
-
 먼저 그런 $x$의 자릿수가 기껏해야 $m+1$개임을 어렵지 않게 보일 수 있다.
 $10^p\le x<10^{p+1}$이면 $x$는 $p+1$자리인데, $p>m$일 때는
-$$\pi_m x\le(p+1)9^m<10^{p+1}\hbox{이 아니라}\quad\pi_m x<10^p\le x$$
+$\pi_m x\le(p+1)9^m<10^{p+1}\hbox{이 아니라}\quad\pi_m x<10^p\le x$
 가 되어 $\pi_m x=x$가 될 수 없다. 사실의 핵심은 $(m+1)9^m<10^{m+1}$이라는 부등식
 하나다. 그러니 자릿수는 $m+1$개면 넉넉하고, 우리는 그 $m+1$개의 자릿수를
-$$9\ge x_1\ge x_2\ge\cdots\ge x_{m+1}\ge0$$
+$9\ge x_1\ge x_2\ge\cdots\ge x_{m+1}\ge0$
 처럼 {\it 내림차순\/}으로 하나씩 고르며 백트래킹한다. $\pi_m$은 자릿수의 순서에
 무관하니, 순서를 정해 두면 같은 다중집합을 한 번씩만 훑게 된다. $m$이 작다면
 그런 자릿수 열이 ${m+10\choose9}$가지뿐이라 통째로 훑을 수도 있다---$m=40$이면
 약 25억 가지다. 하지만 아래에서 세울 상$\cdot$하계는 그보다 훨씬 매섭게 가지를
 쳐 낸다.
 
-@ 프로그램의 구조는 다음과 같다.
 @c
 package main
 
@@ -50,39 +47,44 @@ const (
 	maxdigs = 1 + maxm/15 // 다중정밀 수 하나가 차지하는 8바이트 워드 수
 )
 
-var (
-	@<전역 변수@>
-)
-@<보조 루틴@>@;
+@<전역 변수@>
+@<보조 루틴@>
 
 func main() {
 	var (
-		j, k, l, p, r, t int
-		pd, alt, blt, xl int
-		change           bool
+		j, k, l, p, r, t, pd, alt, blt, xl int
+		change bool
 	)
-	@<커맨드라인을 처리한다@>@;
-	@<거듭제곱 표를 미리 계산한다@>@;
-	@<모든 경우를 백트래킹한다@>@;
+	@<커맨드라인을 처리한다@>
+	@<거듭제곱 표를 미리 계산한다@>
+	@<모든 경우를 백트래킹한다@>
 	fmt.Fprintf(os.Stderr, "m=%d에 대해 해가 모두 %d개 (노드 %d개, mem %d개).\n",
 		m, count, nodes, mems)
-	if vbose > 0 {
-		@<프로파일을 출력한다@>@;
-	}
+	if vbose > 0 { @<프로파일을 출력한다@> }
 }
 
 @ 전역 변수는 대부분 레벨을 첨자로 갖는 큰 배열이다. |goto|가 선언을 건너뛰지
 못하는 Go의 제약 때문에, 탐색이 쓰는 작업 배열은 패키지 전역으로 둔다. 레벨 |l|은
 $1$부터 $m+2$까지 갈 수 있으므로 배열은 |maxm+3|칸으로 넉넉히 잡았다.
+
+원문은 곳곳에 계산기 이용 횟수(mem)를 헤아리는 계수기를 심어 두었다.Knuth가 알고리즘의
+실제 비용을 재는 방식인데, 최적화 컴파일러가 서브루틴을 인라인하고 분포 배열을 한 8바이트
+워드에 팩킹했다고 {\it 가정하고\/} 메모리 참조를 센다. (실제로는 디버깅이 편하도록
+원소들을 풀어서 들고 다닌다.) 그 계수를 원문 그대로 옮겨, 끝에 노드 수와 함께 찍는다.
+깊이별로 방문한 노드 수를 세는 |profile|도 그대로다. 두 값 모두 원문과 한 치도 어긋나지
+않으니, 옮김이 옳았는지 검산하는 잣대로 삼기에 좋다.
+
 @<전역 변수@>=
-m       int   // 명령줄에서 받는 거듭제곱 차수
-mdigs   int   // 다중정밀 산술이 실제로 쓰는 워드 수
-vbose   int   // 얼마나 수다스럽게 굴 것인가
-count   int   // 지금까지 찾은 해의 수
-nodes   int64 // 방문한 탐색 노드 수
-mems    int64 // 헤아린 계산기 이용 횟수(mem)
-thresh  int64 = 10000000000 // 다음 중간 보고 시점
-profile [maxm + 3]int64
+var (
+	m       int   // 명령줄에서 받는 거듭제곱 차수
+	mdigs   int   // 다중정밀 산술이 실제로 쓰는 워드 수
+	vbose   int   // 얼마나 수다스럽게 굴 것인가
+	count   int   // 지금까지 찾은 해의 수
+	nodes   int64 // 방문한 탐색 노드 수
+	mems    int64 // 헤아린 계산기 이용 횟수(mem)
+	thresh  int64 = 10000000000 // 다음 중간 보고 시점
+	profile [maxm + 3]int64
+)
 
 @ 원문의 |argc<2|${} \lor {}$|sscanf(...)!=1|처럼, 인자가 없는 경우와 숫자로 못 읽는 경우를
 한 조건으로 묶어 사용법 안내를 한 번만 둔다.
@@ -129,16 +131,13 @@ func add(p, q, r []uint64) { // |p|와 |q|를 더해 |r|에
 $10$ 이상일 때 이진 자리올림이 위 니블로 자연스럽게 넘어간다. 그러고 나서 자리올림이
 일어나지 {\it 않은\/} 니블에서만 도로 $6$을 빼면 십진 덧셈이 완성된다.
 @<|c+p[k]|를 |q[k]|에 더해 |r[k]|와 자리올림 |c|를 얻는다@>=
-o()
-x := p[k] + c                             // |x|는 이제 비십진 니블을 가질 수 있다
-o()
-y := q[k] + 0x666666666666666             // 니블 사이 자리올림은 아직 없다
+mems++; x := p[k] + c                             // |x|는 이제 비십진 니블을 가질 수 있다
+mems++; y := q[k] + 0x666666666666666             // 니블 사이 자리올림은 아직 없다
 tt := x + y
 w := (tt ^ x ^ y) & 0x1111111111111110    // 니블 사이 자리올림이 여기서 드러난다
 w = (w ^ 0x1111111111111110) >> 3
 tt -= w + (w << 1)                        // 자리올림 없던 곳에서 $6$을 뺀다
-o()
-r[k] = tt & 0xfffffffffffffff
+mems++; r[k] = tt & 0xfffffffffffffff
 c = tt >> 60
 
 @ 비결은 두 걸음이다. 먼저 한쪽 덧수의 모든 니블에 $6$을 얹는다(코드의
@@ -153,8 +152,8 @@ $6$을 얹은 |y| 쪽에 더 얹으면 십진법 아닌 니블 \.{a}$\ldots$\.{f
 @ 백문이 불여일견이니, 앞서 든 $344159959+271828043$을 이 형식으로 더해 보자.
 \medskip
 \centerline{\pic{back-pdi-1.pdf}}
-\figcap{그림 1: 두 덧수의 니블 합이 $10$ 이상인 칸(음영)에서 이진 자리올림이 위
-니블로 넘어간다. 얹었던 $6$을 자리올림이 없던 칸에서만 도로 빼면, 십진 덧셈이
+\figcap{{\sl 그림} 1: 두 덧수의 니블 합이 $10$ 이상인 칸(음영)에서 이진 자리올림이
+위 니블로 넘어간다. 얹었던 $6$을 자리올림이 없던 칸에서만 도로 빼면, 십진 덧셈이
 십육진 니블 위에서 그대로 완성된다.}
 
 오른쪽 끝부터 따라가 보면 기교가 손에 잡힌다. 첫 칸은 $9+3=12$라 십진 자리올림이
@@ -180,22 +179,13 @@ func kmult(k int, a []uint64) { // |a|를 $k$배로
 		add(a, a, a)
 		fallthrough
 	case 3:
-		add(a, a, z[:])
-		add(a, z[:], a)
+		add(a, a, z[:]); add(a, z[:], a)
 	case 5:
-		add(a, a, z[:])
-		add(z[:], z[:], z[:])
-		add(a, z[:], a)
+		add(a, a, z[:]); add(z[:], z[:], z[:]); add(a, z[:], a)
 	case 9:
-		add(a, a, z[:])
-		add(z[:], z[:], z[:])
-		add(z[:], z[:], z[:])
-		add(a, z[:], a)
+		add(a, a, z[:]); add(z[:], z[:], z[:]); add(z[:], z[:], z[:]); add(a, z[:], a)
 	case 7:
-		add(a, a, z[:])
-		add(a, z[:], z[:])
-		add(z[:], z[:], z[:])
-		add(a, z[:], a)
+		add(a, a, z[:]); add(a, z[:], z[:]); add(z[:], z[:], z[:]); add(a, z[:], a)
 	case 0, 1:
 	}
 }
@@ -214,8 +204,10 @@ for k = 1; k < 10; k++ {
 }
 
 @ @<전역 변수@>=
-table [maxm + 2][10][maxdigs]uint64 // 미리 계산한 $j\cdot k^m$의 표
-z     [maxdigs]uint64               // 큰 수를 담는 임시 버퍼
+var (
+	table [maxm + 2][10][maxdigs]uint64 // 미리 계산한 $j\cdot k^m$의 표
+	z     [maxdigs]uint64               // 큰 수를 담는 임시 버퍼
+)
 
 @ 다중정밀 수 |num|의 자리 |p|(니블 하나)를 꺼내는 짧은 도우미다.
 @<보조 루틴@>=
@@ -264,26 +256,13 @@ func printnum(num []uint64, t int) {
 이 프로그램은 전형적인 백트래킹 프로그램의 뼈대에 몇 가지 비틀기를 더한 구조다.
 그 비틀기 하나가 상태 변수 |pd|인데, 레벨 |l-1|에서 둔 수가 {\it 강제된\/} 것이었을
 때 $0$이 아니다. (그런 경우는 드물지만 중요하다.)
-
-원문은 곳곳에 계산기 이용 횟수(mem)를 헤아리는 계수기를 심어 두었다. |o|는 mem
-하나를, |oo|는 둘을 센다. Knuth가 알고리즘의 실제 비용을 재는 방식인데, 최적화
-컴파일러가 서브루틴을 인라인하고 분포 배열을 한 8바이트 워드에 팩킹했다고
-{\it 가정하고\/} 메모리 참조를 센다. (실제로는 디버깅이 편하도록 원소들을 풀어서
-들고 다닌다.) 그 계수를 원문 그대로 옮겨, 끝에 노드 수와 함께 찍는다. 깊이별로
-방문한 노드 수를 세는 |profile|도 그대로다. 두 값 모두 원문과 한 치도 어긋나지
-않으니, 옮김이 옳았는지 검산하는 잣대로 삼기에 좋다.
-@<보조 루틴@>=
-func o()  { mems++ }   // mem 하나
-func oo() { mems += 2 } // mem 둘
-
-@ @<모든 경우를 백트래킹한다@>=
+@<모든 경우를 백트래킹한다@>=
 @<자료 구조를 초기화한다@>@;
 b2:
-	profile[l]++
-	nodes++
+	profile[l]++; nodes++
 	@<mem이 문턱을 넘었으면 중간 상태를 보고한다@>@;
 	@<부모의 분포를 물려받고 |xl|을 더한다@>@;
-	oo(); oo() // 팩킹했다면 |pdist|와 |dist|를 옮기는 데 드는 두 mem씩
+	mems+=2; mems+=2 // 팩킹했다면 |pdist|와 |dist|를 옮기는 데 드는 두 mem씩
 	if pd != 0 {
 		@<강제된 수를 흡수한다@>@;
 	} else {
@@ -315,15 +294,13 @@ move:
 b4:
 	if xl != 0 {
 		xl--
-		o()
-		pd = pdist[l][xl] // |dist[l][xl]|은 $0$이었다
+		mems++; pd = pdist[l][xl] // |dist[l][xl]|은 $0$이었다
 		goto b3
 	}
 b5:
 	l--
 	if l != 0 {
-		o()
-		pd = pdsave[l]
+		mems++; pd = pdsave[l]
 		if pd != 0 {
 			goto b5
 		}
@@ -381,15 +358,17 @@ $m+2$까지 오른다. 그래서 $m$이 |maxm|이면 |sig[m+2]|를 비롯한 접
 $m=|maxm|$을 돌려 보면 엉뚱한 해가 쏟아진다.) 여기서는 모두 |maxm+3|으로 통일해
 그 경계 넘침을 없앴다.
 @<전역 변수@>=
-dist   [maxm + 3][16]int
-pdist  [maxm + 3][16]int
-a      [maxm + 3][maxdigs]uint64
-b      [maxm + 3][maxdigs]uint64
-sig    [maxm + 3][maxdigs]uint64
-x      [maxm + 3]int
-rsave  [maxm + 3]int
-tsave  [maxm + 3]int
-pdsave [maxm + 3]int
+var(
+	dist   [maxm + 3][16]int
+	pdist  [maxm + 3][16]int
+	a      [maxm + 3][maxdigs]uint64
+	b      [maxm + 3][maxdigs]uint64
+	sig    [maxm + 3][maxdigs]uint64
+	x      [maxm + 3]int
+	rsave  [maxm + 3]int
+	tsave  [maxm + 3]int
+	pdsave [maxm + 3]int
+)
 
 @ 뿌리 레벨에서는 |b2|를 정말 하고 싶지 않아서, 초기화가 끝나면 곧장 |b3|으로 뛴다.
 @<자료 구조를 초기화한다@>=
@@ -417,13 +396,9 @@ for k = 0; k < 10; k++ {
 }
 
 @ @<다음 레벨로 나아간다@>=
-oo()
-tsave[l] = t
-rsave[l] = r
-o()
-pdsave[l] = pd
-o()
-x[l] = xl
+mems+=2; tsave[l] = t; rsave[l] = r
+mems++; pdsave[l] = pd
+mems++; x[l] = xl
 l++
 goto b2
 
@@ -480,15 +455,14 @@ if blt < xl {
 	add(b[l][:], table[r-1][xl][:], b[l][:]) // $b_l\gets|sig[l]|+|blt|^m+(r-1)|xl|^m$
 } else {
 	for k = 0; k < mdigs; k++ {
-		oo()
-		a[l][k] = sig[l][k] // $a_l\gets|sig[l]|$
+		mems+=2; a[l][k] = sig[l][k] // $a_l\gets|sig[l]|$
 	}
 	add(sig[l][:], table[r][xl][:], b[l][:]) // $b_l\gets|sig[l]|+r\cdot|xl|^m$
 }
 @<개선된 |alt|와 |blt|를 반영한다@>@;
 
 @ @<개선된 |alt|와 |blt|를 반영한다@>=
-o()
+mems++
 if alt != nybb(a[l][:], t) {
 	if alt > nybb(a[l][:], t) {
 		fmt.Fprintf(os.Stderr, "혼란 (a가 줄었다)!\n")
@@ -499,7 +473,7 @@ if alt != nybb(a[l][:], t) {
 		change = true
 	}
 }
-o()
+mems++
 if blt != nybb(b[l][:], t) {
 	if blt < nybb(b[l][:], t) {
 		fmt.Fprintf(os.Stderr, "혼란 (b가 늘었다)!\n")
@@ -519,10 +493,9 @@ if blt != nybb(b[l][:], t) {
 $B$이면 $\alpha$ 다음 $\beta$를, $A$이고 $B$가 아니면 아무것도, $A$가 아니면 $\beta$만
 하고 싶다. |goto| 없이 하려면 $A$를 두 번 평가하거나 $\beta$를 두 번 적어야 한다.
 @<현재 접두를 늘리거나 |b5|로 간다@>=
-o()
-p = pdist[l][blt]
+mems++; p = pdist[l][blt]
 if blt >= xl {
-	o()
+	mems++
 	if p < dist[l][blt] {
 		goto okay // ``필요한'' |goto|다!
 	}
@@ -537,31 +510,25 @@ if r < 0 {
 }
 add(sig[l][:], table[1][blt][:], sig[l][:]) // |xl|보다 작은, 새로 알게 된 자릿수
 okay:
-	o()
-	pdist[l][blt] = p + 1
+	mems++; pdist[l][blt] = p + 1
 	t--
 	change = true
 	if t < 0 {
 		break
 	}
-	oo()
-	alt = nybb(a[l][:], t)
-	blt = nybb(b[l][:], t)
+	mems+=2; alt = nybb(a[l][:], t); blt = nybb(b[l][:], t)
 
 @ @<레벨 |l|의 이전 상태를 복원한다@>=
-oo()
-t = tsave[l]
-r = rsave[l]
+mems+=2; t = tsave[l]; r = rsave[l]
 if t >= 0 {
-	oo()
+	mems+=2
 	alt = nybb(a[l][:], t)
 	blt = nybb(b[l][:], t)
 } else {
 	alt = 9
 	blt = 9
 }
-o()
-xl = x[l]
+mems++; xl = x[l]
 
 @ |dist|가 |pdist|를 ``따라잡는'' 중일 때는 |sig|를 바꾸지 않는다. 접두에 이미
 나타난 자릿수는 벌써 셈에 넣었기 때문이다---|xl| 하나가 올 줄 알고 있었고, 이제야
@@ -571,8 +538,7 @@ if vbose > 1 {
 	fmt.Fprintf(os.Stderr, "레벨 %d, 그 %d는 강제되었다\n", l, xl)
 }
 for k = 0; k < mdigs; k++ {
-	oo()
-	sig[l][k] = sig[l-1][k]
+	mems+=2; sig[l][k] = sig[l-1][k]
 }
 pd--
 if pd != 0 {
