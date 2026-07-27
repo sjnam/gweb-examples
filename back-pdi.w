@@ -7,9 +7,11 @@
 \def\figcap#1{\smallskip{\narrower\noindent #1\par}\medskip}
 
 @* 들어가며.
-이 글은 Knuth의 \.{CWEB} 프로그램 \.{back-pdi}를\.{GWEB}으로 옮긴 것이다.
+이 글은 Knuth의 \.{CWEB} 프로그램 \pdfURL{\.{back-pdi.w}}%
+{https://www-cs-faculty.stanford.edu/\TILDE/knuth/programs/back-pdi.w}를
+\.{GWEB}으로 옮긴 것이다.
 백트래킹의 좋은 예제인 데다, 자리올림만 있으면 되는 다중정밀 산술을 비트 기교로
-푸는 대목(TAOCP의 연습문제 7.1.3--100)이 곁들여 있어 옮길 맛이 났다. 원문의
+푸는 대목(\.{TAOCP}의 연습문제 7.1.3--100)이 곁들여 있어 옮길 맛이 났다. 원문의
 논평을 충실히 따르되, 어투는 내 식으로 풀어 썼다.
 
 $153$은 제 자릿수를 저마다 세제곱해 더하면 도로 제자신이 되는 놀라운 수이다.
