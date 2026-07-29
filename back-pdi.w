@@ -84,7 +84,7 @@ var (
 	count   int   // 지금까지 찾은 해의 수
 	nodes   int64 // 방문한 탐색 노드 수
 	mems    int64 // 헤아린 계산기 이용 횟수(mem)
-	thresh  int64 = 10000000000 // 다음 중간 보고 시점
+	thresh  int64 = 10_000_000_000 // 다음 중간 보고 시점
 	profile [maxm + 3]int64
 )
 
