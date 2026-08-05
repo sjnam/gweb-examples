@@ -23,6 +23,17 @@
 @z
 
 @x
+(병렬 판은 이 한 절을 여러 일꾼으로 바꿔치기하는데, 그 이야기는 딸린 변경 파일에서
+한다.)
+@y
+최상위 시작 낱말(대각 낱말 W00)의
+선택은 서로 완전히 독립이므로, 그것을 여러 고루틴에 나눠 맡기면 코어 수만큼
+빨라진다. 명령줄에 워커 수(숫자)를 주면 그만큼의 일꾼이 원자적 작업 큐에서
+시작 낱말을 하나씩 받아 자기 |worker|로 탐색하고, 끝에 셈을 합친다. 시작 낱말마다
+부하가 크게 다르므로(흔한 첫 글자일수록 무거움) 정적 분할보다 동적 큐가 균형이 좋다.
+@z
+
+@x
 	var wk worker
 	for w := 0; w < len(words); w++ {
 		wk.searchFrom(w)
@@ -59,21 +70,26 @@
 @z
 
 @x
+@ 명령줄 인자로 낱말 파일을 받되, 없으면 \.{sgb-words.txt}를 쓴다.
+@<명령줄을 처리한다@>=
 	wordFile = "sgb-words.txt"
 	if len(os.Args) >= 2 {
 		wordFile = os.Args[1]
 	}
 @y
-	wordFile = "sgb-words.txt"
-	workers := 1
-	for _, a := range os.Args[1:] {
-		if k, err := strconv.Atoi(a); err == nil {
-			workers = k
-		} else {
-			wordFile = a
-		}
+@ 명령줄 인자로 낱말 파일을 받되, 없으면 \.{sgb-words.txt}를 쓴고,
+워커의 수를 읽는다. 기본 워커의 수는 한개다.
+@<명령줄을 처리한다@>=
+wordFile = "sgb-words.txt"
+workers := 1
+for _, a := range os.Args[1:] {
+	if k, err := strconv.Atoi(a); err == nil {
+		workers = k
+	} else {
+		wordFile = a
 	}
-	if workers < 1 {
-		workers = 1
-	}
+}
+if workers < 1 {
+	workers = 1
+}
 @z

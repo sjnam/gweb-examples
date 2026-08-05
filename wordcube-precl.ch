@@ -38,6 +38,14 @@
 @z
 
 @x
+탐색을 하도록. 전역에는 낱말 목록과 채우는 순서, 합계만 둔다.
+@y
+탐색을 하도록. 전역에는 낱말 목록과 채우는 순서, 합계, 그리고
+각 미래 낱말의 위치가 어느 층에서 정해지는지를 |knownTime|에 미리 담아 두고, 짝
+$(a,b)$의 놓는 차례는 |pairIdx|에 답는다.
+@z
+
+@x
 	nodes    int64          // 노드 총수(합계)
 	profile  [lines + 1]int64
 )
@@ -47,6 +55,13 @@
 	pairIdx   [n][n]int      // 짝 (a,b) -> 놓는 차례
 	knownTime [lines][n]int  // 낱말 u의 위치 c가 정해지는 층
 )
+@z
+
+@x
+|words[w]|로 정해---곧 큐브의 주대각선을 깔고---나머지 열넷을 |solve|로 채운다.
+@y
+|words[w]|로 정해---곧 큐브의 주대각선을 깔고---나머지 열넷을 |solve|로 채운다.
+이때 |feasible|를 두고, 놓은 뒤 그것이 참일 때만 내려간다.
 @z
 
 @x
@@ -88,6 +103,9 @@ func (wk *worker) put(a, b, c int, ch byte) {
 	wk.cube[c][b][a] = ch
 }
 
+@ 낱말을 놓을 때마다 |feasible|로 남은 낱말들의 알려진
+접두사가 사전에 있는지 확인한다.
+@<함수들@>=
 func (wk *worker) feasible(t int) bool {
 	for u := t + 1; u < lines; u++ {
 		iu, ju := order[u][0], order[u][1]
