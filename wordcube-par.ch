@@ -26,7 +26,9 @@
 	var wk worker
 	for w := 0; w < len(words); w++ {
 		wk.searchFrom(w)
+		fmt.Fprintf(os.Stderr, "\r진행: 시작 낱말 %d/%d, 노드 %d ", w+1, len(words), wk.nodes)
 	}
+	fmt.Fprintln(os.Stderr)
 	count, distinct, nodes, profile = wk.count, wk.distinct, wk.nodes, wk.profile
 @y
 	pool := make([]worker, workers)

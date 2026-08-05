@@ -157,6 +157,10 @@ var (
 	}
 	f.Close()
 	sort.Strings(words)
+	if err := sc.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 
 @ 접두사로 낱말을 찾는 일이 탐색의 안쪽 고리다. 그 뼈대는 낱말의 앞 몇 글자만
 접두사와 견주는 이 함수 하나뿐이다. 나머지---접두사에 맞는 구간을 이진 탐색으로 잡는
@@ -274,14 +278,18 @@ $83576$번만 도므로 이 겹루프는 공짜나 다름없다.
 
 @* 세어 보고하기.
 본론은 일꾼 하나로 모든 시작 낱말을 차례로 훑는다. 다 훑으면 그 일꾼의 셈이 곧
-합계다. (병렬 판은 이 한 절을 여러 일꾼으로 바꿔치기하는데, 그 이야기는 딸린 변경
-파일에서 한다.)
+합계다. 탐색이 몇 분씩 걸리는데 답은 끝에만 나오므로, 시작 낱말이 몇 개나
+처리됐는지를 표준 오류로 흘려 살아 있음을 알린다---|\r|로 같은 줄을 계속 덮어쓴다.
+(병렬 판은 이 한 절을 여러 일꾼으로 바꿔치기하는데, 그 이야기는 딸린 변경 파일에서
+한다.)
 
 @<탐색하여 센다@>=
 	var wk worker
 	for w := 0; w < len(words); w++ {
 		wk.searchFrom(w)
+		fmt.Fprintf(os.Stderr, "\r진행: 시작 낱말 %d/%d, 노드 %d ", w+1, len(words), wk.nodes)
 	}
+	fmt.Fprintln(os.Stderr)
 	count, distinct, nodes, profile = wk.count, wk.distinct, wk.nodes, wk.profile
 
 @ 명령줄 인자로 낱말 파일을 받되, 없으면 \.{sgb-words.txt}를 쓴다.
