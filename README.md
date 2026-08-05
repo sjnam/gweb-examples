@@ -144,6 +144,22 @@ does not reach into them — build those from inside (`cd life-game && make`).
   (typeset with **luatex**).
 * [wc.w](wc.w) — a literate word-count program; its tangled
   output matches the system `wc`. It also shows `@f` setting a user type in bold.
+* [wordcube.w](wordcube.w) — how many **symmetric 5×5×5 word
+  cubes** can be built from the Stanford GraphBase's 5757 five-letter words? A
+  fully symmetric cube reads the same word along any of its three axes; a clean
+  backtrack fills the fifteen lines in row-major order, where each new word's
+  already-placed letters form a prefix and dictionary lookup does the rest. The
+  answer is 83,576 (75,130 if all fifteen words must differ). A Korean literate
+  essay (typeset with **luatex**), with a MetaPost figure. A companion change
+  file `wordcube-par.ch` (`gtangle wordcube.w wordcube-par.ch`) forks a goroutine-parallel
+  build — the independent first-word choices fan out across workers, ~9× faster on
+  10 cores with identical counts. A second change file `wordcube-precl.ch` adds
+  *preclusion* (forward-checking): after each word is placed it verifies every
+  not-yet-filled line can still be completed from the dictionary, pruning the tree
+  from 4.6B search nodes to 98M (~3.6× faster sequentially), again identical counts.
+  A third change file `wordcube-fast.ch` stacks both — the two optimizations touch
+  disjoint sections, so preclusion's 98M nodes fan out across workers for the
+  shortest wall-clock of all.
 * [ziptree.w](ziptree.w) — the **zip tree** of Tarjan, Levy,
   and Timmel: a randomized BST that is max-heap-ordered by a geometric random
   *rank* (ties favoring the smaller key), updated by *unzipping* and *zipping*
