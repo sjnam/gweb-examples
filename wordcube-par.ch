@@ -15,6 +15,7 @@
 	"sort"
 )
 @y
+	"runtime"
 	"sort"
 	"strconv"
 	"sync"
@@ -91,11 +92,11 @@
 @y
 @ 명령줄 인자로 낱말 파일을 받되, 없으면 \.{sgb-words.txt}를 쓰고,
 워커의 수(숫자)도 읽는다. 파일과 워커 수는 순서에 상관없이 준다. 워커 수를
-안 주면 하나다---곧 순차 실행이다.
+안 주면 CPU 코어 갯수로 한다---곧 순차 실행이다.
 
 @<명령줄을 처리한다@>=
 	wordFile = "sgb-words.txt"
-	workers := 1
+	workers := runtime.NumCPU()
 	for _, a := range os.Args[1:] {
 		if k, err := strconv.Atoi(a); err == nil {
 			workers = k
