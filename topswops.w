@@ -1,5 +1,9 @@
 \input kotexgweb
-\input pic
+\input luamplib.sty
+
+% 그림은 topswops.mp 안에 fig_... 라는 이름의 매크로로 있다. 여기서 한 번 읽어
+% 두고 그림 자리마다 이름만 부른다.
+\everymplib{input topswops;}
 
 @* 위에서 읽어 위로 뒤집어 얹는 놀이.
 {\it 톱스웝스\/}는 존 콘웨이(John H. Conway)가 고안한 혼자 하는 카드
@@ -10,8 +14,11 @@
 
 백문이 불여일견이니 $n=3$, 시작 패 $3\,1\,2$로 한 판 두어 보자.
 
-\medskip
-\centerline{\pic{topswops-1.pdf}}
+$$
+\mplibcode
+fig_forward;
+\endmplibcode
+$$
 \smallskip
 \centerline{그림 1: $3\,1\,2$의 한 판. 색칠한 부분이 이번 수에 통째로 뒤집히는
 덩어리이고, 화살표의 숫자는 뒤집는 장수다.}
@@ -66,8 +73,11 @@ Mathematical Gazette\/} {\bf 73} (1989), 131--133): 전진 게임의 골칫거�
 끝나는 자리, 곧 점수 $l$짜리 순열이다. 그러니 $f(n)$은 이 나무에서 가장 깊은
 잎의 깊이일 뿐이고, 탐색은 나무를 깊이 우선으로 걷는 것이 전부다.
 
-\medskip
-\centerline{\pic{topswops-2.pdf}}
+$$
+\mplibcode
+fig_backtree;
+\endmplibcode
+$$
 \smallskip
 \centerline{그림 2: $n=3$의 역방향 탐색 나무 전부. 간선의 숫자는 되돌린
 뒤집기의 장수다.}

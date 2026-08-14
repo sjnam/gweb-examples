@@ -1,17 +1,13 @@
-% ntt.mp -- figures for ntt.w (FFT/NTT).
-%   fig 1: the evaluate-multiply-interpolate detour
-%   fig 2: squaring folds the n-th roots of unity two-to-one
-%   fig 3: the n=8 butterfly network (three stages: length 2, 4, 8)
-% Build with: mpost --tex=etex ntt.mp && mptopdf ntt.[0-9]*
-%   (-> ntt-1.pdf, -2.pdf, -3.pdf)
+% ntt.mp -- ntt.w 의 그림 꾸러미.
+% luamplib이 문서 안에서 `input ntt;` 로 읽어들인 뒤 이름으로 불러 쓴다.
+%   fig_detour    -- 평가--곱셈--보간의 우회로
+%   fig_folding   -- 제곱이 단위근을 둘씩 접는 모습
+%   fig_butterfly -- $n=8$ 나비꼴 회로 (길이 2, 4, 8 세 단계)
 
 input boxes
 
-% 라벨의 한글은 plain TeX 쪽 kotex(kotex-plain)이 맡는다. e-TeX 원시명령을
-% 쓰므로 tex 이 아니라 etex 으로 돌려야 한다.
-verbatimtex \input kotex.sty etex
-
 % ---------------------------------------------------------------- fig 1
+def fig_detour =
 beginfig(1);
   boxit.tl(btex $A,\;B$ etex);
   boxit.tr(btex $C=AB$ etex);
@@ -33,8 +29,10 @@ beginfig(1);
   drawarrow (br.c -- tr.c cutbefore bpath.br cutafter bpath.tr);
   label.rt(btex 보간 (FFT$^{-1}$) etex, (221, 42));
 endfig;
+enddef;
 
 % ---------------------------------------------------------------- fig 2
+def fig_folding =
 beginfig(2);
   numeric rr, rs, gap;
   rr := 46; rs := 32; gap := 205;
@@ -75,8 +73,10 @@ beginfig(2);
   label.bot(btex $\omega^6$ etex, R + 1.15rs*dir(270));
   label.top(btex 접혀서 네 점 etex, R + (0, 1.45rs));
 endfig;
+enddef;
 
 % ---------------------------------------------------------------- fig 3
+def fig_butterfly =
 beginfig(3);
   numeric xc[], yr[], dd;
   for c=0 upto 3: xc[c] := 62c; endfor
@@ -127,4 +127,4 @@ beginfig(3);
   label.bot(btex $\ell=4$ etex, (.5[xc[1],xc[2]], -12));
   label.bot(btex $\ell=8$ etex, (.5[xc[2],xc[3]], -12));
 endfig;
-end.
+enddef;

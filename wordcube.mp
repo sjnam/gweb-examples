@@ -1,13 +1,12 @@
-% wordcube.mp -- figures for wordcube.w.
-%   fig 1: the example as a symmetric 5x5 array of words (a word square),
-%          with the main diagonal shaded.  Reading a row, a column, or --
-%          stacking the square into a cube -- a pillar all give words.
-%   fig 2: the same object as a real 5x5x5 cube of letters, in isometric
-%          projection.  The three visible faces carry letters; one line of
-%          five letters is pulled out of the right face as a rod, so the
-%          third reading direction (into the cube) becomes visible too.
-% Build with: mpost --tex=etex wordcube.mp && mptopdf wordcube.[0-9]*
-%   (-> wordcube-1.pdf, wordcube-2.pdf)
+% wordcube.mp -- wordcube.w 의 그림 꾸러미.
+% luamplib이 문서 안에서 `input wordcube;` 로 읽어들인 뒤 이름으로 불러 쓴다.
+%   fig_square -- 보기를 대칭인 5x5 낱말 배열(낱말 사각형)로 그린 것. 주대각선에
+%                 음영을 넣었다. 가로줄, 세로줄, 그리고 사각형을 쌓아 세운
+%                 기둥이 모두 낱말이 된다.
+%   fig_cube   -- 같은 것을 진짜 5x5x5 글자 정육면체로, 등각 투영으로 그린 것.
+%                 보이는 세 면에 글자를 얹고, 오른쪽 면에서 다섯 글자 한 줄을
+%                 막대로 뽑아내어 세 번째 읽기 방향(속으로 들어가는 쪽)도
+%                 눈에 보이게 했다.
 
 defaultfont := "cmtt10";
 defaultscale := 0.95;
@@ -20,6 +19,7 @@ cell[2][0]:="tacos"; cell[2][1]:="adopt"; cell[2][2]:="cover"; cell[2][3]:="oper
 cell[3][0]:="elope"; cell[3][1]:="leper"; cell[3][2]:="opera"; cell[3][3]:="perks"; cell[3][4]:="erase";
 cell[4][0]:="reset"; cell[4][1]:="extra"; cell[4][2]:="strap"; cell[4][3]:="erase"; cell[4][4]:="taper";
 
+def fig_square =
 beginfig(1);
   numeric w, h;
   w := 54; h := 20;
@@ -37,6 +37,7 @@ beginfig(1);
     draw (0, -k*h)--(5w, -k*h);
   endfor
 endfig;
+enddef;
 
 % ---- Isometric machinery for fig 2 ----------------------------------
 % i runs down-left, j runs down-right, k runs up; q(i,j,k) projects a
@@ -76,6 +77,7 @@ def cubelet(expr c, ch) =
   label(ch, c+.5ez);
 enddef;
 
+def fig_cube =
 beginfig(2);
   numeric u;
   u := 20;                        % edge of one little cube
@@ -140,5 +142,5 @@ beginfig(2);
   label.bot(btex $i$ etex, o+.8ey);
   label.top(btex $k$ etex, o+.8ez);
 endfig;
+enddef;
 
-end.

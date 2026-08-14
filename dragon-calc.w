@@ -1,7 +1,11 @@
 @s bufio.Scanner int
 
 \input kotexgweb
-\input pic
+\input luamplib.sty
+
+% 그림은 dragon-calc.mp 안에 fig_... 라는 이름의 매크로로 있다. 여기서 한 번 읽어
+% 두고 그림 자리마다 이름만 부른다.
+\everymplib{input dragon-calc;}
 
 \def\title{용 곡선 계산기}
 \font\logo=logo10
@@ -20,7 +24,9 @@
 곡선이다. 이 프로그램은 그런 {\it 접기열\/}과 그것이 그리는 경로를 가지고 노는
 대화식 계산기다.
 $$
-\pic{dragon-calc-1.pdf}
+\mplibcode
+fig_dragons;
+\endmplibcode
 $$
 \figcap{그림 1: 접을수록 자라는 용. 위는 차수 $1$부터 $5$까지고, 아래는 차수
 $12$다. 차수 $n$의 용은 선분 $2^n$개로 되어 있다. 한 번 더 접으면 앞 차수의
@@ -499,7 +505,9 @@ $$F\,g_0\,\tilde F\,g_1\,F\,g_2\,\tilde F\,\cdots$$
 곱하는 것이 \.D 하나여야 할 까닭은 없다. 무엇을 곱하느냐에 따라 딴판인 곡선이
 쏟아지는데, Dekking이 일반화한 용이 바로 이것들이다.
 $$
-\pic{dragon-calc-2.pdf}
+\mplibcode
+fig_general;
+\endmplibcode
 $$
 \figcap{그림 2: 단위 경로에 경로 \.{01012}(접기열 \.{DUDD})를 거듭 곱한 것. 곱할
 때마다 길이가 다섯 곱절이 된다. 그림 1의 용은 이 자리에 \.D 하나를 곱한 것일

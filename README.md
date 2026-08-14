@@ -35,9 +35,17 @@ directory at once would make Go refuse to compile (`main` redeclared).
 The TeX engine is chosen automatically — **luatex** for Korean documents (those
 with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
 
-Only sources are tracked: the `.w`/`.ch` programs, the MetaPost figures
-(`*.mp`), and the hand-written `pic.tex`. Every `.go`
-and every PDF here is generated, so you will not find one until you build it.
+Figures need no build step of their own. Every illustrated document here is a
+Korean one, hence typeset with luatex, so **luamplib** runs MetaPost inline
+while the document is being typeset — no `mpost` pass, no intermediate PDFs,
+and figure labels are set in the document's own fonts. A document with a single
+figure carries the MetaPost right inside its `.w`; one with several keeps them
+in `<name>.mp` as named macros (`fig_...`) and pulls them in with
+`\everymplib{input <name>;}`, calling each by name where it belongs.
+
+Only sources are tracked: the `.w`/`.ch` programs and the MetaPost figure
+libraries (`*.mp`). Every `.go` and every PDF here is generated, so you will
+not find one until you build it.
 
 The entries below that name a directory rather than a `.w` are separate
 projects, each with its own `README.md`, `Makefile` and `go.mod`. This Makefile

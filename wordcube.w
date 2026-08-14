@@ -1,5 +1,9 @@
 \input kotexgweb
-\input pic
+\input luamplib.sty
+
+% 그림은 wordcube.mp 안에 fig_... 라는 이름의 매크로로 있다. 여기서 한 번 읽어
+% 두고 그림 자리마다 이름만 부른다.
+\everymplib{input wordcube;}
 
 \def\title{대칭 단어 정육면체}
 
@@ -21,7 +25,9 @@ $$ a_{ijk}=a_{ikj}=a_{jik}=a_{jki}=a_{kij}=a_{kji}.$$
 그런 정육면체 하나를, 셋째 축을 읽기 방향으로 삼아 $(i,j)$칸마다 낱말 $a_{ij\ast}$를
 적어 펼친 것이다.
 $$
-\pic{wordcube-1.pdf}
+\mplibcode
+fig_square;
+\endmplibcode
 $$
 \figcap{{\bf 그림 1}: 대칭 단어 정육면체 하나를 $5\times5$ 낱말 표로 편 모습. $(i,j)$칸은
 낱말 $a_{ij\ast}$이다. 대칭이라 표는 대칭 행렬이고(음영은 대각 낱말), 어느 행을
@@ -44,7 +50,9 @@ $i=4$, $j=4$, $k=4$ 세 장이니 그럴 수밖에 없다. 축을 맞바꿔도 �
 말이 이렇게 눈에 보인다. 속으로 뻗은 낱말은 겉에서 보이지 않으므로, 하나를 글자
 다섯 개로 떼어 통째로 뽑아냈다.
 $$
-\pic{wordcube-2.pdf}
+\mplibcode
+fig_cube;
+\endmplibcode
 $$
 \figcap{{\bf 그림 2}: 같은 정육면체를 등각 투영으로 본 모습. 오른쪽 면에서 파란 줄은
 아래에서 위로 읽어 \.{extra}이고, 초록 줄은 오른쪽 위에서 왼쪽 아래로 읽어

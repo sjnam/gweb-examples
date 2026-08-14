@@ -1,5 +1,5 @@
 \input kotexgweb
-\input pic
+\input luamplib.sty
 
 \def\title{완전 자릿수 불변수}
 
@@ -152,8 +152,46 @@ $6$을 얹은 |y| 쪽에 더 얹으면 십진법 아닌 니블 \.{a}$\ldots$\.{f
 있기 때문이다.
 
 @ 백문이 불여일견이니, 앞서 든 $344159959+271828043$을 이 형식으로 더해 보자.
-\medskip
-\centerline{\pic{back-pdi-1.pdf}}
+$$
+\mplibcode
+beginfig(1);
+  numeric w, h, y[];
+  w := 20; h := 24;
+  y0 := 56; y1 := 28; y2 := 0; % 윗 덧수, 아랫 덧수, 합
+  string topd, botd, sumd;
+  topd := "344159959";
+  botd := "271828043";
+  sumd := "615988002";
+
+  % 자리올림이 난 칸(왼쪽에서 0-기준): 1,5,6,7,8
+  boolean carry[];
+  for c=0 upto 8: carry[c] := false; endfor
+  carry[1] := true; carry[5] := true;
+  carry[6] := true; carry[7] := true; carry[8] := true;
+  for c=0 upto 8:
+    if carry[c]:
+      fill (c*w, y2-4)--((c+1)*w, y2-4)
+        --((c+1)*w, y0+h+2)--(c*w, y0+h+2)--cycle withcolor (1, 0.92, 0.78);
+    fi
+  endfor
+
+  % 세 줄의 자릿수
+  for c=0 upto 8:
+    label(substring(c,c+1) of topd, (c*w+.5w, y0+.5h));
+    label(substring(c,c+1) of botd, (c*w+.5w, y1+.5h));
+    label(substring(c,c+1) of sumd, (c*w+.5w, y2+.5h));
+  endfor
+
+  % 합 위의 가로줄과 더하기표
+  draw (-.7w, y1-4)--(9w, y1-4);
+  label.lft(btex $+$ etex, (-.35w, y1+.5h));
+
+  % 오른쪽 끝에 자리 이름
+  label.rt(btex 십진수 그대로 etex, (9w+.3w, y0+.5h));
+  label.rt(btex 음영은 자리올림이 난 칸 etex, (9w+.3w, y2+.5h));
+endfig;
+\endmplibcode
+$$
 \figcap{{\sl 그림} 1: 두 덧수의 니블 합이 $10$ 이상인 칸(음영)에서 이진 자리올림이
 위 니블로 넘어간다. 얹었던 $6$을 자리올림이 없던 칸에서만 도로 빼면, 십진 덧셈이
 십육진 니블 위에서 그대로 완성된다.}

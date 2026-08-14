@@ -13,7 +13,6 @@
 
 GTANGLE ?= gtangle
 GWEAVE  ?= gweave
-MPOST   ?= mpost
 
 WFILES := $(wildcard *.w)
 NAMES  := $(WFILES:.w=)
@@ -35,21 +34,17 @@ $(NAMES): %: %.go %.pdf
 
 # Weave + 조판: <name>.w -> <name>.tex -> <name>.pdf
 #
-# 그림(.mp)의 btex 라벨은 plain TeX으로 조판한다. mptopdf 는 늘 --tex=latex 로
-# 돌기 때문에 mpost 를 직접 부르고, 나온 그림 파일(<name>.1 ...)만 mptopdf 로
-# PDF 로 바꾼다. plain TeX 이되 e-TeX 원시명령이 있어야 하므로 etex 를 쓴다
-# (한글 라벨을 넣는 kotex-plain 이 \unless 따위를 쓴다).
+# 그림은 따로 만들 것이 없다. 그림이 있는 문서는 모두 한글 문서(곧 luatex)이고,
+# MetaPost 는 luamplib 이 조판 중에 직접 돌린다. 그림이 여러 장인 문서는 그림들을
+# <name>.mp 에 이름 붙은 매크로로 두고 문서가 `input <name>;` 으로 읽어들인다.
 %.pdf: %.w
 	$(GWEAVE) $<
-	@if [ -f $*.mp ]; then echo ">> mpost --tex=etex $*.mp"; \
-	rm -f $*.[0-9]*; $(MPOST) --tex=etex $*.mp && mptopdf $*.[0-9]*; fi
 	@if grep -q kotexgweb $<; then eng=luatex; else eng=pdftex; fi; \
 	echo ">> $$eng $*.tex"; $$eng $*.tex </dev/null
 
-# 생성물만 삭제한다. 소스(.w, .ch, .mp, 그리고 손으로 쓴 pic.tex 같은 .tex)는
-# 남긴다. 특히 woven 출력만 골라 지운다: `*.tex`로 싹 지우면 pic.tex 같은 소스
-# .tex 까지 날아가므로, .w 에 대응하는 <name>.tex 만 지운다.
+# 생성물만 삭제한다. 소스(.w, .ch, .mp)는 남긴다. 특히 woven 출력만 골라 지운다:
+# `*.tex`로 싹 지우면 손으로 쓴 .tex 가 있을 때 함께 날아가므로, .w 에 대응하는
+# <name>.tex 만 지운다.
 clean:
 	rm -f *.go $(WFILES:.w=.tex) *.log *.toc *.pdf *.idx *.scn *.dvi *.out
-	rm -f *.[0-9]* *.mpx *.mps
 	rm -f $(NAMES)

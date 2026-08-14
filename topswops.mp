@@ -1,10 +1,10 @@
-% topswops.mp -- figures for topswops.w.
-% fig 1: the forward game 3 1 2 -> 2 1 3 -> 1 2 3 (shaded block = about to flip)
-% fig 2: the complete backward search tree for n = 3
-% Build with: mpost --tex=etex topswops.mp && mptopdf topswops.[0-9]*
-%   (-> topswops-1.pdf, topswops-2.pdf)
-% Labels avoid spaces: cmr10 (mpost's default label font) has no space glyph.
+% topswops.mp -- topswops.w 의 그림 꾸러미.
+% luamplib이 문서 안에서 `input topswops;` 로 읽어들인 뒤 이름으로 불러 쓴다.
+%   fig_forward  -- 앞으로 가는 판 3 1 2 -> 2 1 3 -> 1 2 3 (음영 = 곧 뒤집힐 뭉치)
+%   fig_backtree -- $n=3$ 의 거꾸로 탐색 나무 전부
+% 라벨에 빈칸을 쓰지 않는다: mpost 기본 라벨 글꼴 cmr10 에 빈칸 글립이 없다.
 
+def fig_forward =
 beginfig(1);
   numeric w, h, gap, g; w := 16; h := 20; gap := 44;
   def card(expr x, v, hot) =
@@ -30,7 +30,9 @@ beginfig(1);
   drawarrow (g + 3w + 7, 0.5h) -- (g + 3w + gap - 7, 0.5h);
   label.top("2", (g + 3w + 0.5gap, 0.5h + 2));
 endfig;
+enddef;
 
+def fig_backtree =
 beginfig(2);
   numeric dy, bw, bh; dy := 40; bw := 36; bh := 15;
   % a tree node: fixed-size box around three characters placed by hand,
@@ -56,4 +58,4 @@ beginfig(2);
   node(A,  "2", "1", ".");  node(B,  "3", ".", "1");
   node(AA, "3", "1", "2");  node(BB, "2", "3", "1");
 endfig;
-end.
+enddef;

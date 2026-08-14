@@ -1,14 +1,9 @@
-% dragon-calc.mp -- figures for dragon-calc.w.
-%   fig 1: the paperfolding dragon of orders 1..5, and of order 12.
-%   fig 2: a generalized dragon -- the unit path times the path 01012,
-%          three times over (s=125).
-% The D, U and O macros below are exactly the ones that dragon-calc's `m'
-% command emits, so these pictures are drawn the way the program draws.
-% Build with: mpost --tex=etex dragon-calc.mp && mptopdf dragon-calc.[0-9]*
-%   (-> dragon-calc-1.pdf, dragon-calc-2.pdf)
-%
-% 라벨이 수식뿐이라 프리앰블이 아예 없어도 된다. 한글 라벨을 넣으려면 다른
-% 그림들처럼 `verbatimtex \input kotex.sty etex' 한 줄을 얹으면 된다.
+% dragon-calc.mp -- dragon-calc.w 의 그림 꾸러미.
+% luamplib이 문서 안에서 `input dragon-calc;` 로 읽어들인 뒤 이름으로 불러 쓴다.
+%   fig_dragons -- 차수 1..5 의 종이접기 용, 그리고 차수 12 의 용
+%   fig_general -- 일반화된 용. 단위 경로에 경로 01012 를 세 번 곱한 것(s=125)
+% 아래의 D, U, O 매크로는 dragon-calc 의 `m' 명령이 뱉는 것과 똑같다. 그러니
+% 이 그림들은 프로그램이 그리는 그대로 그려진다.
 
 % btex 는 변수를 받지 못하므로, 라벨을 미리 그림으로 만들어 두고 골라 쓴다.
 picture nlbl[], slbl[];
@@ -28,6 +23,7 @@ def O = zz:=origin; dd:=-90; D; enddef;
 def Dn(expr n) = if n>0: Dn(n-1); D; Un(n-1); fi enddef;
 def Un(expr n) = if n>0: Dn(n-1); U; Un(n-1); fi enddef;
 
+def fig_dragons =
 beginfig(1);
   picture p[], q;
   numeric wd, cw, x, top;
@@ -52,9 +48,11 @@ beginfig(1);
   draw q shifted (.5x - .5(xpart urcorner q + xpart llcorner q),
                   top - ypart urcorner q);
 endfig;
+enddef;
 
 % 일반화된 용. 단위 경로에 경로 01012 를 거듭 곱한 것으로, 접기열은 프로그램의
 % m 명령이 뱉은 것을 그대로 옮겼다.
+def fig_general =
 beginfig(2);
   picture g[];
   numeric wd, cw, x;
@@ -82,5 +80,5 @@ beginfig(2);
     x := x + cw + 22;
   endfor
 endfig;
+enddef;
 
-end.

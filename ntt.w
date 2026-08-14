@@ -1,8 +1,12 @@
 @i types.w
 
 \input kotexgweb
-\input pic
+\input luamplib.sty
 \input amssym
+
+% 그림은 ntt.mp 안에 fig_... 라는 이름의 매크로로 있다. 여기서 한 번 읽어 두고
+% 그림 자리마다 이름만 부른다.
+\everymplib{input ntt;}
 
 \def\title{NTT: 정수 위의 고속 푸리에 변환}
 
@@ -82,8 +86,11 @@ $$C(x_t)=A(x_t)\,B(x_t)$$
 그렇다면 길이 보인다. 계수를 점값으로 옮겨(평가) 거기서 싸게 곱하고, 다시 계수로
 되돌리면(보간) 된다. 곧장 가는 대신 빙 둘러 가는 우회로다.
 
-\medskip
-\centerline{\pic{ntt-1.pdf}}
+$$
+\mplibcode
+fig_detour;
+\endmplibcode
+$$
 \figcap{{\sl 그림 1.} 위쪽 점선이 $O(n^2)$짜리 직행길, 아래로 도는 실선이 우회로다.
   평가와 보간만 싸면 우회가 이긴다.}
 
@@ -124,8 +131,11 @@ $450^\circ$가 되어, 둘 다 $\omega^2$이다.
 그래서 $n$개의 점을 모두 제곱하면 서로 다른 값은 $n/2$개만 남고, 더구나 그 $n/2$개는
 정확히 $n/2$차 단위근들이다.
 
-\medskip
-\centerline{\pic{ntt-2.pdf}}
+$$
+\mplibcode
+fig_folding;
+\endmplibcode
+$$
 \figcap{{\sl 그림 2.} $n=8$. 점선으로 이은 마주 보는 짝이 제곱에서 한 점이 되어,
   여덟 점이 네 점으로 접힌다. 예컨대 왼쪽의 $\omega^1$과 $\omega^5$는 나란히
   오른쪽의 $\omega^2$로 간다.}
@@ -173,8 +183,11 @@ $a_1=a_{001_2}$은 $100_2=4$번 자리로, $a_3=a_{011_2}$은 $110_2=6$번 자�
 거기서부터 묶음을 $2,4,\ldots,n$으로 키우며 나비 연산으로 합쳐 올라가면 된다.
 재귀도, 여분의 배열도 필요 없다.
 
-\medskip
-\centerline{\pic{ntt-3.pdf}}
+$$
+\mplibcode
+fig_butterfly;
+\endmplibcode
+$$
 \figcap{{\sl 그림 3.} $n=8$의 나비 흐름도. 왼쪽은 비트 역순으로 놓인 입력, 오른쪽은 평가 결과다.
  층이 $\log_2 8=3$개, 층마다 점 $8$개를 건드리니 합쳐서 $O(n\log n)$이다.}
 

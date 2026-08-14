@@ -1,5 +1,9 @@
 \input kotexgweb
-\input pic
+\input luamplib.sty
+
+% 그림은 topswops_fwd.mp 안에 fig_... 라는 이름의 매크로로 있다. 여기서 한 번 읽어
+% 두고 그림 자리마다 이름만 부른다.
+\everymplib{input topswops_fwd;}
 
 \def\title{TOPSWOPS\_\,FWD}
 
@@ -26,8 +30,11 @@ $$f(n)=\hbox{$\{1,\ldots,n\}$의 $n!$가지 순열 가운데 가장 큰 점수}$
 하나를 골라 가능성과 상계를 검사하며, \.{infeas}는 퇴짜맞은 후보의 뒤처리(다른
 자리를 시도하거나 물러남)를, \.{backup}은 한 레벨 후퇴를, \.{nextv}는 저장해 둔
 덱을 복원하며 다음 후보로 넘어가는 일을 맡는다.
-\smallskip
-\centerline{\pic{topswops_fwd-1.pdf}}
+$$
+\mplibcode
+fig_states;
+\endmplibcode
+$$
 \smallskip
 \centerline{그림 1: |main|의 상태 기계. \.{tryit}의 세 갈래(descend/leaf/reject)가
 탐색의 심장 박동이다.}
@@ -77,8 +84,11 @@ $$c+f(m)\;\ge\;r$$
 일 때뿐이다. 아니라면 어떤 후손도 기록을 넘지 못하니, 부분 나무를 통째로
 버린다.
 
-\medskip
-\centerline{\pic{topswops_fwd-2.pdf}}
+$$
+\mplibcode
+fig_bound;
+\endmplibcode
+$$
 \smallskip
 \centerline{그림 2: 걸어온 $c$걸음에 남은 최선 $f(m)$을 더해도 기록 $r$에 닿지
 못하면, 이 가지는 파 볼 가치가 없다.}

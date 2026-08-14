@@ -1,12 +1,12 @@
-% topswops_fwd.mp -- figures for topswops_fwd.w.
-% fig 1: the five-label state machine inside main
-% fig 2: the branch-and-bound test c + f(m) >= r
-% Build with: mpost --tex=etex topswops_fwd.mp && mptopdf topswops_fwd.[0-9]*
-%   (-> topswops_fwd-1.pdf, -2.pdf)
-% Labels avoid spaces: cmr10 (mpost's default label font) has no space glyph.
+% topswops_fwd.mp -- topswops_fwd.w 의 그림 꾸러미.
+% luamplib이 문서 안에서 `input topswops_fwd;` 로 읽어들인 뒤 이름으로 불러 쓴다.
+%   fig_states -- main 안에 든 라벨 다섯 개짜리 상태 기계
+%   fig_bound  -- 분기한정 판정 c + f(m) >= r
+% 라벨에 빈칸을 쓰지 않는다: mpost 기본 라벨 글꼴 cmr10 에 빈칸 글립이 없다.
 
 input boxes
 
+def fig_states =
 beginfig(1);
   boxit.adv("advance"); boxit.tri("tryit"); boxit.don("done");
   boxit.inf("infeas");  boxit.bak("backup"); boxit.nxt("nextv");
@@ -42,7 +42,9 @@ beginfig(1);
   % nextv -> done: backed up to the root
   drawarrow nxt.c -- don.c cutbefore bpath.nxt cutafter bpath.don;
 endfig;
+enddef;
 
+def fig_bound =
 beginfig(2);
   numeric y; y := 20;
   % steps taken so far
@@ -57,4 +59,4 @@ beginfig(2);
   draw (235, y-15) -- (235, y+22) dashed evenly;
   label.top("r", (235, y+22));
 endfig;
-end.
+enddef;
