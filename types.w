@@ -1,7 +1,4 @@
 % constants
-@d Stdin
-@d Stdout
-@d Stderr
 @d ScanWords
 @d MinInt64
 
