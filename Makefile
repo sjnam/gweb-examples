@@ -13,6 +13,7 @@
 
 GTANGLE ?= gtangle
 GWEAVE  ?= gweave
+MPOST   ?= mpost
 
 WFILES := $(wildcard *.w)
 NAMES  := $(WFILES:.w=)
@@ -33,9 +34,15 @@ $(NAMES): %: %.go %.pdf
 	$(GTANGLE) $<
 
 # Weave + 조판: <name>.w -> <name>.tex -> <name>.pdf
+#
+# 그림(.mp)의 btex 라벨은 plain TeX으로 조판한다. mptopdf 는 늘 --tex=latex 로
+# 돌기 때문에 mpost 를 직접 부르고, 나온 그림 파일(<name>.1 ...)만 mptopdf 로
+# PDF 로 바꾼다. plain TeX 이되 e-TeX 원시명령이 있어야 하므로 etex 를 쓴다
+# (한글 라벨을 넣는 kotex-plain 이 \unless 따위를 쓴다).
 %.pdf: %.w
 	$(GWEAVE) $<
-	@if [ -f $*.mp ]; then echo ">> mptopdf $*.mp"; mptopdf $*.mp; fi
+	@if [ -f $*.mp ]; then echo ">> mpost --tex=etex $*.mp"; \
+	rm -f $*.[0-9]*; $(MPOST) --tex=etex $*.mp && mptopdf $*.[0-9]*; fi
 	@if grep -q kotexgweb $<; then eng=luatex; else eng=pdftex; fi; \
 	echo ">> $$eng $*.tex"; $$eng $*.tex </dev/null
 

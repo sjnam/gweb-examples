@@ -1,14 +1,11 @@
 % ziptree.mp -- Figure 1 of Tarjan, Levy & Timmel, "Zip Trees":
 % insertion and deletion of key K (assigned rank 3).
-% Companion figure for ziptree.w; build with: mptopdf ziptree.mp  (-> ziptree-1.pdf)
+% Build with: mpost --tex=etex ziptree.mp && mptopdf ziptree.[0-9]*
+%   (-> ziptree-1.pdf)
 
-% mptopdf runs mpost with --tex=latex, so a LaTeX preamble here lets
-% btex...etex carry Korean (and spaces, which bare cmr10 labels cannot).
-verbatimtex
-\documentclass{article}
-\usepackage{kotex}
-\begin{document}
-etex
+% 라벨의 한글은 plain TeX 쪽 kotex(kotex-plain)이 맡는다. e-TeX 원시명령을
+% 쓰므로 tex 이 아니라 etex 으로 돌려야 한다.
+verbatimtex \input kotex.sty etex
 
 beginfig(1);
   numeric dx, dy, rr, xs;

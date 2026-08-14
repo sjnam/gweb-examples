@@ -6,15 +6,8 @@
 %          projection.  The three visible faces carry letters; one line of
 %          five letters is pulled out of the right face as a rod, so the
 %          third reading direction (into the cube) becomes visible too.
-% Build with: mptopdf wordcube.mp  (-> wordcube-1.pdf, wordcube-2.pdf)
-
-% mptopdf runs mpost with --tex=latex, so a LaTeX preamble here lets
-% btex...etex carry Korean (and spaces, which bare cmr10 labels cannot).
-verbatimtex
-\documentclass{article}
-\usepackage{kotex}
-\begin{document}
-etex
+% Build with: mpost --tex=etex wordcube.mp && mptopdf wordcube.[0-9]*
+%   (-> wordcube-1.pdf, wordcube-2.pdf)
 
 defaultfont := "cmtt10";
 defaultscale := 0.95;

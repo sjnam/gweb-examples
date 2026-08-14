@@ -1,7 +1,8 @@
 % topswops_fwd.mp -- figures for topswops_fwd.w.
 % fig 1: the five-label state machine inside main
 % fig 2: the branch-and-bound test c + f(m) >= r
-% Build with: mptopdf topswops_fwd.mp  (-> topswops_fwd-1.pdf, -2.pdf)
+% Build with: mpost --tex=etex topswops_fwd.mp && mptopdf topswops_fwd.[0-9]*
+%   (-> topswops_fwd-1.pdf, -2.pdf)
 % Labels avoid spaces: cmr10 (mpost's default label font) has no space glyph.
 
 input boxes

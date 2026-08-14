@@ -1,7 +1,8 @@
 % topswops.mp -- figures for topswops.w.
 % fig 1: the forward game 3 1 2 -> 2 1 3 -> 1 2 3 (shaded block = about to flip)
 % fig 2: the complete backward search tree for n = 3
-% Build with: mptopdf topswops.mp  (-> topswops-1.pdf, topswops-2.pdf)
+% Build with: mpost --tex=etex topswops.mp && mptopdf topswops.[0-9]*
+%   (-> topswops-1.pdf, topswops-2.pdf)
 % Labels avoid spaces: cmr10 (mpost's default label font) has no space glyph.
 
 beginfig(1);

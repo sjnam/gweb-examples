@@ -2,17 +2,14 @@
 %   fig 1: the evaluate-multiply-interpolate detour
 %   fig 2: squaring folds the n-th roots of unity two-to-one
 %   fig 3: the n=8 butterfly network (three stages: length 2, 4, 8)
-% Build with: mptopdf ntt.mp  (-> ntt-1.pdf, -2.pdf, -3.pdf)
+% Build with: mpost --tex=etex ntt.mp && mptopdf ntt.[0-9]*
+%   (-> ntt-1.pdf, -2.pdf, -3.pdf)
 
 input boxes
 
-% mptopdf runs mpost with --tex=latex, so a LaTeX preamble here lets
-% btex...etex carry Korean (and spaces, which bare cmr10 labels cannot).
-verbatimtex
-\documentclass{article}
-\usepackage{kotex}
-\begin{document}
-etex
+% 라벨의 한글은 plain TeX 쪽 kotex(kotex-plain)이 맡는다. e-TeX 원시명령을
+% 쓰므로 tex 이 아니라 etex 으로 돌려야 한다.
+verbatimtex \input kotex.sty etex
 
 % ---------------------------------------------------------------- fig 1
 beginfig(1);

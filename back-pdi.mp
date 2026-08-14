@@ -1,15 +1,12 @@
 % back-pdi.mp -- figure for back-pdi.w.
 %   fig 1: a worked BCD addition, 344159959 + 271828043 = 615988002,
 %          with the carry columns shaded.
-% Build with: mptopdf back-pdi.mp  (-> back-pdi-1.pdf)
+% Build with: mpost --tex=etex back-pdi.mp && mptopdf back-pdi.[0-9]*
+%   (-> back-pdi-1.pdf)
 
-% mptopdf runs mpost with --tex=latex, so a LaTeX preamble here lets
-% btex...etex carry Korean (and spaces, which bare cmr10 labels cannot).
-verbatimtex
-\documentclass{article}
-\usepackage{kotex}
-\begin{document}
-etex
+% 라벨의 한글은 plain TeX 쪽 kotex(kotex-plain)이 맡는다. e-TeX 원시명령을
+% 쓰므로 tex 이 아니라 etex 으로 돌려야 한다.
+verbatimtex \input kotex.sty etex
 
 beginfig(1);
   numeric w, h, y[];
