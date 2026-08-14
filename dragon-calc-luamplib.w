@@ -1,5 +1,3 @@
-@s pair int
-@s scanner int
 @s bufio.Scanner int
 
 \input kotexgweb
