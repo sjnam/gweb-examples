@@ -3,9 +3,9 @@
 @s bufio.Scanner int
 
 \input kotexgweb
-\input pic
+\input luamplib.sty
 
-\def\title{용 곡선 계산기}
+\def\title{용 곡선 계산기 (luamplib 판)}
 \font\logo=logo10
 \datethis
 
@@ -15,6 +15,14 @@
 \def\thing#1#2\par{\smallskip\item{$\bullet$}#1\hfil\break#2\par}
 \def\<#1>{\hbox{$\langle\,$#1$\,\rangle$}}
 
+% 그림마다 앞세울 MetaPost 정의. 프로그램의 m 명령이 뱉는 D, U, O 그대로다.
+\everymplib{numeric dd; pair rr,ww,zz;
+def D = dd:=dd+90; ww:=zz; zz:=ww+rr rotated dd; draw ww--zz; enddef;
+def U = dd:=dd-90; ww:=zz; zz:=ww+rr rotated dd; draw ww--zz; enddef;
+def O = zz:=origin; dd:=-90; D; enddef;
+def Dn(expr n) = if n>0: Dn(n-1); D; Un(n-1); fi enddef;
+def Un(expr n) = if n>0: Dn(n-1); U; Un(n-1); fi enddef;}
+
 @* 들어가며.
 종이띠를 반으로 접고, 접힌 것을 또 반으로 접고, 그렇게 $n$번 접은 다음 모든 접힌
 자리를 직각으로 펴 보라. 자를 대고 그린 적도 없는데 {\it 용 곡선\/}(dragon curve)이
@@ -22,7 +30,36 @@
 곡선이다. 이 프로그램은 그런 {\it 접기열\/}과 그것이 그리는 경로를 가지고 노는
 대화식 계산기다.
 $$
-\pic{dragon-calc-1.pdf}
+\mplibcode
+picture nlbl[];
+nlbl[1] := btex $n=1$ etex;  nlbl[2] := btex $n=2$ etex;
+nlbl[3] := btex $n=3$ etex;  nlbl[4] := btex $n=4$ etex;
+nlbl[5] := btex $n=5$ etex;
+beginfig(1);
+  picture p[], q;
+  numeric wd, cw, x, top;
+  rr := (7bp,0);
+  for n=1 upto 5:
+    p[n] := image(O Dn(n));
+  endfor
+  x := 0;
+  for n=1 upto 5:
+    % 칸 너비는 그림과 라벨 가운데 넓은 쪽. 둘 다 칸 한가운데 놓는다.
+    wd := xpart urcorner p[n] - xpart llcorner p[n];
+    cw := max(wd, xpart urcorner nlbl[n] - xpart llcorner nlbl[n]);
+    draw p[n] shifted (x + .5(cw-wd) - xpart llcorner p[n],
+                       -ypart llcorner p[n]);
+    label.bot(nlbl[n], (x + .5cw, -4));
+    x := x + cw + 14;
+  endfor
+  top := -36;
+  rr := (2.6bp,0);
+  drawoptions(withpen pencircle scaled .3bp);
+  q := image(O Dn(12));
+  draw q shifted (.5x - .5(xpart urcorner q + xpart llcorner q),
+                  top - ypart urcorner q);
+endfig;
+\endmplibcode
 $$
 \figcap{그림 1: 접을수록 자라는 용. 위는 차수 $1$부터 $5$까지고, 아래는 차수
 $12$다. 차수 $n$의 용은 선분 $2^n$개로 되어 있다. 한 번 더 접으면 앞 차수의
@@ -35,6 +72,17 @@ Knuth가 2010년 9월에 \.{CWEB}으로 쓴 \.{dragon-calc.w}인데, 나는 그�
 옮기면서 한글로 다시 썼다. 원본 끝에 그는 이렇게 적어 두었다: ``맡은 일이 많아
 이 프로그램을 몹시 서둘러 써야 했음을 헤아려 주시기 바랍니다.'' 서두른 자리가
 군데군데 보이길래 몇 곳은 손을 보았고, 그럴 때마다 어디를 왜 고쳤는지 밝혀 두었다.
+
+@ 이 파일은 \.{dragon-calc.w}의 딴판이다. 프로그램은 한 글자도 다르지 않고, 그림을
+다루는 방식만 다르다. 본판은 그림을 동봉 파일 \.{dragon-calc.mp}에 두고 \.{mpost}로
+미리 PDF를 구운 뒤 그것을 불러들이지만, 이 판은 {\logo METAPOST} 코드를 이 문서
+{\it 안에\/} 그대로 두고 \.{luamplib}이 조판 도중에 바로 그리게 한다. 그러니
+동봉 파일도, 미리 굽는 걸음도 없다. \.{gweave} 다음에 \.{luatex} 한 번이면 끝이다.
+
+덤이 하나 더 있다. \.{btex...etex} 안의 라벨을 문서 자신의 \TeX 이 조판하므로 본문과
+똑같은 글꼴이 나온다. 따로 굽는 판에서는 라벨만 딴 글꼴이었다---한글이면 특히 그렇다.
+값도 치른다. 이 파일은 \.{luatex} 전용이고(\.{pdftex}로는 짤 수 없다), 그림 코드를
+여러 문서가 나눠 쓸 수 없다. 그림은 두 판이 화소까지 같다.
 
 @ 프로그램은 물음표 대신 \.{>}를 내밀고 명령을 기다린다. 할 수 있는 일은 다음과 같다.
 
@@ -501,7 +549,38 @@ $$F\,g_0\,\tilde F\,g_1\,F\,g_2\,\tilde F\,\cdots$$
 곱하는 것이 \.D 하나여야 할 까닭은 없다. 무엇을 곱하느냐에 따라 딴판인 곡선이
 쏟아지는데, Dekking이 일반화한 용이 바로 이것들이다.
 $$
-\pic{dragon-calc-2.pdf}
+\mplibcode
+picture slbl[];
+slbl[1] := btex $s=5$ etex;  slbl[2] := btex $s=25$ etex;
+slbl[3] := btex $s=125$ etex;
+beginfig(2);
+  picture g[];
+  numeric wd, cw, x;
+  rr := (9bp,0);
+  g[1] := image(O D U D D;);
+  g[2] := image(O D U D D D U U D U U D U D D D U U D U D D U D D;);
+  rr := (5bp,0);
+  g[3] := image(
+  O D U D D D U U D U U D U D D D U U D U D D U D D D U U D U U D
+  U D D U U U D U D D U D D U U U D U U D U D D D U U D U U D U D
+  D D U U D U D D U D D D U U D U U D U D D U U U D U D D U D D U
+  U U D U D D U D D D U U D U U D U D D D U U D U D D U D D;);
+  numeric bot;
+  bot := 0;
+  for n=1 upto 3:
+    bot := min(bot, -.5(ypart urcorner g[n] - ypart llcorner g[n]));
+  endfor
+  x := 0;
+  for n=1 upto 3:
+    wd := xpart urcorner g[n] - xpart llcorner g[n];
+    cw := max(wd, xpart urcorner slbl[n] - xpart llcorner slbl[n]);
+    draw g[n] shifted (x + .5(cw-wd) - xpart llcorner g[n],
+                       -.5(ypart urcorner g[n] + ypart llcorner g[n]));
+    label.bot(slbl[n], (x + .5cw, bot - 3));
+    x := x + cw + 22;
+  endfor
+endfig;
+\endmplibcode
 $$
 \figcap{그림 2: 단위 경로에 경로 \.{01012}(접기열 \.{DUDD})를 거듭 곱한 것. 곱할
 때마다 길이가 다섯 곱절이 된다. 그림 1의 용은 이 자리에 \.D 하나를 곱한 것일
