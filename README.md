@@ -51,6 +51,17 @@ does not reach into them — build those from inside (`cd life-game && make`).
   +6 / −6 carry trick, with a worked figure). A Go/GWEB port of Knuth's CWEB
   program; its node counts match the original exactly. Korean (typeset with
   **luatex**), one MetaPost figure.
+* [dragon-calc.w](dragon-calc.w) — Knuth's **dragon-calc**: an interactive
+  calculator for Dekking's generalized dragon curves and the calculus of tiles
+  from his *diamonds and dragons* notes. Fold sequences of `D`s and `U`s, the
+  folding product that doubles (or quintuples) a curve, tiles as Gaussian
+  integers with odd coordinate sum, congruence classes mod (2+2i)z via a
+  Hermite-normal-form basis found by Euclid on imaginary parts, factoring tiles
+  over plane-filling paths, and MetaPost output. A Go/GWEB port of Knuth's 2010
+  CWEB program whose answers match the original line for line; the `goto` web
+  became a labeled loop, the 134 MB static table became an exact allocation, and
+  a divide-by-zero on closed paths is now caught. Korean (typeset with
+  **luatex**), two MetaPost figures.
 * [fast_cancel.w](fast_cancel.w) — It shows a complementary pattern
   useful in any concurrent Go program: how to propagate a first-error signal to all
   sibling goroutines cleanly.
