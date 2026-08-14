@@ -1,5 +1,5 @@
 \input kotexgweb
-\input ../pic
+\input luamplib.sty
 
 \def\title{셔우드의 장부: 호기심 많은 로빈 후드}
 
@@ -67,9 +67,35 @@ $t$를 두되, $t[i]$에는 원소 하나가 아니라 {\it 구간
 $(i-lowbit(i),\,i]$의 합}을 담는다. 그림이 $n=16$일 때의 배치다---%
 상자 안의 수가 색인 $i$이고, 상자의 가로 폭이 그 상자가 책임지는 구간이다.
 
-\medskip
-\centerline{\pic{robin-1.pdf}}
-\medskip
+$$
+\mplibcode
+% 펜윅 트리의 책임 구간 (n=16).
+% 상자 t[i]는 구간 (i-lowbit(i), i]의 합을 책임지고, 상자 안의 수가 색인 i다.
+% 회색 상자 셋은 접두사 합 sum(13) = t[13]+t[12]+t[8]의 분해.
+
+beginfig(1);
+  numeric u, h, dy;
+  u := 7mm; h := 3.6mm; dy := 6mm;
+
+  % 구간 (a, b]를 책임지는 상자를 높이 lev에 그린다
+  def bar(expr a, b, lev, shaded) =
+    begingroup
+      save p; path p;
+      p := (a*u, lev*dy)--(b*u, lev*dy)--(b*u, lev*dy+h)--(a*u, lev*dy+h)--cycle;
+      if shaded: fill p withcolor .85white; fi
+      draw p;
+      label(decimal b, ((b-.5)*u, lev*dy+.5h));
+    endgroup
+  enddef;
+
+  for i = 1 step 2 until 15: bar(i-1, i, 0, (i=13)); endfor  % lowbit 1
+  for i = 2 step 4 until 14: bar(i-2, i, 1, false); endfor   % lowbit 2
+  for i = 4 step 8 until 12: bar(i-4, i, 2, (i=12)); endfor  % lowbit 4
+  bar(0, 8, 3, true);                                        % lowbit 8
+  bar(0, 16, 4, false);                                      % lowbit 16
+endfig;
+\endmplibcode
+$$
 
 접두사 합 $S_{13}$을 구해 보자. $13=8+4+1$이니 구간 $[1,13]$은
 $[1,8]$, $[9,12]$, $[13,13]$---그림의 회색 상자 셋---으로 쪼개지고, 그

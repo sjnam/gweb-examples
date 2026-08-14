@@ -1,5 +1,5 @@
 \input kotexgweb
-\input ../pic
+\input luamplib.sty
 
 \def\title{과하탁교(過河拆橋): 리차오 트리}
 
@@ -95,9 +95,41 @@ $[0,X]$($X$는 질의가 나올 수 있는 최대, 여기서는 $h$의 최댓값
 자식에게, $r$에서 이기면 오른 자식에게 내려보내고, 양끝에서도 다 지면 구간
 전체에서 지는 것이니 그제야 허문다.
 
-\medskip
-\centerline{\pic{bridge-1.pdf}}
-\medskip
+$$
+\mplibcode
+% 리차오 트리 노드의 결투.
+% 노드 [l,r]의 한가운데 m에서 주인 g와 도전자 ell이 값을 겨룬다.
+% m에서 낮은 g(찬 점)가 노드를 지키고, 진 ell(빈 점)은 제가 아직 낮은
+% 데가 남은 왼쪽 반으로만 내려간다(화살표).
+
+beginfig(1);
+  numeric u; u := 9mm;
+
+  % 구간 [l,r]과 한가운데 m
+  draw (0,0)--(10u,0);
+  for xx = 0, 5, 10:
+    draw (xx*u,0)--(xx*u,7u) dashed evenly scaled 0.7;
+  endfor
+  label.bot(btex $l$ etex, (0,-1mm));
+  label.bot(btex $m$ etex, (5u,-1mm));
+  label.bot(btex $r$ etex, (10u,-1mm));
+
+  % 주인 g와 도전자 ell; 교차는 왼반에서 단 한 번
+  draw (0,2.5u)--(10u,5.0u) withpen pencircle scaled 1pt;
+  draw (0,2.0u)--(10u,6.4u) dashed evenly;
+  label.rt(btex $g$ etex, (10u,5.0u));
+  label.rt(btex $\ell$ etex, (10u,6.4u));
+
+  % 한가운데의 결투: g가 이긴다
+  fill fullcircle scaled 3.5bp shifted (5u,3.75u);
+  draw fullcircle scaled 3.5bp shifted (5u,4.2u);
+
+  % 진 직선은 왼쪽 반으로 내려간다
+  drawarrow (4.7u,-8mm)--(0.3u,-8mm);
+  label.bot(btex $\ell$ etex, (2.5u,-8.5mm));
+endfig;
+\endmplibcode
+$$
 
 그림이 결투 한 판이다. 한가운데 $m$에서 낮은 $g$(찬 점)가 노드를 지키고, 진
 $\ell$(빈 점)은 제가 아직 낮은 데가 남은 왼쪽 반으로만 내려간다---$m$에서
