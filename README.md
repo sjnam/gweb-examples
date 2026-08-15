@@ -160,6 +160,21 @@ does not reach into them — build those from inside (`cd life-game && make`).
 * [slidingmax.w](slidingmax.w) — LeetCode's *Sliding Window
   Maximum*, solved in O(n) with a **monotonic deque**. A Korean literate essay
   (typeset with **luatex**, like `hangul.w`).
+* [spiders.w](spiders.w) — Knuth's **spiders**, which closes the trilogy and
+  makes `koda-ruskey` and `li-ruskey` obsolete: the same problem — list every
+  0/1 labeling of a totally acyclic digraph respecting `x → y ⟹ bit x ≤ bit y`
+  as a Gray path whose root bit flips once — solved from a different direction.
+  The near-sets `U_k`/`V_k` carried implicitly on *progenitor* chains so the
+  whole O(n²) worth of sets fits in linear time and space; the parity of the
+  reflected code read off a single `ueven`/`veven` table instead of n-bit
+  arithmetic; and an *active list* of alternately awake and asleep nodes whose
+  blocks enter and leave behind delayed flags, giving a genuinely loopless
+  generator. Knuth's original recurrence for the insertion point was wrong for
+  twenty-five years — a five-vertex spider breaks it — and this document walks
+  through the failure and the fix (which Knuth adopted in June 2026 and
+  credited to this repository's author) with a figure. Verified against the
+  CWEB original on all 10,067 connected spiders of ≤ 7 vertices, `-v` output
+  included. Korean (typeset with **luatex**), four MetaPost figures.
 * [squint.w](squint.w) — lazy power series as demand-driven
   channel networks (sum, product, composition, reciprocal, functional inverse,
   and differential equations like `exp`), after McIlroy's *Squinting at Power
