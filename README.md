@@ -91,6 +91,20 @@ does not reach into them — build those from inside (`cd life-game && make`).
   coroutines with a ten-state `switch`, this port writes them out as goroutines
   rendezvousing on unbuffered channels, so the six-line coroutine body survives
   intact. Korean (typeset with **luatex**), three MetaPost figures.
+* [li-ruskey.w](li-ruskey.w) — Knuth's **li-ruskey**, the sequel to
+  `koda-ruskey`: the constraints now carry *directions*, so instead of a forest
+  poset the input is any totally acyclic digraph, and the job is to list every
+  0/1 labeling respecting `x → y ⟹ bit x ≤ bit y` as a Gray path whose root bit
+  flips exactly once. Near-positive and near-negative vertex sets, the
+  mixed-radix reflected code that splices two half-paths into one, entourages
+  and transition strings, and a fringe that stays loopless by leaving *stale*
+  links behind a travelling flag. Knuth left the coroutine version as an
+  exercise, noting that its parent pointers would have to be dynamic; this port
+  does that exercise with goroutines, where the difficulty evaporates (the call
+  stack *is* the parent pointer) and each coroutine picks its entry point by
+  reading its own bit as it first wakes. Both implementations run in one
+  program and agree line for line with the CWEB original, `-v` output included.
+  Korean (typeset with **luatex**), four MetaPost figures.
 * [ntt.w](ntt.w) — a friendly guide to the **fast Fourier
   transform** and its integer cousin, the **number theoretic transform**: the
   evaluate–multiply–interpolate detour, why squaring folds the roots of unity
