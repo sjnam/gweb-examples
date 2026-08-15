@@ -82,6 +82,15 @@ does not reach into them — build those from inside (`cd life-game && make`).
   of Permutations*: each value becomes a 2-D point, reducing the queries to
   rectangle counting with point updates — a **Fenwick tree of Fenwick trees**
   with offline coordinate compression. Korean (typeset with **luatex**).
+* [koda-ruskey.w](koda-ruskey.w) — Knuth's **koda-ruskey**: generate every
+  *ideal of a forest poset* — all bitstrings in which a bit may be 1 only if
+  its parent's is — as a generalized reflected Gray code, one bit changing per
+  step. Two implementations of the same sequence, side by side: one coroutine
+  per node, and a loopless one whose every step is a bounded number of
+  operations on a four-link *fringe*. Where the CWEB original hand-simulates
+  coroutines with a ten-state `switch`, this port writes them out as goroutines
+  rendezvousing on unbuffered channels, so the six-line coroutine body survives
+  intact. Korean (typeset with **luatex**), three MetaPost figures.
 * [ntt.w](ntt.w) — a friendly guide to the **fast Fourier
   transform** and its integer cousin, the **number theoretic transform**: the
   evaluate–multiply–interpolate detour, why squaring folds the roots of unity
