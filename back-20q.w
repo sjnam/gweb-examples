@@ -259,8 +259,7 @@ var (
 @ 처음에는 스무 답이 모두 자유롭다.
 @<처음 제약을 놓는다@>=
 for q = 1; q <= 20; q++ {
-	mems++
-	mem[q] = AA + BB + CC + DD + EE
+	mems++; mem[q] = AA + BB + CC + DD + EE
 }
 
 @ 어떤 문제는 검색나무의 뿌리 가까이에서 다루는 편이 훨씬 낫다. 그래서 부분
@@ -324,8 +323,7 @@ func clash(u int, holds bool) bool { return holds == (u != 0) }
 @<함수들@>=
 func remov(q, x int) int {
 	t := 1 << x
-	mems++
-	b := mem[q]
+	mems++; b := mem[q]
 	if b&t == 0 {
 		return b
 	}
@@ -333,14 +331,11 @@ func remov(q, x int) int {
 		fmt.Fprintf(os.Stderr, "(%d: %d번은 %c가 아니다)\n", stackptr, q, letter(q, x))
 	}
 	bb := b - t
-	mems++
-	mem[q] = bb
-	mems++
-	stack[stackptr] = q<<8 + b
+	mems++; mem[q] = bb
+	mems++; stack[stackptr] = q<<8 + b
 	stackptr++
 	if believe3 && bb != 0 && bb&(bb-1) == 0 {
-		mems++
-		pstack[pstackptr] = q
+		mems++; pstack[pstackptr] = q
 		pstackptr++
 	}
 	return bb
@@ -351,8 +346,7 @@ func remov(q, x int) int {
 @<함수들@>=
 func force(q, x int) bool {
 	t := 1 << x
-	mems++
-	b := mem[q]
+	mems++; b := mem[q]
 	if b&t == 0 {
 		return false
 	}
@@ -360,14 +354,11 @@ func force(q, x int) bool {
 		if vbose > 2 {
 			fmt.Fprintf(os.Stderr, "(%d: %d번은 %c다)\n", stackptr, q, letter(q, x))
 		}
-		mems++
-		mem[q] = t
-		mems++
-		stack[stackptr] = q<<8 + b
+		mems++; mem[q] = t
+		mems++; stack[stackptr] = q<<8 + b
 		stackptr++
 		if believe3 {
-			mems++
-			pstack[pstackptr] = q
+			mems++; pstack[pstackptr] = q
 			pstackptr++
 		}
 	}
@@ -429,10 +420,8 @@ A밖에 될 수 없다. 9번도 B를 잃는다. 이렇게 한 번의 변화가 �
 @<강제된 결과를 이웃으로 퍼뜨린다@>=
 for pstackptr != 0 {
 	pstackptr--
-	mems++
-	t = pstack[pstackptr]
-	mems += 2
-	j = rho[mem[t]]
+	mems++; t = pstack[pstackptr]
+	mems += 2; j = rho[mem[t]]
 	if vbose > 3 {
 		fmt.Fprintf(os.Stderr, "(%d%c에서 퍼뜨린다)\n", t, 'A'+j)
 	}
@@ -488,19 +477,15 @@ b2:
 	if l > 20 {
 		@<답인지 확인하고 |b5|로 간다@>@;
 	}
-	mems += 2
-	q = order[l]
-	u = falsity[q]
-	mems++
-	y = mem[q]
+	mems += 2; q = order[l]; u = falsity[q]
+	mems++; y = mem[q]
 b3:
 	if y == 0 {
 		fmt.Fprintln(os.Stderr, "어리둥절하다!")
 		os.Exit(1)
 	}
 	p = stackptr
-	mems++
-	x = rho[y]
+	mems++; x = rho[y]
 	pstackptr = 0
 	if vbose > 1 {
 		fmt.Fprintf(os.Stderr, "레벨 %d(%d), %d%c 시도\n", l, p, q, letter(q, x))
@@ -517,9 +502,7 @@ b3:
 흘러든다. 꼬리표도 되돌리기 스택에 쌓아 두어야 함을 잊지 말자.
 @<한 걸음 나아가거나, 물러서거나@>=
 postpone:
-	mems += 2
-	mem[tag+q] = 1
-	stack[stackptr] = (q + tag) << 8
+	mems += 2; mem[tag+q] = 1; stack[stackptr] = (q + tag) << 8
 	stackptr++
 	if vbose > 1 {
 		fmt.Fprintf(os.Stderr, "(%d: %d%c를 미룬다)\n", stackptr-1, q, letter(q, x))
@@ -529,8 +512,7 @@ okay:
 		goto bad
 	}
 	@<강제된 결과를 이웃으로 퍼뜨린다@>@;
-	mems++
-	frame[l] = p
+	mems++; frame[l] = p
 	l++
 	goto b2
 @<막혔을 때@>@;
@@ -569,26 +551,19 @@ b4:
 b5:
 	l--
 	if l != 0 {
-		mems += 2
-		q = order[l]
-		u = falsity[q]
-		mems++
-		p = frame[l]
+		mems += 2; q = order[l]; u = falsity[q]
+		mems++; p = frame[l]
 		for stackptr > p {
 			@<저장해 둔 것을 하나 되돌린다@>@;
 		}
-		mems += 2
-		y = mem[q]
-		x = rho[y]
+		mems += 2; y = mem[q]; x = rho[y]
 		goto b4
 	}
 
 @ @<저장해 둔 것을 하나 되돌린다@>=
-mems++
-stackptr--
+mems++; stackptr--
 t = stack[stackptr]
-mems++
-mem[t>>8] = t & 0x1f
+mems++; mem[t>>8] = t & 0x1f
 
 @ @<형편을 알리고 |thresh|를 올린다@>=
 fmt.Fprintf(os.Stderr, "mem %d 지난 뒤: l=%d, stackptr=%d\n", mems, l, stackptr)
@@ -613,10 +588,8 @@ for q = 1; q <= 20; q++ {
 	if mem[tag+q] == 0 {
 		continue
 	}
-	mems += 2
-	x = rho[mem[q]]
-	mems++
-	u = falsity[q]
+	mems += 2; x = rho[mem[q]]
+	mems++; u = falsity[q]
 	if vbose > 1 {
 		fmt.Fprintf(os.Stderr, "%d%c 확인\n", q, letter(q, x))
 	}
@@ -928,8 +901,7 @@ case pack(0, 7, A), pack(0, 7, B), pack(0, 7, C), pack(0, 7, D), pack(0, 7, E),
 @<미룬 스위치의 갈래들@>=
 case pack(0, 7, A), pack(0, 7, B), pack(0, 7, C), pack(0, 7, D), pack(0, 7, E),
 	pack(1, 7, A), pack(1, 7, B), pack(1, 7, C), pack(1, 7, D), pack(1, 7, E):
-	mems++
-	j = dist[x]
+	mems++; j = dist[x]
 	for i = 0; i < 5; i++ {
 		mems++
 		if dist[i] > j {
@@ -951,8 +923,7 @@ case pack(0, 7, A), pack(0, 7, B), pack(0, 7, C), pack(0, 7, D), pack(0, 7, E),
 case pack(0, 8, A), pack(0, 8, B), pack(0, 8, C), pack(0, 8, D), pack(0, 8, E),
 	pack(1, 8, A), pack(1, 8, B), pack(1, 8, C), pack(1, 8, D), pack(1, 8, E):
 	for i = 0; i < 5; i++ {
-		mems++
-		tie[i] = 0
+		mems++; tie[i] = 0
 	}
 	@<개수가 같은 것끼리 짝지어 표시한다@>@;
 	@<짝 없는 것들 가운데 가장 드문 개수를 |j|에 담는다@>@;
@@ -1076,8 +1047,7 @@ case pack(0, 12, A), pack(0, 12, B), pack(0, 12, C), pack(0, 12, D),
 		goto b5
 	}
 case pack(0, 12, E), pack(1, 12, E):
-	mems++
-	j = dist[E] - 1
+	mems++; j = dist[E] - 1
 	holds := true
 	for _, c := range [3]int{B, C, D} {
 		mems++
