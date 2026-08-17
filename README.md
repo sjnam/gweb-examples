@@ -51,6 +51,31 @@ The entries below that name a directory rather than a `.w` are separate
 projects, each with its own `README.md`, `Makefile` and `go.mod`. This Makefile
 does not reach into them — build those from inside (`cd life-game && make`).
 
+* [back-20q.w](back-20q.w) — Knuth's **back-20q**, which solves Don Woods's
+  *Twenty Questions*: a twenty-item multiple-choice quiz whose every question
+  talks about the answer sheet it is printed on ("the first question whose
+  answer is A is…", "the maximum score that can be achieved on this test is…").
+  A backtrack over five-bit candidate sets, splitting each question into the
+  part that can be decided on the spot and the part that must wait until all
+  twenty letters are known, with one forced letter cascading down the row of
+  neighbours. The document quotes all twenty questions (try it yourself before
+  reading on) and then turns each into code, one section apiece. Two errors in
+  the published CWEB are found and fixed along the way — an unreachable line
+  that made question 18 impossible to get wrong, and an inverted test that let
+  question 15 be marked wrong while it was in fact right — costing the original
+  14 valid answer sheets and gaining it 5 invalid ones, though the puzzle's own
+  answer survives untouched: the best possible score is 19, and exactly one
+  sheet reaches it with question 20 answered correctly. Verified against the
+  corrected original on all 211 falsity patterns, against an independent
+  re-grader written from the English text, and against a dozen different search
+  orderings. Knuth's two change files come along as GWEB change files
+  ([back-20q-backmod9,15.ch](back-20q-backmod9,15.ch),
+  [back-20q-backmod9,15-indet.ch](back-20q-backmod9,15-indet.ch)), each
+  reworking a couple of the questions and reporting its own answer — and the
+  first of them shows where the question-15 bug most likely came from, since
+  under its wording the five options line up and the offending case disappears.
+  Apply them the CWEB way: `gtangle back-20q.w back-20q-backmod9,15.ch`.
+  Korean (typeset with **luatex**), three MetaPost figures.
 * [back-pdi.w](back-pdi.w) — Knuth's **back-pdi**: find every
   *perfect digital invariant* of order m — an integer equal to the sum of the
   m-th powers of its own digits, like 153 = 1³ + 5³ + 3³. A backtrack that picks
