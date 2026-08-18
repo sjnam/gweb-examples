@@ -1,6 +1,8 @@
 \input kotexgweb
 \input luamplib.sty
 
+@s bufio.Writer int
+
 % 그림 하나는 이 파일 안에 바로 그린다. 나머지 하나(fig_square)는 wordcube.w의
 % 그림 꾸러미에서 그대로 빌려 쓴다---두 문서가 같은 보기를 다루니 딱 맞다.
 \everymplib{input wordcube;}
