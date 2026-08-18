@@ -239,12 +239,14 @@ does not reach into them — build those from inside (`cd life-game && make`).
   an uncolored secondary item per word turns "all fifteen words distinct" into an
   extra flag (`-d`) rather than extra code. Verified against `wordcube` on
   truncated dictionaries (3 = 3 at 3000 words, 83 = 83 at 3500, 60 = 60 with `-d`),
-  and each emitted solution rebuilt into a 5×5×5 array and re-checked along all
-  three axes. The closing chapter runs the match: dancing cells prunes the *better*
-  tree — about half the nodes — yet loses on the clock by ~50×, because a cell item
-  sits in 3·|W| options, so one coloring walks thousands of them where the
-  backtrack does one binary search. Korean (typeset with **luatex**), with one
-  inline MetaPost figure and one borrowed from `wordcube.mp`.
+  each emitted solution rebuilt into a 5×5×5 array and re-checked along all three
+  axes, and the full list run to the end for the same 83,576. The closing chapter
+  runs the match: dancing cells prunes the *better* tree — 57.1M nodes against
+  98.0M — yet loses on the clock, because a cell item sits in 3·|W| options, so one
+  coloring walks thousands of them where the backtrack does one binary search. The
+  gap does narrow with scale, as covered items shorten the lists (92× at 2000 words,
+  39× at 3500, 16× on the full list: 26m36s against 1m41s). Korean (typeset with
+  **luatex**), with one inline MetaPost figure and one borrowed from `wordcube.mp`.
 * [wordcube.w](wordcube.w) — how many **symmetric 5×5×5 word
   cubes** can be built from the Stanford GraphBase's 5757 five-letter words? A
   fully symmetric cube reads the same word along any of its three axes; a clean
