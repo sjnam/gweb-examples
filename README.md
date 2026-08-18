@@ -226,6 +226,25 @@ does not reach into them — build those from inside (`cd life-game && make`).
   (typeset with **luatex**).
 * [wc.w](wc.w) — a literate word-count program; its tangled
   output matches the system `wc`. It also shows `@f` setting a user type in bold.
+* [word-cube-dlx.w](word-cube-dlx.w) — the same symmetric word cubes as
+  `wordcube.w`, but handed to somebody else: this one **translates the whole
+  problem into a single exact-cover (XCC) instance** and writes it out as a DLX
+  file, in the manner of Knuth's
+  [word-rect-dlx.w](https://www-cs-faculty.stanford.edu/~knuth/programs/word-rect-dlx.w)
+  ("supposed to compete with BACK-MXN-WORDS-NEW"). The translation is startlingly
+  small — 15 primary items (the lines `i <= j`), 35 secondary items (the cells,
+  named by their sorted index triple), and one option per line-and-word, its five
+  colored items saying which letter goes where. Sorting the name is the whole
+  symmetry mechanism; not one line of code checks it. A bonus falls out for free:
+  an uncolored secondary item per word turns "all fifteen words distinct" into an
+  extra flag (`-d`) rather than extra code. Verified against `wordcube` on
+  truncated dictionaries (3 = 3 at 3000 words, 83 = 83 at 3500, 60 = 60 with `-d`),
+  and each emitted solution rebuilt into a 5×5×5 array and re-checked along all
+  three axes. The closing chapter runs the match: dancing cells prunes the *better*
+  tree — about half the nodes — yet loses on the clock by ~50×, because a cell item
+  sits in 3·|W| options, so one coloring walks thousands of them where the
+  backtrack does one binary search. Korean (typeset with **luatex**), with one
+  inline MetaPost figure and one borrowed from `wordcube.mp`.
 * [wordcube.w](wordcube.w) — how many **symmetric 5×5×5 word
   cubes** can be built from the Stanford GraphBase's 5757 five-letter words? A
   fully symmetric cube reads the same word along any of its three axes; a clean
