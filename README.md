@@ -130,6 +130,23 @@ does not reach into them — build those from inside (`cd life-game && make`).
   √1…√50 into two nearly-equal halves. A worked literate solution
   (meet-in-the-middle search, Gray-code enumeration, compensated summation, and
   a `math/big` verification).
+* [hyperbolic.w](hyperbolic.w) — Knuth's **hyperbolic**, which computes the
+  unique tiling of the hyperbolic plane by 36°-45°-90° triangles. Points live in
+  the upper half plane, "lines" are semicircles centred on the real axis, and the
+  whole tiling grows from one triangle by repeatedly reflecting a vertex in the
+  opposite edge — an inversion in a circle. Restricting the work to one
+  quarter-annulus makes 301 triangles enough for the entire plane, and the trick
+  that makes the restriction free is a vertical "circle" of centre 0 that the
+  algorithm then declines to cross. Ten of these triangles make a regular
+  pentagon, so this is Margenstern's pentagrid in disguise, and the golden ratio
+  duly appears in the starting coordinates. Where Knuth wrote the neighbour
+  computation out three times and copied 667 arcs into his `.mp` file by hand,
+  the Go port folds the three into one indexed loop and emits the MetaPost
+  itself — all 667 arcs agree with his to the last printed digit, even though the
+  underlying coordinates differ by up to 3.3e-13 because compilers fuse
+  multiply-add differently. That they still produce the identical tiling is
+  exactly what the fuzzy binary-search dictionary is for. Korean (typeset with
+  **luatex**), four MetaPost figures.
 * [intersect.w](intersect.w) — Codeforces 1093E *Intersection
   of Permutations*: each value becomes a 2-D point, reducing the queries to
   rectangle counting with point updates — a **Fenwick tree of Fenwick trees**
