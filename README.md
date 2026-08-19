@@ -95,6 +95,33 @@ does not reach into them — build those from inside (`cd life-game && make`).
   became a labeled loop, the 134 MB static table became an exact allocation, and
   a divide-by-zero on closed paths is now caught. Korean (typeset with
   **luatex**), two MetaPost figures.
+* [enigmatic-puzzle.w](enigmatic-puzzle.w) — Knuth's **enigmatic-puzzle**,
+  which breaks the 125-character Enigma message posed in TAOCP 7.2.2.8. Given
+  nothing but the ciphertext and one crib word (`ENIGMATICALLY`), it recovers the
+  rotor choice and order, the ring settings, the start position, the plugboard,
+  and the plaintext. Five of Knuth's programs are fused into one pipeline here, so
+  the document runs through all of them: the **machine** itself (three rotors from
+  five, reflector B, the double-stepping quirk, and the fatal flaw that no letter
+  ever enciphers to itself — which kills 50 of the 113 crib positions in a single
+  line); the **delta tree**, which sidesteps the unknown ring settings by tracking
+  only how far each rotor has turned, and has exactly 2k+1 nodes on level k; the
+  **bombe**, a union-find over the 351 unordered letter pairs, where taking the
+  pairs unordered *is* Welchman's diagonal board; the improved filter that merges
+  all forced classes into one giant class; a stripped-down watched-literal SAT
+  solver that enumerates every plugboard consistent with the surviving classes;
+  the arithmetic that turns a delta path back into start positions and ring
+  settings; and finally five-gram statistics to pick the one candidate out of
+  3,331,188 that is actually English. It is, and it comes from a 1653 book on
+  alchemy. Verified line-for-line against Knuth's C original over the full
+  million-configuration sweep. Three latent buffer problems in the original are
+  fixed and explained: `move[64]` is indexed up to the variable count, which Knuth
+  himself notes can exceed 64 — and the full run proves it does, reporting
+  `max vars 79`; `plugs[…][26]` has no room for the sentinel when a
+  plugboard has no plugs at all; and an at-least-one clause with no literals reads
+  an unwritten cell. Woven with the history — Scherbius, Rejewski and the Polish
+  bomba, Pyry, Turing, Welchman. Korean (typeset with **luatex**), two MetaPost
+  figures. Needs Knuth's `VOL1TEXT` (a 900 KB file on his site) for the five-gram
+  counts, and about two hours to run.
 * [fast_cancel.w](fast_cancel.w) — It shows a complementary pattern
   useful in any concurrent Go program: how to propagate a first-error signal to all
   sibling goroutines cleanly.
