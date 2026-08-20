@@ -147,7 +147,16 @@ does not reach into them — build those from inside (`cd life-game && make`).
   certificate that the answer is optimal, checkable by eye. Verified against the C
   original on 1200 random instances: identical matchings, rounds, and dag arcs,
   cross-checked against an independent implementation, with every cover valid and
-  exactly the right size. Korean (typeset with **luatex**), three MetaPost
+  exactly the right size. The last chapter takes up the exercise Knuth leaves at
+  the end — that round 1 deserves a faster custom implementation. It does, and the
+  reason is that `final_level` is necessarily 0 in round 1, so the depth-first
+  search never descends and the whole round is a greedy maximal matching computed
+  the long way round, through a dag of t arcs written and immediately read back.
+  Replacing it with eight lines of greedy makes round 1 about 4x faster (69% of
+  the running time down to 41%) and the whole matching 1.6-2.3x faster, at the
+  cost of a different starting matching that changes the round count either way in
+  about one instance in five. Behind a flag, so the default still reproduces
+  Knuth's output exactly. Korean (typeset with **luatex**), three MetaPost
   figures.
 * [hyperbolic.w](hyperbolic.w) — Knuth's **hyperbolic**, which computes the
   unique tiling of the hyperbolic plane by 36°-45°-90° triangles. Points live in
