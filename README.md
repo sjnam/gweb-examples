@@ -219,10 +219,16 @@ does not reach into them — build those from inside (`cd life-game && make`).
   printed embeddings, and the mem counts all agree. Getting there needed care: C's
   comma operator becomes either a prefixed `mems++` or a multiple assignment like
   `mems, k = mems+1, next[k]`, and an `o` sitting inside a `&&` is charged to only
-  one of the two conditions — missing that cost 119 phantom mems. One real fix:
-  `thresh` is declared with maxn entries but read at index maxn when T's maximum
-  degree is 61, and the loop that fills it stops short of the entry solve() needs
-  whenever T's maximum degree reaches S's node count. Korean (typeset with
+  one of the two conditions — missing that cost 119 phantom mems. There was also a
+  real defect in the version this was translated from: `thresh` was declared with
+  maxn entries but read at index maxn when T's maximum degree is 61, and the loop
+  that filled it stopped short of the entry solve() needs whenever T's maximum
+  degree reached S's node count. It survives only because the neighbouring word
+  happens to hold zero — planting a chosen value there makes the old code answer 62
+  where 61 is right. Knuth revised the file on 2026-08-21, while this was being
+  written, and fixed exactly those two places: the array grows by one entry, as
+  here, and the missing slot is filled a different way at the same cost, so the mem
+  counts now agree with his on every input tested. Korean (typeset with
   **luatex**), three MetaPost figures.
 * [ntt.w](ntt.w) — a friendly guide to the **fast Fourier
   transform** and its integer cousin, the **number theoretic transform**: the
