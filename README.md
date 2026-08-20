@@ -130,6 +130,25 @@ does not reach into them — build those from inside (`cd life-game && make`).
   √1…√50 into two nearly-equal halves. A worked literate solution
   (meet-in-the-middle search, Gray-code enumeration, compensated summation, and
   a `math/big` verification).
+* [hopcroft-karp.w](hopcroft-karp.w) — Knuth's **hopcroft-karp**: maximum
+  bipartite matching in O((t+n)·sqrt(m)) by finding, in each round, a maximal set
+  of vertex-disjoint *shortest* augmenting paths at once instead of one path at a
+  time. Half the document is the proof: the symmetric difference of two matchings
+  splits into cycles and paths, which gives Berge's lemma; an augmentation
+  destroys a component without creating a shorter one, so path length strictly
+  grows; and after round r the matching is already r/(r+1) of optimal, which
+  bounds the rounds by 2·sqrt(s). Knuth's `goto enter_level` / `goto advance`
+  become one loop where `continue` *is* the advance. Two additions to the
+  original. Knuth defines rank k for a path of length 2k-1 but then prints (and
+  later argues with) `final_level`, which is one less; the port picks the
+  definition and says so. And since the last, failed breadth-first search has
+  already computed exactly the alternating-reachable set, the program can hand
+  back a minimum vertex cover of the same size as the matching — a Kőnig
+  certificate that the answer is optimal, checkable by eye. Verified against the C
+  original on 1200 random instances: identical matchings, rounds, and dag arcs,
+  cross-checked against an independent implementation, with every cover valid and
+  exactly the right size. Korean (typeset with **luatex**), three MetaPost
+  figures.
 * [hyperbolic.w](hyperbolic.w) — Knuth's **hyperbolic**, which computes the
   unique tiling of the hyperbolic plane by 36°-45°-90° triangles. Points live in
   the upper half plane, "lines" are semicircles centred on the real axis, and the
