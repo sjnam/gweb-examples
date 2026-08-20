@@ -202,6 +202,28 @@ does not reach into them — build those from inside (`cd life-game && make`).
   reading its own bit as it first wakes. Both implementations run in one
   program and agree line for line with the CWEB original, `-v` output included.
   Korean (typeset with **luatex**), four MetaPost figures.
+* [matula.w](matula.w) — Knuth's **matula**: is the free tree *S* isomorphic to a
+  subtree of the free tree *T*? Subgraph isomorphism is NP-complete in general —
+  clique and Hamiltonian path are special cases — but for trees David W. Matula's
+  1978 algorithm settles it in O(mn·sqrt(max inner degree)). The reason to read it
+  right after [hopcroft-karp.w](hopcroft-karp.w) is that its inner loop *is*
+  bipartite matching: node p of S embeds at v of T exactly when p's children can be
+  matched to distinct neighbours of v, and Matula's insight is that all s+1 versions
+  of that subproblem (one per choice of which neighbour plays the parent) collapse
+  into one, saving a factor of n. Knuth said he stole the matching code from
+  HOPCROFT-KARP; we had just translated it. The climax is Matula's Theorem 3.4: the
+  girls who can be freed from a perfect matching are precisely those left in the
+  breadth-first queue when HK stops, so the answer is already lying in the dag.
+  Instrumented with Knuth's mems, and the port reproduces his count exactly —
+  1917+14760 on his own example, and on 1100 random tree pairs the answers, the
+  printed embeddings, and the mem counts all agree. Getting there needed care: C's
+  comma operator becomes either a prefixed `mems++` or a multiple assignment like
+  `mems, k = mems+1, next[k]`, and an `o` sitting inside a `&&` is charged to only
+  one of the two conditions — missing that cost 119 phantom mems. One real fix:
+  `thresh` is declared with maxn entries but read at index maxn when T's maximum
+  degree is 61, and the loop that fills it stops short of the entry solve() needs
+  whenever T's maximum degree reaches S's node count. Korean (typeset with
+  **luatex**), three MetaPost figures.
 * [ntt.w](ntt.w) — a friendly guide to the **fast Fourier
   transform** and its integer cousin, the **number theoretic transform**: the
   evaluate–multiply–interpolate detour, why squaring folds the roots of unity
