@@ -133,13 +133,13 @@ $$(0,0),(0,1),(0,2),(0,3),(0,4),(1,1),(1,2),\ldots,(4,4)$$
 제약을 대신한다.\/}
 
 @<채우는 순서를 만든다@>=
-	t := 0
-	for i := 0; i < n; i++ {
-		for j := i; j < n; j++ {
-			order[t] = [2]int{i, j}
-			t++
-		}
+t := 0
+for i := 0; i < n; i++ {
+	for j := i; j < n; j++ {
+		order[t] = [2]int{i, j}
+		t++
 	}
+}
 
 @ 탐색이 쓰는 상태는 정육면체 |cube|와 지금까지 고른 낱말 번호 |chosen|, 그리고 세어
 본 것들이다. 이들을 |worker| 하나에 묶는다---한 일꾼이 저마다 이것을 들고 서로 독립인
@@ -172,23 +172,23 @@ var (
 낱말을 찾으려면 정렬이 있어야 이진 탐색이 먹힌다. 파일을 열지 못하면 곧바로 접는다.
 
 @<단어를 읽어 정렬한다@>=
-	f, err := os.Open(wordFile)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+f, err := os.Open(wordFile)
+if err != nil {
+	fmt.Fprintln(os.Stderr, err)
+	os.Exit(1)
+}
+sc := bufio.NewScanner(f)
+for sc.Scan() {
+	if s := sc.Text(); len(s) == n {
+		words = append(words, s)
 	}
-	sc := bufio.NewScanner(f)
-	for sc.Scan() {
-		if s := sc.Text(); len(s) == n {
-			words = append(words, s)
-		}
-	}
-	f.Close()
-	sort.Strings(words)
-	if err := sc.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
+}
+f.Close()
+sort.Strings(words)
+if err := sc.Err(); err != nil {
+	fmt.Fprintln(os.Stderr, err)
+	os.Exit(1)
+}
 
 @ 접두사로 낱말을 찾는 일이 탐색의 안쪽 고리다. 그 뼈대는 낱말의 앞 몇 글자만
 접두사와 견주는 이 함수 하나뿐이다. 접두사에 맞는 구간이나 존재 여부는 쓰이는
@@ -248,23 +248,23 @@ func (wk *worker) solve(t int) {
 것도 일단 허용한다---나중에 잎에서 가려낸다.
 
 @<접두사를 읽어 후보 낱말을 훑는다@>=
-	var pre [n]byte
-	for c := 0; c < j; c++ {
-		pre[c] = wk.cube[i][j][c]
-	}
-	@<접두사에 맞는 낱말 구간 |lo..hi|를 잡는다@>@;
-	for w := lo; w < hi; w++ {
-		@<이 낱말을 놓고 한 겹 내려갔다 되돌린다@>@;
-	}
+var pre [n]byte
+for c := 0; c < j; c++ {
+	pre[c] = wk.cube[i][j][c]
+}
+@<접두사에 맞는 낱말 구간 |lo..hi|를 잡는다@>@;
+for w := lo; w < hi; w++ {
+	@<이 낱말을 놓고 한 겹 내려갔다 되돌린다@>@;
+}
 
 @ 정렬된 목록에서 접두사 |pre[:j]|로 시작하는 낱말들이 놓인 구간 |[lo,hi)|를 두 번의
 이진 탐색으로 잡는다. 앞 탐색은 접두사에 든 첫 낱말을, 뒤 탐색은 접두사를 벗어나는 첫
 낱말을 가리킨다.
 
 @<접두사에 맞는 낱말 구간 |lo..hi|를 잡는다@>=
-	p := pre[:j]
-	lo := sort.Search(len(words), func(k int) bool { return cmpPrefix(words[k], p) >= 0 })
-	hi := lo + sort.Search(len(words)-lo, func(k int) bool { return cmpPrefix(words[lo+k], p) > 0 })
+p := pre[:j]
+lo := sort.Search(len(words), func(k int) bool { return cmpPrefix(words[k], p) >= 0 })
+hi := lo + sort.Search(len(words)-lo, func(k int) bool { return cmpPrefix(words[lo+k], p) > 0 })
 
 @ 놓는 것은 뒤 $n-j$글자를 새로 적는 일뿐이다. 앞 $j$글자는 접두사로 맞춰 두었으니
 건드리지 않는다. 고른 낱말의 번호는 |chosen[t]|에 적어 둔다. 내려가기 전에 |feasible|로
@@ -272,14 +272,14 @@ func (wk *worker) solve(t int) {
 자리들은 다음 후보가 어차피 덮어쓰므로 따로 지울 필요가 없다.
 
 @<이 낱말을 놓고 한 겹 내려갔다 되돌린다@>=
-	s := words[w]
-	for c := j; c < n; c++ {
-		wk.put(i, j, c, s[c])
-	}
-	wk.chosen[t] = w
-	if wk.feasible(t) {
-		wk.solve(t + 1)
-	}
+s := words[w]
+for c := j; c < n; c++ {
+	wk.put(i, j, c, s[c])
+}
+wk.chosen[t] = w
+if wk.feasible(t) {
+	wk.solve(t + 1)
+}
 
 @ 다중집합 $\{i,j,c\}$에 글자를 놓는다는 것은, 세 첨자를 뒤섞은 여섯 자리에 같은
 글자를 적는 일이다. 이렇게 해 두면 |cube|는 늘 완전 대칭을 유지한다.
@@ -298,18 +298,18 @@ func (wk *worker) put(a, b, c int, ch byte) {
 $83{,}576$번만 도므로 이 겹루프는 공짜나 다름없다.
 
 @<열다섯 낱말이 모두 다르면 |distinct|를 늘린다@>=
-	dup := false
-	for a := 0; a < lines && !dup; a++ {
-		for b := a + 1; b < lines; b++ {
-			if wk.chosen[a] == wk.chosen[b] {
-				dup = true
-				break
-			}
+dup := false
+for a := 0; a < lines && !dup; a++ {
+	for b := a + 1; b < lines; b++ {
+		if wk.chosen[a] == wk.chosen[b] {
+			dup = true
+			break
 		}
 	}
-	if !dup {
-		wk.distinct++
-	}
+}
+if !dup {
+	wk.distinct++
+}
 
 @* 선행 배제.
 지금까지의 백트래킹은 {\it 시간순\/}(chronological)이다: 낱말을 놓다가 어떤 낱말의
@@ -328,19 +328,19 @@ $\{i_u,j_u,c\}$인데, 이 칸은 짝 $\{i_u,c\}$와 $\{j_u,c\}$ 가운데 {\it 
 |knownTime[u][c]<=t|가 이어지는 앞자리의 개수일 뿐이다.
 
 @<배제 표를 미리 계산한다@>=
-	for u := 0; u < lines; u++ {
-		pairIdx[order[u][0]][order[u][1]] = u
-		pairIdx[order[u][1]][order[u][0]] = u
-	}
-	for u := 0; u < lines; u++ {
-		iu, ju := order[u][0], order[u][1]
-		for c := 0; c < n; c++ {
-			knownTime[u][c] = pairIdx[iu][c]
-			if pairIdx[ju][c] < knownTime[u][c] {
-				knownTime[u][c] = pairIdx[ju][c]
-			}
+for u := 0; u < lines; u++ {
+	pairIdx[order[u][0]][order[u][1]] = u
+	pairIdx[order[u][1]][order[u][0]] = u
+}
+for u := 0; u < lines; u++ {
+	iu, ju := order[u][0], order[u][1]
+	for c := 0; c < n; c++ {
+		knownTime[u][c] = pairIdx[iu][c]
+		if pairIdx[ju][c] < knownTime[u][c] {
+			knownTime[u][c] = pairIdx[ju][c]
 		}
 	}
+}
 
 @ 이 표들은 탐색 내내 읽기만 하므로 전역에 둔다. 여러 일꾼이 병렬로 돌 때도 함께
 읽기만 하니 안전하다.
@@ -382,21 +382,21 @@ func (wk *worker) feasible(t int) bool {
 한다.)
 
 @<탐색하여 센다@>=
-	var wk worker
-	for w := 0; w < len(words); w++ {
-		wk.searchFrom(w)
-		fmt.Fprintf(os.Stderr, "\r진행: 시작 낱말 %d/%d, 노드 %d ", w+1, len(words), wk.nodes)
-	}
-	fmt.Fprintln(os.Stderr)
-	count, distinct, nodes, profile = wk.count, wk.distinct, wk.nodes, wk.profile
+var wk worker
+for w := 0; w < len(words); w++ {
+	wk.searchFrom(w)
+	fmt.Fprintf(os.Stderr, "\r진행: 시작 낱말 %d/%d, 노드 %d ", w+1, len(words), wk.nodes)
+}
+fmt.Fprintln(os.Stderr)
+count, distinct, nodes, profile = wk.count, wk.distinct, wk.nodes, wk.profile
 
 @ 명령줄 인자로 낱말 파일을 받되, 없으면 \.{sgb-words.txt}를 쓴다.
 
 @<명령줄을 처리한다@>=
-	wordFile = "sgb-words.txt"
-	if len(os.Args) >= 2 {
-		wordFile = os.Args[1]
-	}
+wordFile = "sgb-words.txt"
+if len(os.Args) >= 2 {
+	wordFile = os.Args[1]
+}
 
 @ 다 세었으면 두 가지 개수와 밟은 노드 수를, 이어서 층별 두께를 알린다. 층별 두께는
 탐색이 어디서 굵어지는지 보여 준다: 행 $0$을 다 채운 상태(|profile[5]|)가 곧 SGB
@@ -404,12 +404,12 @@ func (wk *worker) feasible(t int) bool {
 $541{,}968$개나 된다. 그중 극히 일부만 정육면체로 자라 오른다.
 
 @<결과를 보고한다@>=
-	fmt.Printf("대칭 단어 정육면체는 모두 %d개다", count)
-	fmt.Printf(" (그중 열다섯 낱말이 모두 다른 것은 %d개, 노드 %d개).\n", distinct, nodes)
-	fmt.Fprint(os.Stderr, "층별 노드:")
-	for t := 1; t <= lines; t++ {
-		fmt.Fprintf(os.Stderr, " %d", profile[t])
-	}
-	fmt.Fprintln(os.Stderr)
+fmt.Printf("대칭 단어 정육면체는 모두 %d개다", count)
+fmt.Printf(" (그중 열다섯 낱말이 모두 다른 것은 %d개, 노드 %d개).\n", distinct, nodes)
+fmt.Fprint(os.Stderr, "층별 노드:")
+for t := 1; t <= lines; t++ {
+	fmt.Fprintf(os.Stderr, " %d", profile[t])
+}
+fmt.Fprintln(os.Stderr)
 
 @* 색인.

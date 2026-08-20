@@ -319,15 +319,15 @@ $$r=\sqrt{\phi+\sqrt{\phi}},\qquad \cos\theta=1/\sqrt{\mskip1mu2\phi}$$
 이고 $\phi=(1+\sqrt5\,)/2$는 황금비다. 오각형이 숨어 있으니 황금비가 나온다.
 
 @<첫 삼각형을 놓는다@>=
-	phi := (1 + math.Sqrt(5)) / 2
-	a := savepoint(point{math.Sqrt(0.5 / phi), math.Sqrt(1 - 0.5/phi)})
-	b := savepoint(point{0, 1 / math.Sqrt(phi+math.Sqrt(phi))})
-	c := savepoint(point{0, 1})
-	inner = hpoint[b].y
-	@<0번 삼각형의 변을 구한다@>@;
-	savetriangle(a, b, c)
-	fmt.Printf("삼각형 0 = (z%d,z%d,z%d), 변 (*,%d,%d)\n",
-		a, b, c, triang[0].e[a45], triang[0].e[a90])
+phi := (1 + math.Sqrt(5)) / 2
+a := savepoint(point{math.Sqrt(0.5 / phi), math.Sqrt(1 - 0.5/phi)})
+b := savepoint(point{0, 1 / math.Sqrt(phi+math.Sqrt(phi))})
+c := savepoint(point{0, 1})
+inner = hpoint[b].y
+@<0번 삼각형의 변을 구한다@>@;
+savetriangle(a, b, c)
+fmt.Printf("삼각형 0 = (z%d,z%d,z%d), 변 (*,%d,%d)\n",
+	a, b, c, triang[0].e[a45], triang[0].e[a90])
 
 @ 첫 삼각형의 변~|e36|은 $i/r$에서 $i$로 곧게 올라가는 세로선이다. 이 프로그램에서
 곧은 세로선은 이것 하나뿐이다. 이 예외를 다루는 가장 손쉬운 길은 |e36|을 |e45|와
@@ -335,9 +335,9 @@ $$r=\sqrt{\phi+\sqrt{\phi}},\qquad \cos\theta=1/\sqrt{\mskip1mu2\phi}$$
 잔꾀''라고 실토했다. 왜 이것이 통하는지는 다음 장에서 밝혀진다.
 
 @<0번 삼각형의 변을 구한다@>=
-	triang[0].e[a45] = savecircle(circle{0, 1})
-	triang[0].e[a36] = triang[0].e[a45]
-	triang[0].e[a90] = savecircle(circle{hpoint[b].y, math.Sqrt2 * hpoint[b].y})
+triang[0].e[a45] = savecircle(circle{0, 1})
+triang[0].e[a36] = triang[0].e[a45]
+triang[0].e[a90] = savecircle(circle{hpoint[b].y, math.Sqrt2 * hpoint[b].y})
 
 @ 안쪽 반지름 $1/r$은 뒤에서 그림을 그릴 때 다시 쓰이므로 적어 둔다.
 
@@ -359,80 +359,80 @@ $\vert z\vert=1/r^2$ 사이---의 무늬는 서로 $\vert z\vert=1/r$에 대한 
 않는다. 첫 삼각형이 세로 변을 가진 유일한 삼각형인 것도 같은 이유다.
 
 @<삼각형 |k|의 이웃을 구한다@>=
-	for i := 0; i < 3; i++ {
-		if hcircle[triang[k].e[i]].c == 0 {
-			continue
-		}
-		@<변 |i| 너머의 이웃을 구한다@>@;
+for i := 0; i < 3; i++ {
+	if hcircle[triang[k].e[i]].c == 0 {
+		continue
 	}
-	@<이웃을 알린다@>@;
+	@<변 |i| 너머의 이웃을 구한다@>@;
+}
+@<이웃을 알린다@>@;
 
 @ 꼭짓점~|i|를 맞은편 변에 되비추면 이웃 삼각형의 새 꼭짓점이 나온다. 나머지 두
 꼭짓점은 그대로다. 그렇게 만든 세 쌍을 표에 넣어 보아 |tptr|이 늘었으면 처음 보는
 삼각형이니 변까지 마저 구해 준다.
 
 @<변 |i| 너머의 이웃을 구한다@>=
-		vv := triang[k].v
-		vv[i] = savepoint(reflect(hpoint[vv[i]], hcircle[triang[k].e[i]]))
-		t := tptr
-		triang[k].t[i] = savetriangle(vv[0], vv[1], vv[2])
-		if tptr > t {
-			@<새로 생긴 삼각형의 변을 구한다@>@;
-		}
+vv := triang[k].v
+vv[i] = savepoint(reflect(hpoint[vv[i]], hcircle[triang[k].e[i]]))
+t := tptr
+triang[k].t[i] = savetriangle(vv[0], vv[1], vv[2])
+if tptr > t {
+	@<새로 생긴 삼각형의 변을 구한다@>@;
+}
 
 @ 새 삼각형은 변~|i|를 우리와 나눠 가진다. 남은 두 변은 새로 그어야 하는데,
 변~$j$는 꼭짓점~$j$의 맞은편이니 나머지 두 꼭짓점을 잇는 쌍곡 직선이다. 그것이
 바로 |rest| 표를 두 번 쓰는 대목이다.
 
 @<새로 생긴 삼각형의 변을 구한다@>=
-			triang[t].e[i] = triang[k].e[i]
-			for _, j := range rest[i] {
-				triang[t].e[j] = savecircle(common(
-					hpoint[triang[t].v[rest[j][0]]],
-					hpoint[triang[t].v[rest[j][1]]]))
-			}
-			@<새 삼각형을 알린다@>@;
+triang[t].e[i] = triang[k].e[i]
+for _, j := range rest[i] {
+	triang[t].e[j] = savecircle(common(
+		hpoint[triang[t].v[rest[j][0]]],
+		hpoint[triang[t].v[rest[j][1]]]))
+}
+@<새 삼각형을 알린다@>@;
 
 @ @<새 삼각형을 알린다@>=
-			fmt.Printf("삼각형 %d = (z%d,z%d,z%d), 변 (%d,%d,%d)\n", t,
-				triang[t].v[0], triang[t].v[1], triang[t].v[2],
-				triang[t].e[0], triang[t].e[1], triang[t].e[2])
+fmt.Printf("삼각형 %d = (z%d,z%d,z%d), 변 (%d,%d,%d)\n", t,
+	triang[t].v[0], triang[t].v[1], triang[t].v[2],
+	triang[t].e[0], triang[t].e[1], triang[t].e[2])
 
 @ 고리 밖으로 나가는 변은 이웃을 구하지 않았으니 알리지도 않는다.
 
 @<이웃을 알린다@>=
-	fmt.Printf("삼각형 %d의 이웃:", k)
-	for i := 0; i < 3; i++ {
-		if hcircle[triang[k].e[i]].c != 0 {
-			fmt.Printf(" t%s=%d", angle[i], triang[k].t[i])
-		}
+fmt.Printf("삼각형 %d의 이웃:", k)
+for i := 0; i < 3; i++ {
+	if hcircle[triang[k].e[i]].c != 0 {
+		fmt.Printf(" t%s=%d", angle[i], triang[k].t[i])
 	}
-	fmt.Printf("\n")
+}
+fmt.Printf("\n")
 
 @* 그림 그리기. 여기서부터는 원본에 없는 부분이다. 크누스는 프로그램이 뱉은
 좌표를 손으로 골라 \.{hyperbolic.mp}에 옮겨 적었다. 그림 셋에 걸쳐 원이 육백
 예순일곱 개다. 우리는 프로그램에게 그 일을 시킨다.
 
 @<그림 파일을 쓴다@>=
-	if len(os.Args) > 1 {
-		@<{\logo METAPOST} 파일을 만든다@>@;
-	}
+if len(os.Args) > 1 {
+	@<{\logo METAPOST} 파일을 만든다@>@;
+}
 
 @ 파일에는 그림 셋이 |fig_annulus|, |fig_dual|, |fig_tiling|이라는 이름으로 들어간다.
 그림을 오른쪽 위 사분원으로 잘라 내고 테두리를 두르는 일은 \.{hyperbolic.mp}에
 |quarter|라는 매크로로 있으므로, 여기서는 반원 목록만 적으면 된다.
 
 @<{\logo METAPOST} 파일을 만든다@>=
-		f, err := os.Create(os.Args[1])
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		defer f.Close()
-		fmt.Fprint(f, mphead)
-		@<고리 하나를 그린다@>@;
-		@<안쪽 고리를 그린다@>@;
-		@<반평면 전체를 그린다@>@;
+f, err := os.Create(os.Args[1])
+if err != nil {
+	fmt.Fprintln(os.Stderr, err)
+	os.Exit(1)
+}
+defer f.Close()
+fmt.Fprint(f, mphead)
+@<고리 하나를 그린다@>@;
+@<안쪽 고리를 그린다@>@;
+@<반평면 전체를 그린다@>@;
 
 @ @<상수@>=
 const mphead = `% hyperbolic.go 가 적은 파일이다. 손대지 말 것.
@@ -452,11 +452,11 @@ func arcout(f *os.File, l circle) {
 |quarter|가 따로 그린다.
 
 @<고리 하나를 그린다@>=
-		fmt.Fprintln(f, "def fig_annulus =\nbeginfig(2);")
-		for i := 2; i <= cptr; i++ {
-			arcout(f, hcircle[i])
-		}
-		fmt.Fprintln(f, " quarter;\nendfig;\nenddef;")
+fmt.Fprintln(f, "def fig_annulus =\nbeginfig(2);")
+for i := 2; i <= cptr; i++ {
+	arcout(f, hcircle[i])
+}
+fmt.Fprintln(f, " quarter;\nendfig;\nenddef;")
 
 @ 둘째 그림은 같은 직선들을 $\vert z\vert=1/r$에 대해 되비춘 것---곧 안쪽 고리의
 무늬다. 중심이~$c$, 반지름이~$\rho$인 원을 원점 중심 반지름~$R$인 원에 대해
@@ -475,11 +475,11 @@ func invert(l circle) circle {
 어엿한 원이라 그릴 값이 있다.
 
 @<안쪽 고리를 그린다@>=
-		fmt.Fprintln(f, "def fig_dual =\nbeginfig(3);")
-		for i := 1; i <= cptr; i++ {
-			arcout(f, invert(hcircle[i]))
-		}
-		fmt.Fprintln(f, " quarter;\nendfig;\nenddef;")
+fmt.Fprintln(f, "def fig_dual =\nbeginfig(3);")
+for i := 1; i <= cptr; i++ {
+	arcout(f, invert(hcircle[i]))
+}
+fmt.Fprintln(f, " quarter;\nendfig;\nenddef;")
 
 @ 셋째 그림은 앞의 두 벌을 모두 가져다 놓고, 각각을 $1/r^2$배씩 거듭 줄여 원점
 쪽으로 무한히 이어 붙인 것이다. 반지름이 $0.007$보다 작아지면 종이 위에서 잉크
@@ -489,12 +489,12 @@ func invert(l circle) circle {
 항목을 보라. `Bond, James'다.)
 
 @<반평면 전체를 그린다@>=
-		fmt.Fprintln(f, "def fig_tiling =\nbeginfig(4);")
-		for i := 1; i <= cptr; i++ {
-			shrink(f, hcircle[i], i == 1)
-			shrink(f, invert(hcircle[i]), false)
-		}
-		fmt.Fprintln(f, " quarter;\nendfig;\nenddef;")
+fmt.Fprintln(f, "def fig_tiling =\nbeginfig(4);")
+for i := 1; i <= cptr; i++ {
+	shrink(f, hcircle[i], i == 1)
+	shrink(f, invert(hcircle[i]), false)
+}
+fmt.Fprintln(f, " quarter;\nendfig;\nenddef;")
 
 @ 첫 그림에서 $1$번 직선을 뺐던 것과 같은 까닭으로, 여기서도 그 첫 항 하나만
 건너뛴다. 줄인 것들은 모두 그린다.

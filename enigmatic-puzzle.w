@@ -119,13 +119,13 @@ var (
 것은 ``들어갈 때 더하고 나올 때 빼는'' 일이다.
 
 @<글자 |c|를 암호화한다@>=
-	c = mod26[perm[2][mod26[c+off[2]]]+26-off[2]]
-	c = mod26[perm[1][mod26[c+off[1]]]+26-off[1]]
-	c = mod26[perm[0][mod26[c+off[0]]]+26-off[0]]
-	c = refl[c]
-	c = mod26[iperm[0][mod26[c+off[0]]]+26-off[0]]
-	c = mod26[iperm[1][mod26[c+off[1]]]+26-off[1]]
-	c = mod26[iperm[2][mod26[c+off[2]]]+26-off[2]]
+c = mod26[perm[2][mod26[c+off[2]]]+26-off[2]]
+c = mod26[perm[1][mod26[c+off[1]]]+26-off[1]]
+c = mod26[perm[0][mod26[c+off[0]]]+26-off[0]]
+c = refl[c]
+c = mod26[iperm[0][mod26[c+off[0]]]+26-off[0]]
+c = mod26[iperm[1][mod26[c+off[1]]]+26-off[1]]
+c = mod26[iperm[2][mod26[c+off[2]]]+26-off[2]]
 
 @ 글자 하나를 칠 때마다 회전자가 돈다. 빠른 회전자는 늘 한 칸 돌고, 그것이 한 바퀴를
 채우면 가운데 것을 밀어 올리며, 가운데 것이 한 바퀴를 채우면 느린 것까지 밀어 올린다.
@@ -135,16 +135,16 @@ var (
 두었으므로, 문턱 검사가 ``자리가 $25$인가''로 단순해진다.
 
 @<회전자를 돌린다@>=
-	switch {
-	case pos[1] == 25: // 큰 자리올림: 셋이 함께 돈다
-		pos[0], off[0] = mod26[pos[0]+1], mod26[off[0]+1]
-		fallthrough
-	case pos[2] == 25: // 가운데와 빠른 것이 돈다
-		pos[1], off[1] = mod26[pos[1]+1], mod26[off[1]+1]
-		fallthrough
-	default: // 빠른 것만 돈다
-		pos[2], off[2] = mod26[pos[2]+1], mod26[off[2]+1]
-	}
+switch {
+case pos[1] == 25: // 큰 자리올림: 셋이 함께 돈다
+	pos[0], off[0] = mod26[pos[0]+1], mod26[off[0]+1]
+	fallthrough
+case pos[2] == 25: // 가운데와 빠른 것이 돈다
+	pos[1], off[1] = mod26[pos[1]+1], mod26[off[1]+1]
+	fallthrough
+default: // 빠른 것만 돈다
+	pos[2], off[2] = mod26[pos[2]+1], mod26[off[2]+1]
+}
 
 @* 델타 나무.
 공격을 시작하려면 성가신 사실 하나를 넘어야 한다. 우리는 링 설정을 모른다. 링
@@ -191,47 +191,47 @@ $(0,\ast,\cdot)$였을 때만---$(1,2,\cdot)$이다. 앞자리가 이미 $1$이�
 없어 가운데 값을 그대로 물려받는다.
 
 @<델타 나무를 짓는다@>=
-	for k := range level {
-		level[k] = -1
-	}
-	delta[0].parent, delta[0].sibling = -1, -1
-	j, p := 1, 0
-	@<층 |k|에 노드를 하나 단다@>@;
-	newnode(0, 0, 1)
-	newnode(0, 1, 1)
-	newnode(1, 1, 1)
-	@<둘째 층부터 스물다섯째 층까지 자란다@>@;
+for k := range level {
+	level[k] = -1
+}
+delta[0].parent, delta[0].sibling = -1, -1
+j, p := 1, 0
+@<층 |k|에 노드를 하나 단다@>@;
+newnode(0, 0, 1)
+newnode(0, 1, 1)
+newnode(1, 1, 1)
+@<둘째 층부터 스물다섯째 층까지 자란다@>@;
 
 @ 노드를 다는 일은 한곳에 모아 두는 편이 낫다. 클로저 하나로 |j|와 |k|와 |p|를
 함께 잡아 둔다.
 
 @<층 |k|에 노드를 하나 단다@>=
-	k = 1
-	newnode := func(a, b, c int) {
-		delta[j].parent, delta[j].sibling = p, level[k]
-		delta[j].del = [3]int{a, b, c}
-		level[k] = j
-		j++
-	}
+k = 1
+newnode := func(a, b, c int) {
+	delta[j].parent, delta[j].sibling = p, level[k]
+	delta[j].del = [3]int{a, b, c}
+	level[k] = j
+	j++
+}
 
 @ @<둘째 층부터 스물다섯째 층까지 자란다@>=
-	for k = 2; k < 26; k++ {
-		for p = level[k-1]; p >= 0; p = delta[p].sibling {
-			d := delta[p].del
-			switch {
-			case d[0] != 0:
-				newnode(1, d[1], k)
-			case d[1] == 0:
-				newnode(0, 0, k)
-				newnode(0, 1, k)
-			default:
-				newnode(0, 1, k)
-				if delta[delta[p].parent].del[1] == 0 {
-					newnode(1, 2, k)
-				}
+for k = 2; k < 26; k++ {
+	for p = level[k-1]; p >= 0; p = delta[p].sibling {
+		d := delta[p].del
+		switch {
+		case d[0] != 0:
+			newnode(1, d[1], k)
+		case d[1] == 0:
+			newnode(0, 0, k)
+			newnode(0, 1, k)
+		default:
+			newnode(0, 1, k)
+			if delta[delta[p].parent].del[1] == 0 {
+				newnode(1, 2, k)
 			}
 		}
 	}
+}
 
 @ 로터 셋을 고르고 나면, 회전량 세 개가 정해질 때마다 기계가 어떤 치환을 내는지
 미리 다 계산해 둘 수 있다. 회전량이 $26^3$가지이고 글자가 $26$개이니 표가
@@ -242,17 +242,17 @@ $26^4=456{,}976$칸이다. 값이 모두 $0\dts25$이므로 바이트 하나면 
 var enc [26][26][26][26]uint8 // 지금 로터로 만든 치환들
 
 @ @<지금 로터로 치환표를 만든다@>=
-	for off[0] = 0; off[0] < 26; off[0]++ {
-		for off[1] = 0; off[1] < 26; off[1]++ {
-			for off[2] = 0; off[2] < 26; off[2]++ {
-				for j := 0; j < 26; j++ {
-					c := j
-					@<글자 |c|를 암호화한다@>@;
-					enc[off[0]][off[1]][off[2]][j] = uint8(c)
-				}
+for off[0] = 0; off[0] < 26; off[0]++ {
+	for off[1] = 0; off[1] < 26; off[1]++ {
+		for off[2] = 0; off[2] < 26; off[2]++ {
+			for j := 0; j < 26; j++ {
+				c := j
+				@<글자 |c|를 암호화한다@>@;
+				enc[off[0]][off[1]][off[2]][j] = uint8(c)
 			}
 		}
 	}
+}
 
 @* 봄베.
 1932년, 폴란드 암호국(Biuro Szyfr\'ow)의 젊은 수학자 Marian Rejewski가 동료
@@ -314,23 +314,23 @@ var (
 )
 
 @ @<처음 상태를 미리 만들어 둔다@>=
-	for i := 0; i < 26; i++ {
-		for j := 0; j < 26; j++ {
-			if i <= j {
-				locTab[i][j] = rowadd[i] + j
-			} else {
-				locTab[i][j] = rowadd[j] + i
-			}
+for i := 0; i < 26; i++ {
+	for j := 0; j < 26; j++ {
+		if i <= j {
+			locTab[i][j] = rowadd[i] + j
+		} else {
+			locTab[i][j] = rowadd[j] + i
 		}
 	}
-	for v := 0; v < nn; v++ {
-		self[v], ones[v] = v, 1
+}
+for v := 0; v < nn; v++ {
+	self[v], ones[v] = v, 1
+}
+for i := 0; i < 26; i++ {
+	for j := i; j < 26; j++ {
+		bits0[loc(i, j)] = (1 << i) | (1 << j)
 	}
-	for i := 0; i < 26; i++ {
-		for j := i; j < 26; j++ {
-			bits0[loc(i, j)] = (1 << i) | (1 << j)
-		}
-	}
+}
 
 @ 셈은 이렇지만 실제로는 표를 하나 떠 두고 짚는다. 이 함수가 봄베의 안쪽 고리에서
 한 번 돌 때마다 천 번 넘게 불리므로, 비교 한 번을 아끼는 것이 그냥 아끼는 것이 아니다.
@@ -401,156 +401,156 @@ var (
 )
 
 @ @<명령줄을 처리한다@>=
-	args := os.Args[1:]
-	if len(args) >= 3 {
-		corpusFile, args = args[2], args[:2]
-	}
-	if len(args) != 2 {
-		fmt.Fprintf(os.Stderr, "사용법: %s 크립 암호문 [원문파일]\n", os.Args[0])
-		os.Exit(1)
-	}
-	crib, cipher := args[0], args[1]
-	@<크립과 암호문을 숫자로 바꾼다@>@;
+args := os.Args[1:]
+if len(args) >= 3 {
+	corpusFile, args = args[2], args[:2]
+}
+if len(args) != 2 {
+	fmt.Fprintf(os.Stderr, "사용법: %s 크립 암호문 [원문파일]\n", os.Args[0])
+	os.Exit(1)
+}
+crib, cipher := args[0], args[1]
+@<크립과 암호문을 숫자로 바꾼다@>@;
 
 @ 두 문자열은 대문자 알파벳만이어야 하고, 크립이 암호문보다 길면 말이 안 된다.
 
 @<크립과 암호문을 숫자로 바꾼다@>=
-	plainsize, ciphersize = len(crib), len(cipher)
-	if plainsize > maxm || ciphersize > maxmc || plainsize > ciphersize {
-		fmt.Fprintf(os.Stderr, "크립은 %d글자까지, 암호문은 %d글자까지, 그리고 크립이 더 짧아야 한다!\n",
-			maxm, maxmc)
+plainsize, ciphersize = len(crib), len(cipher)
+if plainsize > maxm || ciphersize > maxmc || plainsize > ciphersize {
+	fmt.Fprintf(os.Stderr, "크립은 %d글자까지, 암호문은 %d글자까지, 그리고 크립이 더 짧아야 한다!\n",
+		maxm, maxmc)
+	os.Exit(1)
+}
+for i, ch := range []byte(crib + cipher) {
+	if ch < 'A' || ch > 'Z' {
+		fmt.Fprintln(os.Stderr, "글자는 모두 대문자여야 한다!")
 		os.Exit(1)
 	}
-	for i, ch := range []byte(crib + cipher) {
-		if ch < 'A' || ch > 'Z' {
-			fmt.Fprintln(os.Stderr, "글자는 모두 대문자여야 한다!")
-			os.Exit(1)
-		}
-		if i < plainsize {
-			plaintext[i] = int(ch - 'A')
-			pused[plaintext[i]]++
-		} else {
-			ciphertext[i-plainsize] = int(ch - 'A')
-		}
+	if i < plainsize {
+		plaintext[i] = int(ch - 'A')
+		pused[plaintext[i]]++
+	} else {
+		ciphertext[i-plainsize] = int(ch - 'A')
 	}
-	fmt.Fprintf(os.Stderr, "크립 %d글자, 암호문 %d글자로 시작한다.\n", plainsize, ciphersize)
+}
+fmt.Fprintf(os.Stderr, "크립 %d글자, 암호문 %d글자로 시작한다.\n", plainsize, ciphersize)
 
 @ @<자료 구조를 채비한다@>=
-	for i := 0; i < 26; i++ {
-		mod26[i], mod26[i+26] = i, i
-		refl[i] = int(reflector[i] - 'A')
+for i := 0; i < 26; i++ {
+	mod26[i], mod26[i+26] = i, i
+	refl[i] = int(reflector[i] - 'A')
+}
+@<처음 상태를 미리 만들어 둔다@>@;
+@<델타 나무를 짓는다@>@;
+for i := 0; i < 26; i++ {
+	for j := i; j < 26; j++ {
+		name[loc(i, j)] = string([]byte{byte('A' + i), byte('A' + j)})
 	}
-	@<처음 상태를 미리 만들어 둔다@>@;
-	@<델타 나무를 짓는다@>@;
-	for i := 0; i < 26; i++ {
-		for j := i; j < 26; j++ {
-			name[loc(i, j)] = string([]byte{byte('A' + i), byte('A' + j)})
-		}
-	}
-	@<원문을 읽어 다섯 글자 빈도를 센다@>@;
+}
+@<원문을 읽어 다섯 글자 빈도를 센다@>@;
 
 @ 회전자 셋을 고르는 $60$가지와 회전량 $26^3$가지를 곱하면 $1{,}054{,}560$가지,
 곧 백만 남짓이다. 이 여섯 겹 고리가 프로그램의 바깥 뼈대다.
 
 @<백만 가지 바퀴 배치를 훑는다@>=
-	for r0 = 0; r0 < 5; r0++ {
-		@<로터 $0$을 |r0|형으로 끼운다@>@;
-		for r1 = 0; r1 < 5; r1++ {
-			if r1 == r0 {
+for r0 = 0; r0 < 5; r0++ {
+	@<로터 $0$을 |r0|형으로 끼운다@>@;
+	for r1 = 0; r1 < 5; r1++ {
+		if r1 == r0 {
+			continue
+		}
+		@<로터 $1$을 |r1|형으로 끼운다@>@;
+		for r2 = 0; r2 < 5; r2++ {
+			if r2 == r0 || r2 == r1 {
 				continue
 			}
-			@<로터 $1$을 |r1|형으로 끼운다@>@;
-			for r2 = 0; r2 < 5; r2++ {
-				if r2 == r0 || r2 == r1 {
-					continue
-				}
-				@<로터 $2$를 |r2|형으로 끼운다@>@;
-				@<지금 로터로 치환표를 만든다@>@;
-				@<회전량 세 개를 모두 훑는다@>@;
-			}
+			@<로터 $2$를 |r2|형으로 끼운다@>@;
+			@<지금 로터로 치환표를 만든다@>@;
+			@<회전량 세 개를 모두 훑는다@>@;
 		}
 	}
+}
 
 @ 회전자를 끼우는 일은 배선 문자열을 숫자로 옮기고 그 역치환을 만드는 것이다.
 같은 일을 세 번 하므로 이름 있는 절 하나를 세 곳에서 부른다.
 
 @<로터를 끼운다@>=
-	for i := 0; i < 26; i++ {
-		perm[k][i] = int(rotorPerm[jj][i] - 'A')
-	}
-	for i := 0; i < 26; i++ {
-		iperm[k][perm[k][i]] = i
-	}
+for i := 0; i < 26; i++ {
+	perm[k][i] = int(rotorPerm[jj][i] - 'A')
+}
+for i := 0; i < 26; i++ {
+	iperm[k][perm[k][i]] = i
+}
 
 @ @<로터 $0$을 |r0|형으로 끼운다@>=
-	k, jj = 0, r0
-	@<로터를 끼운다@>@;
+k, jj = 0, r0
+@<로터를 끼운다@>@;
 
 @ @<로터 $1$을 |r1|형으로 끼운다@>=
-	k, jj = 1, r1
-	@<로터를 끼운다@>@;
+k, jj = 1, r1
+@<로터를 끼운다@>@;
 
 @ @<로터 $2$를 |r2|형으로 끼운다@>=
-	k, jj = 2, r2
-	@<로터를 끼운다@>@;
+k, jj = 2, r2
+@<로터를 끼운다@>@;
 
 @ @<회전량 세 개를 모두 훑는다@>=
-	for p0 = 0; p0 < 26; p0++ {
-		for p1 = 0; p1 < 26; p1++ {
-			for p2 = 0; p2 < 26; p2++ {
-				@<변형 하나를 살펴본다@>@;
-			}
+for p0 = 0; p0 < 26; p0++ {
+	for p1 = 0; p1 < 26; p1++ {
+		for p2 = 0; p2 < 26; p2++ {
+			@<변형 하나를 살펴본다@>@;
 		}
 	}
+}
 
 @ 델타 나무의 층 $m-1$에 있는 노드 하나를 고르면 크립 $m$글자 동안의 회전량이
 모두 정해지고, 따라서 치환 $\pi_0,\ldots,\pi_{m-1}$이 정해진다. 그 다음은 크립을
 암호문의 어느 자리에 대 볼 것인가---그것이 |kk|다.
 
 @<변형 하나를 살펴본다@>=
-	for pp = level[plainsize-1]; pp >= 0; pp = delta[pp].sibling {
-		@<델타 경로를 따라 |fullswap|을 만든다@>@;
-	nextkk:
-		for kk = 0; kk+plainsize <= ciphersize; kk++ {
-			@<크립이 암호문과 부딪히면 건너뛴다@>@;
-			@<쓰인 글자를 센다@>@;
-			@<봄베를 돌린다@>@;
-			@<시험 해가 나왔으면 거대 강제류를 찾는다@>@;
-		}
+for pp = level[plainsize-1]; pp >= 0; pp = delta[pp].sibling {
+	@<델타 경로를 따라 |fullswap|을 만든다@>@;
+nextkk:
+	for kk = 0; kk+plainsize <= ciphersize; kk++ {
+		@<크립이 암호문과 부딪히면 건너뛴다@>@;
+		@<쓰인 글자를 센다@>@;
+		@<봄베를 돌린다@>@;
+		@<시험 해가 나왔으면 거대 강제류를 찾는다@>@;
 	}
+}
 
 @ 노드에서 뿌리까지 거슬러 올라가며 뒤에서부터 채운다. 뿌리의 델타는 $(0,0,0)$이라
 첫 치환은 회전량 $(p_0,p_1,p_2)$ 그대로다.
 
 @<델타 경로를 따라 |fullswap|을 만든다@>=
-	for k, q := plainsize-1, pp; k >= 0; k, q = k-1, delta[q].parent {
-		d := delta[q].del
-		e := &enc[mod26[p0+d[0]]][mod26[p1+d[1]]][mod26[p2+d[2]]]
-		for j := 0; j < 26; j++ {
-			fullswap[k][j] = int(e[j])
-		}
+for k, q := plainsize-1, pp; k >= 0; k, q = k-1, delta[q].parent {
+	d := delta[q].del
+	e := &enc[mod26[p0+d[0]]][mod26[p1+d[1]]][mod26[p2+d[2]]]
+	for j := 0; j < 26; j++ {
+		fullswap[k][j] = int(e[j])
 	}
+}
 
 @ 반사판이 남긴 흠집을 쓰는 자리가 여기다. 크립의 글자와 암호문의 글자가 한 자리에서
 같으면 그 자리는 볼 것도 없다.
 
 @<크립이 암호문과 부딪히면 건너뛴다@>=
-	clash := false
-	for i := 0; i < plainsize; i++ {
-		if plaintext[i] == ciphertext[kk+i] {
-			clash = true
-			break
-		}
+clash := false
+for i := 0; i < plainsize; i++ {
+	if plaintext[i] == ciphertext[kk+i] {
+		clash = true
+		break
 	}
-	if clash {
-		continue
-	}
+}
+if clash {
+	continue
+}
 
 @ @<쓰인 글자를 센다@>=
-	used = pused
-	for i := 0; i < plainsize; i++ {
-		used[ciphertext[kk+i]]++
-	}
+used = pused
+for i := 0; i < plainsize; i++ {
+	used[ciphertext[kk+i]]++
+}
 
 @ 봄베 자체는 짧다. 짝 $351$개를 저마다 홀로 두고 시작해서, 크립의 걸음마다
 스물여섯 개의 연결을 긋는다.
@@ -561,15 +561,15 @@ var (
 전체에 쓰이기 때문이다.
 
 @<봄베를 돌린다@>=
-	copy(rep[:], self[:])
-	copy(link[:], self[:])
-	copy(size[:], ones[:])
-	copy(bits[:], bits0[:])
-	for k := 0; k < plainsize; k++ {
-		for i := 0; i < 26; i++ {
-			yewnion(loc(plaintext[k], i), loc(ciphertext[kk+k], fullswap[k][i]))
-		}
+copy(rep[:], self[:])
+copy(link[:], self[:])
+copy(size[:], ones[:])
+copy(bits[:], bits0[:])
+for k := 0; k < plainsize; k++ {
+	for i := 0; i < 26; i++ {
+		yewnion(loc(plaintext[k], i), loc(ciphertext[kk+k], fullswap[k][i]))
 	}
+}
 
 @* 더 나은 거르개.
 봄베가 동치류를 다 만들고 나면, 쓰인 글자 $i$마다 ``$i$가 낀 짝을 담은 {\it 좋은\/}
@@ -588,38 +588,38 @@ var (
 합쳐도 되고, 합친 것---{\it 거대류\/}---안의 짝들은 서로 글자가 달라야 한다.
 
 @<시험 해가 나왔으면 거대 강제류를 찾는다@>=
-	giant, hit := -1, 0
-	for i := 0; i < 26; i++ {
-		if used[i] == 0 {
-			continue
-		}
-		@<글자 |i|를 담은 좋은 류를 센다@>@;
-		if c == 0 {
-			continue nextkk // 글자 |i|가 지워졌으니 해가 아니다
-		}
-		if c == 1 { // |hit|이 강제류다
-			if giant < 0 {
-				giant = hit
-			} else if giant != hit {
-				giant = yewnion(giant, hit)
-				if bits[giant] < 0 {
-					continue nextkk
-				}
+giant, hit := -1, 0
+for i := 0; i < 26; i++ {
+	if used[i] == 0 {
+		continue
+	}
+	@<글자 |i|를 담은 좋은 류를 센다@>@;
+	if c == 0 {
+		continue nextkk // 글자 |i|가 지워졌으니 해가 아니다
+	}
+	if c == 1 { // |hit|이 강제류다
+		if giant < 0 {
+			giant = hit
+		} else if giant != hit {
+			giant = yewnion(giant, hit)
+			if bits[giant] < 0 {
+				continue nextkk
 			}
 		}
 	}
-	if giant >= 0 {
-		@<거대류로 더 쳐 낼 수 있으면 쳐 낸다@>@;
-	}
-	@<해를 살펴본다@>@;
+}
+if giant >= 0 {
+	@<거대류로 더 쳐 낼 수 있으면 쳐 낸다@>@;
+}
+@<해를 살펴본다@>@;
 
 @ @<글자 |i|를 담은 좋은 류를 센다@>=
-	c := 0
-	for j := 0; j < 26; j++ {
-		if s := rep[loc(i, j)]; bits[s] >= 0 {
-			c, hit = c+1, s
-		}
+c := 0
+for j := 0; j < 26; j++ {
+	if s := rep[loc(i, j)]; bits[s] >= 0 {
+		c, hit = c+1, s
 	}
+}
 
 @ 거대류가 아닌 류는 강제된 짝들과 글자를 겹치지 않을 때에만 살아남는다. 그러니
 거대류와 부딪히는 류는 모두 죽일 수 있고, 그러면 또 다른 류가 강제류가 될 수 있다.
@@ -629,35 +629,35 @@ var (
 이르렀다면 |change|는 이미 참이므로 결코 걸리지 않는다. 죽은 줄이라 여기서는 뺐다.
 
 @<거대류로 더 쳐 낼 수 있으면 쳐 낸다@>=
-	for {
-		change := false
-		for k := 0; k < nn; k++ {
-			if rep[k] == k && bits[k] >= 0 && k != giant && bits[k]&bits[giant] != 0 {
-				change, bits[k] = true, -1
-			}
+for {
+	change := false
+	for k := 0; k < nn; k++ {
+		if rep[k] == k && bits[k] >= 0 && k != giant && bits[k]&bits[giant] != 0 {
+			change, bits[k] = true, -1
 		}
-		if !change {
-			break
-		}
-		@<새로 강제류가 된 것이 있으면 거대류에 합친다@>@;
 	}
+	if !change {
+		break
+	}
+	@<새로 강제류가 된 것이 있으면 거대류에 합친다@>@;
+}
 
 @ @<새로 강제류가 된 것이 있으면 거대류에 합친다@>=
-	for i := 0; i < 26; i++ {
-		if used[i] == 0 || (1<<i)&bits[giant] != 0 {
-			continue
-		}
-		@<글자 |i|를 담은 좋은 류를 센다@>@;
-		if c == 0 {
+for i := 0; i < 26; i++ {
+	if used[i] == 0 || (1<<i)&bits[giant] != 0 {
+		continue
+	}
+	@<글자 |i|를 담은 좋은 류를 센다@>@;
+	if c == 0 {
+		continue nextkk
+	}
+	if c == 1 {
+		giant = yewnion(giant, hit)
+		if bits[giant] < 0 {
 			continue nextkk
 		}
-		if c == 1 {
-			giant = yewnion(giant, hit)
-			if bits[giant] < 0 {
-				continue nextkk
-			}
-		}
 	}
+}
 
 @* 플러그보드를 SAT로.
 여기까지 통과했다면 플러그보드가 있을 법한 배치를 하나 찾은 것이다. 정말 있는지는
@@ -679,26 +679,26 @@ var (
 )
 
 @ @<해를 살펴본다@>=
-	cases++
-	nvars = 0
-	for k := 0; k < nn; k++ {
-		if rep[k] == k && bits[k] >= 0 {
-			klass[nvars], kbits[nvars] = k, bits[k]
-			nvars++
-		}
+cases++
+nvars = 0
+for k := 0; k < nn; k++ {
+	if rep[k] == k && bits[k] >= 0 {
+		klass[nvars], kbits[nvars] = k, bits[k]
+		nvars++
 	}
-	if nvars > varsmax {
-		varsmax = nvars
+}
+if nvars > varsmax {
+	varsmax = nvars
+}
+satSolve()
+if sols == 0 {
+	fails++
+	if nvars > 64 {
+		hardfails++
 	}
-	satSolve()
-	if sols == 0 {
-		fails++
-		if nvars > 64 {
-			hardfails++
-		}
-	} else {
-		@<플러그보드와 링 설정마다 평문을 살펴본다@>@;
-	}
+} else {
+	@<플러그보드와 링 설정마다 평문을 살펴본다@>@;
+}
 
 @* SAT 해결기.
 아래 코드는 크누스의 오래된 프로그램 \.{SAT0W}를 잘라 붙인 것인데, 우리 쓰임에
@@ -765,18 +765,18 @@ var (
 싸게 걸러 낸다.
 
 @<제약을 만든다@>=
-	for j := 0; j < nvars; j++ {
-		for k := j + 1; k < nvars; k++ {
-			if kbits[j]&kbits[k] != 0 {
-				@<이항 제약 $(\bar x_j\lor\bar x_k)$을 만든다@>@;
-			}
+for j := 0; j < nvars; j++ {
+	for k := j + 1; k < nvars; k++ {
+		if kbits[j]&kbits[k] != 0 {
+			@<이항 제약 $(\bar x_j\lor\bar x_k)$을 만든다@>@;
 		}
 	}
-	if nvars > 64 {
-		@<적어도-하나 제약을 우격다짐으로 만든다@>@;
-	} else {
-		@<겹치는 것을 걸러 적어도-하나 제약을 만든다@>@;
-	}
+}
+if nvars > 64 {
+	@<적어도-하나 제약을 우격다짐으로 만든다@>@;
+} else {
+	@<겹치는 것을 걸러 적어도-하나 제약을 만든다@>@;
+}
 
 @ 절 하나를 닫는 일은 세 곳에서 똑같이 되풀이된다. 쌓아 둔 리터럴 가운데 첫 번째를
 {\it 감시자\/}로 삼아 그 리터럴의 감시 목록에 이 절을 끼워 넣는다. 절이 비었다면
@@ -785,83 +785,83 @@ var (
 쓰이지 않은 칸을 가리키게 된다.
 
 @<절 하나를 닫는다@>=
-	if cells == st {
-		return // 빈 절이 나왔다---풀 수 없다
-	}
-	w := int(mem[st])
-	cmem[clauses].wlink = cmem[w].wlink
-	cmem[w].wlink = uint32(clauses)
-	clauses++
-	cmem[clauses].start = uint32(cells)
+if cells == st {
+	return // 빈 절이 나왔다---풀 수 없다
+}
+w := int(mem[st])
+cmem[clauses].wlink = cmem[w].wlink
+cmem[w].wlink = uint32(clauses)
+clauses++
+cmem[clauses].start = uint32(cells)
 
 @ @<이항 제약 $(\bar x_j\lor\bar x_k)$을 만든다@>=
-	st := cells
-	mem[cells] = uint32(j + j + 3)   // $\bar x_j$
-	mem[cells+1] = uint32(k + k + 3) // $\bar x_k$
-	cells += 2
-	@<절 하나를 닫는다@>@;
+st := cells
+mem[cells] = uint32(j + j + 3)   // $\bar x_j$
+mem[cells+1] = uint32(k + k + 3) // $\bar x_k$
+cells += 2
+@<절 하나를 닫는다@>@;
 
 @ @<겹치는 것을 걸러 적어도-하나 제약을 만든다@>=
-	mk := 0
-	for i := 0; i < 26; i++ {
-		var bb uint64
-		for k := 0; k < nvars; k++ {
-			if (1<<i)&kbits[k] != 0 {
-				bb += 1 << k
-			}
+mk := 0
+for i := 0; i < 26; i++ {
+	var bb uint64
+	for k := 0; k < nvars; k++ {
+		if (1<<i)&kbits[k] != 0 {
+			bb += 1 << k
 		}
-		@<|bb|를 |konstraint|에 넣되 포섭 관계를 정리한다@>@;
 	}
-	for j := 0; j < mk; j++ {
-		@<|konstraint[j]|의 적어도-하나 제약을 만든다@>@;
-	}
+	@<|bb|를 |konstraint|에 넣되 포섭 관계를 정리한다@>@;
+}
+for j := 0; j < mk; j++ {
+	@<|konstraint[j]|의 적어도-하나 제약을 만든다@>@;
+}
 
 @ 이미 있는 제약이 |bb|를 삼키면 |bb|는 버리고, |bb|가 이미 있는 것을 삼키면 그것을
 지운다. 지운 자리는 맨 뒤의 것으로 메운다.
 
 @<|bb|를 |konstraint|에 넣되 포섭 관계를 정리한다@>=
-	k := 0
-	for k < mk {
-		if konstraint[k]&bb == konstraint[k] {
-			break // |bb|가 삼켜진다
-		}
-		if konstraint[k]&bb == bb { // |bb|가 앞의 것을 삼킨다
-			mk--
-			konstraint[k] = konstraint[mk]
-			continue
-		}
-		k++
+k := 0
+for k < mk {
+	if konstraint[k]&bb == konstraint[k] {
+		break // |bb|가 삼켜진다
 	}
-	if k == mk {
-		konstraint[mk] = bb
-		mk++
+	if konstraint[k]&bb == bb { // |bb|가 앞의 것을 삼킨다
+		mk--
+		konstraint[k] = konstraint[mk]
+		continue
 	}
+	k++
+}
+if k == mk {
+	konstraint[mk] = bb
+	mk++
+}
 
 @ @<|konstraint[j]|의 적어도-하나 제약을 만든다@>=
-	st := cells
-	for k, bb := 0, uint64(1); bb != 0 && bb <= konstraint[j]; k, bb = k+1, bb<<1 {
-		if bb&konstraint[j] != 0 {
-			mem[cells] = uint32(k + k + 2) // $x_k$
-			cells++
-		}
+st := cells
+for k, bb := 0, uint64(1); bb != 0 && bb <= konstraint[j]; k, bb = k+1, bb<<1 {
+	if bb&konstraint[j] != 0 {
+		mem[cells] = uint32(k + k + 2) // $x_k$
+		cells++
 	}
-	@<절 하나를 닫는다@>@;
+}
+@<절 하나를 닫는다@>@;
 
 @ 류가 예순넷을 넘으면 비트 낱말이 모자라니 걸러 내기를 포기하고 글자마다 절을
 하나씩 그냥 만든다. 크누스의 말대로, 그런 때는 좀 게을러도 괜찮다.
 
 @<적어도-하나 제약을 우격다짐으로 만든다@>=
-	hardcases++
-	for i := 0; i < 26; i++ {
-		st := cells
-		for k := 0; k < nvars; k++ {
-			if (1<<i)&kbits[k] != 0 {
-				mem[cells] = uint32(k + k + 2) // $x_k$
-				cells++
-			}
+hardcases++
+for i := 0; i < 26; i++ {
+	st := cells
+	for k := 0; k < nvars; k++ {
+		if (1<<i)&kbits[k] != 0 {
+			mem[cells] = uint32(k + k + 2) // $x_k$
+			cells++
 		}
-		@<절 하나를 닫는다@>@;
 	}
+	@<절 하나를 닫는다@>@;
+}
 
 @* 되돌아가기.
 이제 옛날 방식 그대로의 되돌아가기다. 층 |level|에서 변수 하나를 정하고, 그 값이
@@ -902,32 +902,32 @@ backtrack:
 @ 거짓 쪽을 감시하는 절이 있거나 참 쪽을 감시하는 절이 없으면 거짓부터 시도한다.
 
 @<어느 쪽을 먼저 시도할지 고른다@>=
-	if cmem[level+level+1].wlink != 0 || cmem[level+level].wlink == 0 {
-		move[level] = 1
-	} else {
-		move[level] = 0
-	}
+if cmem[level+level+1].wlink != 0 || cmem[level+level].wlink == 0 {
+	move[level] = 1
+} else {
+	move[level] = 0
+}
 
 @ 절 |c|에서 아직 거짓이 아닌 리터럴을 하나 찾아 감시자를 그리로 옮긴다. 첫 칸에
 있던 감시자와 자리를 맞바꾸면 된다. 끝까지 찾지 못하면 절 |c|가 모순이다.
 
 @<고르지 않은 쪽 목록의 절들을 옮겨 붙인다@>=
-	for c = cmem[w].wlink; c != 0; c = q {
-		i, q, j = cmem[c].start, cmem[c].wlink, cmem[c+1].start
-		for p = i + 1; p < j; p++ {
-			k = mem[p]
-			if k >= uint32(level+level) || (int(k)^move[k>>1])&1 == 0 {
-				break
-			}
+for c = cmem[w].wlink; c != 0; c = q {
+	i, q, j = cmem[c].start, cmem[c].wlink, cmem[c+1].start
+	for p = i + 1; p < j; p++ {
+		k = mem[p]
+		if k >= uint32(level+level) || (int(k)^move[k>>1])&1 == 0 {
+			break
 		}
-		if p == j { // 절 |c|가 비었다
-			cmem[w].wlink = c
-			goto tryagain
-		}
-		mem[i], mem[p] = k, w
-		cmem[c].wlink, cmem[k].wlink = cmem[k].wlink, c
 	}
-	cmem[w].wlink = 0
+	if p == j { // 절 |c|가 비었다
+		cmem[w].wlink = c
+		goto tryagain
+	}
+	mem[i], mem[p] = k, w
+	cmem[c].wlink, cmem[k].wlink = cmem[k].wlink, c
+}
+cmem[w].wlink = 0
 
 @ 해를 찾으면 참인 변수들이 가리키는 류의 짝을 모두 적는다. 각 류의 원소는 |link|를
 따라 한 바퀴 돌면 다 나온다. 목록의 끝은 $-1$로 막는데, 다음 류를 적기 시작하면
@@ -937,34 +937,34 @@ backtrack:
 모자란다. 원본은 스물여섯 칸만 잡아 두었는데, 여기서는 넉넉히 잡았다.
 
 @<찾은 해를 갈무리한다@>=
-	jj := 0
-	for k := 1; k < level; k++ {
-		if move[k]&1 != 0 {
-			continue // $x_{k-1}$이 거짓이다
-		}
-		s := klass[k-1]
-		plugs[sols][jj] = s
+jj := 0
+for k := 1; k < level; k++ {
+	if move[k]&1 != 0 {
+		continue // $x_{k-1}$이 거짓이다
+	}
+	s := klass[k-1]
+	plugs[sols][jj] = s
+	jj++
+	for pp := link[s]; pp != s; pp = link[pp] {
+		plugs[sols][jj] = pp
 		jj++
-		for pp := link[s]; pp != s; pp = link[pp] {
-			plugs[sols][jj] = pp
-			jj++
-		}
-		plugs[sols][jj] = -1
 	}
-	sols++
-	if sols > solsmax {
-		if sols >= maxsols {
-			fmt.Fprintln(os.Stderr, "SAT 해가 너무 많다!")
-			os.Exit(1)
-		}
-		solsmax = sols
+	plugs[sols][jj] = -1
+}
+sols++
+if sols > solsmax {
+	if sols >= maxsols {
+		fmt.Fprintln(os.Stderr, "SAT 해가 너무 많다!")
+		os.Exit(1)
 	}
-	if cells > cellsmax {
-		cellsmax = cells
-	}
-	if clauses > clausesmax {
-		clausesmax = clauses
-	}
+	solsmax = sols
+}
+if cells > cellsmax {
+	cellsmax = cells
+}
+if clauses > clausesmax {
+	clausesmax = clauses
+}
 
 @ 다 풀고 나면 자취를 지워야 다음 일을 맡을 수 있다. 고리 |wlink|는 물론이고 |start|도
 지워야 하는데, 프로그램이 |cmem[nonspec].start|가 $0$이라고 믿기 때문이다. 그리고
@@ -972,9 +972,9 @@ backtrack:
 덧붙인 자리다.
 
 @<|cmem|을 지운다@>=
-	for c := 0; c <= clauses; c++ {
-		cmem[c] = clauseRec{}
-	}
+for c := 0; c <= clauses; c++ {
+	cmem[c] = clauseRec{}
+}
 
 @* 시작 위치와 링 설정.
 플러그보드를 찾았으니 이제 링 설정 차례다. 우리가 아는 것은 델타 경로와 그 경로가
@@ -1004,46 +1004,46 @@ var (
 둘 다 $0$이면 크립을 찍는 동안 아무 자리올림도 없었다는 뜻이라 경우가 가장 많다.
 
 @<있을 수 있는 설정을 모두 적는다@>=
-	setups, prefix = 0, kk
-	root[0], root[1], root[2] = p0, p1, p2
-	d := delta[pp].del
-	switch {
-	case d[0] != 0:
-		@<쉬운 경우@>@;
-	case d[1] != 0:
-		@<중간 경우@>@;
-	default:
-		@<어려운 경우@>@;
-	}
-	if sols*setups > solsbysetupsmax {
-		solsbysetupsmax = sols * setups
-	}
+setups, prefix = 0, kk
+root[0], root[1], root[2] = p0, p1, p2
+d := delta[pp].del
+switch {
+case d[0] != 0:
+	@<쉬운 경우@>@;
+case d[1] != 0:
+	@<중간 경우@>@;
+default:
+	@<어려운 경우@>@;
+}
+if sols*setups > solsbysetupsmax {
+	solsbysetupsmax = sols * setups
+}
 
 @ @<쉬운 경우@>=
-	if d[1] == 1 {
-		outbig(prefix + 1)
-	} else {
-		q := delta[pp].parent
-		for delta[q].del[0] != 0 {
-			q = delta[q].parent
-		}
-		outbig(prefix + 1 + delta[q].del[2])
-	}
-
-@ @<중간 경우@>=
+if d[1] == 1 {
+	outbig(prefix + 1)
+} else {
 	q := delta[pp].parent
-	for delta[q].del[1] != 0 {
+	for delta[q].del[0] != 0 {
 		q = delta[q].parent
 	}
-	outmedium((prefix + 1 + delta[q].del[2]) % 26)
+	outbig(prefix + 1 + delta[q].del[2])
+}
+
+@ @<중간 경우@>=
+q := delta[pp].parent
+for delta[q].del[1] != 0 {
+	q = delta[q].parent
+}
+outmedium((prefix + 1 + delta[q].del[2]) % 26)
 
 @ 남은 경우에는 크립을 찍는 동안 어떤 자리올림도 일어나지 않아야 한다. 그런 시각을
 모두 훑는다.
 
 @<어려운 경우@>=
-	for k := (prefix + plainsize) % 26; k != (prefix+1)%26; k = (k + 1) % 26 {
-		outmedium(k)
-	}
+for k := (prefix + plainsize) % 26; k != (prefix+1)%26; k = (k + 1) % 26 {
+	outmedium(k)
+}
 
 @ 큰 자리올림이 |bigcarry|번째 글자에서 일어나도록 기계를 맞춘다. 느린 회전자의
 시작 자리는 늘 \.A로 두어도 일반성을 잃지 않는다.
@@ -1064,18 +1064,18 @@ func outbig(bigcarry int) {
 }
 
 @ @<이 설정을 목록에 적는다@>=
-	for i := 0; i < 3; i++ {
-		startpos[setups][i] = start[i]
-		rings[setups][i] = (now[i] + 26 - root[i]) % 26
+for i := 0; i < 3; i++ {
+	startpos[setups][i] = start[i]
+	rings[setups][i] = (now[i] + 26 - root[i]) % 26
+}
+setups++
+if setups > setupsmax {
+	if setups >= maxsetups {
+		fmt.Fprintln(os.Stderr, "한 배치에 설정이 너무 많다!")
+		os.Exit(1)
 	}
-	setups++
-	if setups > setupsmax {
-		if setups >= maxsetups {
-			fmt.Fprintln(os.Stderr, "한 배치에 설정이 너무 많다!")
-			os.Exit(1)
-		}
-		setupsmax = setups
-	}
+	setupsmax = setups
+}
 
 @ 작은 자리올림은 |carry|번째 글자에서 일어나되 큰 자리올림은 (암호문이 $600$글자를
 넘지 않는 한) 일어나지 않게 맞춘다. 그러고 나서, 크립을 건드리지 않는 시각마다 큰
@@ -1092,12 +1092,12 @@ func outmedium(carry int) {
 }
 
 @ @<큰 자리올림 없이 작은 자리올림만 맞춘다@>=
-	start[2] = 25 - carry
-	start[1] = 0
-	now[2] = (start[2] + prefix + 1) % 26
-	now[1] = (start[2] + prefix + 1) / 26
-	now[0] = 0
-	@<이 설정을 목록에 적는다@>@;
+start[2] = 25 - carry
+start[1] = 0
+now[2] = (start[2] + prefix + 1) % 26
+now[1] = (start[2] + prefix + 1) / 26
+now[0] = 0
+@<이 설정을 목록에 적는다@>@;
 
 @* 영어답기.
 마지막 관문이다. 지금까지의 방법이 크립과 기계의 조건을 모두 만족하는 평문을
@@ -1138,122 +1138,122 @@ var (
 읽으면 되니, 맨 앞자리를 떼고 새 글자를 붙이는 일만 되풀이하면 된다.
 
 @<원문을 읽어 다섯 글자 빈도를 센다@>=
-	text, err := os.ReadFile(corpusFile)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "원문 파일을 열 수 없다: %v\n", err)
-		os.Exit(1)
+text, err := os.ReadFile(corpusFile)
+if err != nil {
+	fmt.Fprintf(os.Stderr, "원문 파일을 열 수 없다: %v\n", err)
+	os.Exit(1)
+}
+text = []byte(strings.Map(func(r rune) rune {
+	if r >= 'A' && r <= 'Z' {
+		return r
 	}
-	text = []byte(strings.Map(func(r rune) rune {
-		if r >= 'A' && r <= 'Z' {
-			return r
-		}
-		return -1
-	}, string(text)))
-	if len(text) < 5 {
-		fmt.Fprintf(os.Stderr, "원문 %s에 대문자가 너무 적다!\n", corpusFile)
-		os.Exit(1)
-	}
-	@<창을 미끄러뜨리며 센다@>@;
-	fmt.Fprintf(os.Stderr, "원문 %s에서 대문자 %d개를 읽었다.\n", corpusFile, len(text))
+	return -1
+}, string(text)))
+if len(text) < 5 {
+	fmt.Fprintf(os.Stderr, "원문 %s에 대문자가 너무 적다!\n", corpusFile)
+	os.Exit(1)
+}
+@<창을 미끄러뜨리며 센다@>@;
+fmt.Fprintf(os.Stderr, "원문 %s에서 대문자 %d개를 읽었다.\n", corpusFile, len(text))
 
 @ 창을 미끄러뜨리는 일은 맨 앞 글자를 버리고 새 글자를 뒤에 붙이는 것뿐이다.
 첨자 다섯 개를 그대로 쓰므로 표를 하나로 펼 것도 없다.
 
 @<창을 미끄러뜨리며 센다@>=
-	var w [5]int
-	for i := 0; i < 4; i++ {
-		w[i+1] = int(text[i] - 'A')
-	}
-	for i := 4; i < len(text); i++ {
-		w[0], w[1], w[2], w[3], w[4] = w[1], w[2], w[3], w[4], int(text[i]-'A')
-		score[w[0]][w[1]][w[2]][w[3]][w[4]]++
-	}
+var w [5]int
+for i := 0; i < 4; i++ {
+	w[i+1] = int(text[i] - 'A')
+}
+for i := 4; i < len(text); i++ {
+	w[0], w[1], w[2], w[3], w[4] = w[1], w[2], w[3], w[4], int(text[i]-'A')
+	score[w[0]][w[1]][w[2]][w[3]][w[4]]++
+}
 
 @* 끝까지 밀어붙이기.
 파이프라인의 끝이다. 설정 |i|와 플러그보드 |j|를 골라 기계를 맞추고, 저 수수께끼
 같은 암호문을 그대로 밀어 넣어 본다. 숨을 죽이고, 손가락을 꼬고서.
 
 @<플러그보드와 링 설정마다 평문을 살펴본다@>=
-	@<있을 수 있는 설정을 모두 적는다@>@;
-	for i := 0; i < setups; i++ {
-		for j := 0; j < sols; j++ {
-			@<설정 |i|와 해 |j|로 암호문을 풀어 본다@>@;
-		}
+@<있을 수 있는 설정을 모두 적는다@>@;
+for i := 0; i < setups; i++ {
+	for j := 0; j < sols; j++ {
+		@<설정 |i|와 해 |j|로 암호문을 풀어 본다@>@;
 	}
+}
 
 @ @<설정 |i|와 해 |j|로 암호문을 풀어 본다@>=
-	count++
-	for k := 0; k < 3; k++ {
-		pos[k] = startpos[i][k]
-		off[k] = mod26[pos[k]+26-rings[i][k]]
-	}
-	@<|plugs[j]|로 플러그보드를 맞춘다@>@;
-	for k := 0; k < ciphersize; k++ {
-		c := ciphertext[k]
-		@<회전자를 돌린다@>@;
-		c = plugboard[c]
-		@<글자 |c|를 암호화한다@>@;
-		plntxt[k] = plugboard[c]
-	}
-	@<크립이 제자리에 나왔는지 다시 확인한다@>@;
-	@<점수를 매기고 좋으면 찍는다@>@;
+count++
+for k := 0; k < 3; k++ {
+	pos[k] = startpos[i][k]
+	off[k] = mod26[pos[k]+26-rings[i][k]]
+}
+@<|plugs[j]|로 플러그보드를 맞춘다@>@;
+for k := 0; k < ciphersize; k++ {
+	c := ciphertext[k]
+	@<회전자를 돌린다@>@;
+	c = plugboard[c]
+	@<글자 |c|를 암호화한다@>@;
+	plntxt[k] = plugboard[c]
+}
+@<크립이 제자리에 나왔는지 다시 확인한다@>@;
+@<점수를 매기고 좋으면 찍는다@>@;
 
 @ 고른 류들이 스물여섯 글자를 모두 덮으므로 플러그보드는 매번 통째로 다시 쓰인다.
 
 @<|plugs[j]|로 플러그보드를 맞춘다@>=
-	for k := 0; plugs[j][k] >= 0; k++ {
-		nm := name[plugs[j][k]]
-		u, v := int(nm[0]-'A'), int(nm[1]-'A')
-		plugboard[u], plugboard[v] = v, u
-	}
+for k := 0; plugs[j][k] >= 0; k++ {
+	nm := name[plugs[j][k]]
+	u, v := int(nm[0]-'A'), int(nm[1]-'A')
+	plugboard[u], plugboard[v] = v, u
+}
 
 @ 스스로를 못 믿는 것이 아니라, 여태 세운 논리가 정말 맞는지 보는 것이다. 이 줄이
 한 번이라도 울린다면 어딘가 크게 틀린 것이다.
 
 @<크립이 제자리에 나왔는지 다시 확인한다@>=
-	for k := 0; k < plainsize; k++ {
-		if plntxt[k+prefix] != plaintext[k] {
-			fmt.Fprintln(os.Stderr, "이런, 내가 뭔가 잘못했다.")
-		}
+for k := 0; k < plainsize; k++ {
+	if plntxt[k+prefix] != plaintext[k] {
+		fmt.Fprintln(os.Stderr, "이런, 내가 뭔가 잘못했다.")
 	}
+}
 
 @ 점수는 $121$개 토막의 빈도를 더한 것이다. 여태까지의 최고와 같거나 그보다 나으면
 찍는다. 크누스는 $6000$점이 넘어도 찍게 해 두었는데, 그래야 상위 후보들을 놓치지
 않기 때문이다.
 
 @<점수를 매기고 좋으면 찍는다@>=
-	s := 0
-	for k := 4; k < ciphersize; k++ {
-		s += int(score[plntxt[k-4]][plntxt[k-3]][plntxt[k-2]][plntxt[k-1]][plntxt[k]])
-	}
-	if s < maxscore {
-		tally[s]++
-	}
-	if s >= bestscore || s >= 6000 {
-		@<이 후보를 찍는다@>@;
-		bestscore = s
-	}
-	if count%250000 == 0 {
-		fmt.Fprintf(os.Stderr, "... 여기까지 평문 %d개, %s %s %s %c%c%c\n", count,
-			rotorName[r0], rotorName[r1], rotorName[r2], p0+'A', p1+'A', p2+'A')
-	}
+s := 0
+for k := 4; k < ciphersize; k++ {
+	s += int(score[plntxt[k-4]][plntxt[k-3]][plntxt[k-2]][plntxt[k-1]][plntxt[k]])
+}
+if s < maxscore {
+	tally[s]++
+}
+if s >= bestscore || s >= 6000 {
+	@<이 후보를 찍는다@>@;
+	bestscore = s
+}
+if count%250000 == 0 {
+	fmt.Fprintf(os.Stderr, "... 여기까지 평문 %d개, %s %s %s %c%c%c\n", count,
+		rotorName[r0], rotorName[r1], rotorName[r2], p0+'A', p1+'A', p2+'A')
+}
 
 @ @<이 후보를 찍는다@>=
-	var b strings.Builder
-	for k := 0; k < ciphersize; k++ {
-		b.WriteByte(byte('A' + plntxt[k]))
+var b strings.Builder
+for k := 0; k < ciphersize; k++ {
+	b.WriteByte(byte('A' + plntxt[k]))
+}
+fmt.Fprintf(&b, " %s %s %s %c%c%c %c%c%c", rotorName[r0], rotorName[r1], rotorName[r2],
+	startpos[i][0]+'A', startpos[i][1]+'A', startpos[i][2]+'A',
+	rings[i][0]+'A', rings[i][1]+'A', rings[i][2]+'A')
+for k := 0; plugs[j][k] >= 0; k++ {
+	if nm := name[plugs[j][k]]; nm[0] != nm[1] {
+		b.WriteByte(' ')
+		b.WriteString(nm)
 	}
-	fmt.Fprintf(&b, " %s %s %s %c%c%c %c%c%c", rotorName[r0], rotorName[r1], rotorName[r2],
-		startpos[i][0]+'A', startpos[i][1]+'A', startpos[i][2]+'A',
-		rings[i][0]+'A', rings[i][1]+'A', rings[i][2]+'A')
-	for k := 0; plugs[j][k] >= 0; k++ {
-		if nm := name[plugs[j][k]]; nm[0] != nm[1] {
-			b.WriteByte(' ')
-			b.WriteString(nm)
-		}
-	}
-	fmt.Fprintf(&b, " (%c%c%c) %6d %d", p0+'A', p1+'A', p2+'A', s, count)
-	fmt.Println(b.String())
+}
+fmt.Fprintf(&b, " (%c%c%c) %6d %d", p0+'A', p1+'A', p2+'A', s, count)
+fmt.Println(b.String())
 
 @* 셈하기.
 마지막으로 점수 분포와 이런저런 최고 기록을 알린다. 크누스가 이 프로그램을 어디까지
@@ -1268,23 +1268,23 @@ var (
 )
 
 @ @<셈한 것을 알린다@>=
-	for s := 0; s < maxscore; s++ {
-		if tally[s] != 0 {
-			fmt.Printf("%10d:%10d\n", s, tally[s])
-		}
+for s := 0; s < maxscore; s++ {
+	if tally[s] != 0 {
+		fmt.Printf("%10d:%10d\n", s, tally[s])
 	}
-	fmt.Fprintf(os.Stderr, "모두 해서 평문 %d개를 들여다보았다.\n", count)
-	fmt.Fprintf(os.Stderr, " %d/%d 경우에 해가 없었고, 그중 어려운 것은 %d/%d다.\n",
-		fails, cases, hardfails, hardcases)
-	fmt.Fprintf(os.Stderr, "최대 변수 %d개, 절 %d개, 칸 %d개,\n", varsmax, clausesmax, cellsmax)
-	fmt.Fprintf(os.Stderr, " 최대 해 %d개, 설정 %d개, 해 곱하기 설정 %d개.\n",
-		solsmax, setupsmax, solsbysetupsmax)
+}
+fmt.Fprintf(os.Stderr, "모두 해서 평문 %d개를 들여다보았다.\n", count)
+fmt.Fprintf(os.Stderr, " %d/%d 경우에 해가 없었고, 그중 어려운 것은 %d/%d다.\n",
+	fails, cases, hardfails, hardcases)
+fmt.Fprintf(os.Stderr, "최대 변수 %d개, 절 %d개, 칸 %d개,\n", varsmax, clausesmax, cellsmax)
+fmt.Fprintf(os.Stderr, " 최대 해 %d개, 설정 %d개, 해 곱하기 설정 %d개.\n",
+	solsmax, setupsmax, solsbysetupsmax)
 
 @ 남은 것은 |main|이 쓰는 지역 변수뿐이다. 여섯 겹 고리의 첨자들과, 이름 있는 절
 여기저기서 함께 쓰는 몇 개다.
 
 @<지역 변수@>=
-	var r0, r1, r2, p0, p1, p2, k, jj, kk, pp int
+var r0, r1, r2, p0, p1, p2, k, jj, kk, pp int
 
 @* 돌려 보기.
 쓰는 법은 이렇다. 크립과 암호문을 명령줄로 주고, 다섯 글자 빈도를 뜰 원문 파일을

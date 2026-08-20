@@ -169,64 +169,64 @@ var (
 알 수 있다.
 
 @<항목 줄을 찍는다@>=
-	out = bufio.NewWriter(os.Stdout)
-	fmt.Fprintf(out, "| word-cube-dlx %s", wordFile)
-	if maxWords != nolimit {
-		fmt.Fprintf(out, ":%d", maxWords)
-	}
-	if distinct {
-		out.WriteString(" -d")
-	}
-	out.WriteByte('\n')
-	@<기본 항목과 보조 항목의 이름을 찍는다@>@;
+out = bufio.NewWriter(os.Stdout)
+fmt.Fprintf(out, "| word-cube-dlx %s", wordFile)
+if maxWords != nolimit {
+	fmt.Fprintf(out, ":%d", maxWords)
+}
+if distinct {
+	out.WriteString(" -d")
+}
+out.WriteByte('\n')
+@<기본 항목과 보조 항목의 이름을 찍는다@>@;
 
 @ 기본 항목은 $i\le j$인 줄들이고, 보조 항목은 $a\le b\le c$인 칸들이다. 여기에
 \.{-d}일 때만 낱말 항목이 붙는다.
 
 @<기본 항목과 보조 항목의 이름을 찍는다@>=
-	for i := 0; i < n; i++ {
-		for j := i; j < n; j++ {
-			fmt.Fprintf(out, "L%d%d ", i, j)
+for i := 0; i < n; i++ {
+	for j := i; j < n; j++ {
+		fmt.Fprintf(out, "L%d%d ", i, j)
+	}
+}
+out.WriteByte('|')
+for a := 0; a < n; a++ {
+	for b := a; b < n; b++ {
+		for c := b; c < n; c++ {
+			fmt.Fprintf(out, " %d%d%d", a, b, c)
 		}
 	}
-	out.WriteByte('|')
-	for a := 0; a < n; a++ {
-		for b := a; b < n; b++ {
-			for c := b; c < n; c++ {
-				fmt.Fprintf(out, " %d%d%d", a, b, c)
-			}
-		}
+}
+if distinct {
+	for _, w := range words {
+		fmt.Fprintf(out, " W%s", w)
 	}
-	if distinct {
-		for _, w := range words {
-			fmt.Fprintf(out, " W%s", w)
-		}
-	}
-	out.WriteByte('\n')
+}
+out.WriteByte('\n')
 
 @* 선택지.
 줄 $15$개와 읽어 들인 낱말 하나하나의 모든 짝마다 선택지 한 줄씩이다.
 
 @<선택지를 찍는다@>=
-	for i := 0; i < n; i++ {
-		for j := i; j < n; j++ {
-			for _, w := range words {
-				@<줄 $(i,j)$에 낱말 |w|를 놓는 선택지@>@;
-			}
+for i := 0; i < n; i++ {
+	for j := i; j < n; j++ {
+		for _, w := range words {
+			@<줄 $(i,j)$에 낱말 |w|를 놓는 선택지@>@;
 		}
 	}
+}
 
 @ 낱말의 $c$번째 글자는 칸 $\{i,j,c\}$에 놓이고, 그 글자가 곧 색이다.
 
 @<줄 $(i,j)$에 낱말 |w|를 놓는 선택지@>=
-	fmt.Fprintf(out, "L%d%d", i, j)
-	for c := 0; c < n; c++ {
-		fmt.Fprintf(out, " %s:%c", cell(i, j, c), w[c])
-	}
-	if distinct {
-		fmt.Fprintf(out, " W%s", w)
-	}
-	out.WriteByte('\n')
+fmt.Fprintf(out, "L%d%d", i, j)
+for c := 0; c < n; c++ {
+	fmt.Fprintf(out, " %s:%c", cell(i, j, c), w[c])
+}
+if distinct {
+	fmt.Fprintf(out, " W%s", w)
+}
+out.WriteByte('\n')
 
 @ 칸의 이름은 첨자 셋을 정렬해 붙여 쓴 것이다. 셋을 줄 세우는 데는 비교 세 번짜리
 정렬 그물이면 넉넉하다. 한 자리 숫자로 적으므로 이 이름 짓기는 $n\le10$에서만
@@ -253,28 +253,28 @@ func cell(i, j, c int) string {
 손잡이가 있어야 실험을 할 수 있다. 여기에 우리 것으로 \.{-d} 하나를 더 얹었다.
 
 @<명령줄을 처리한다@>=
-	for _, a := range os.Args[1:] {
-		switch {
-		case a == "-d":
-			distinct = true
-		case strings.HasPrefix(a, "-"):
-			usage()
-		default:
-			wordFile = a
-		}
+for _, a := range os.Args[1:] {
+	switch {
+	case a == "-d":
+		distinct = true
+	case strings.HasPrefix(a, "-"):
+		usage()
+	default:
+		wordFile = a
 	}
-	@<낱말 수 제한을 떼어 낸다@>@;
+}
+@<낱말 수 제한을 떼어 낸다@>@;
 
 @ 콜론은 뒤에서부터 찾는다. 디렉터리 이름에 콜론이 들어 있어도 탈이 없도록.
 
 @<낱말 수 제한을 떼어 낸다@>=
-	if k := strings.LastIndexByte(wordFile, ':'); k >= 0 {
-		m, err := strconv.Atoi(wordFile[k+1:])
-		if err != nil || m <= 0 {
-			usage()
-		}
-		maxWords, wordFile = m, wordFile[:k]
+if k := strings.LastIndexByte(wordFile, ':'); k >= 0 {
+	m, err := strconv.Atoi(wordFile[k+1:])
+	if err != nil || m <= 0 {
+		usage()
 	}
+	maxWords, wordFile = m, wordFile[:k]
+}
 
 @ 잘못된 명령줄을 만나면 하소연하고 물러난다. 두 곳에서 부르므로 함수로 둔다.
 
@@ -290,44 +290,44 @@ func usage() {
 뜻으로 또렷해진다.
 
 @<낱말을 읽는다@>=
-	f, err := os.Open(wordFile)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+f, err := os.Open(wordFile)
+if err != nil {
+	fmt.Fprintln(os.Stderr, err)
+	os.Exit(1)
+}
+sc := bufio.NewScanner(f)
+for sc.Scan() && len(words) < maxWords {
+	if s := sc.Text(); len(s) == n {
+		words = append(words, s)
 	}
-	sc := bufio.NewScanner(f)
-	for sc.Scan() && len(words) < maxWords {
-		if s := sc.Text(); len(s) == n {
-			words = append(words, s)
-		}
-	}
-	f.Close()
-	@<읽다가 탈이 났으면 접는다@>@;
+}
+f.Close()
+@<읽다가 탈이 났으면 접는다@>@;
 
 @ 낱말이 하나도 없으면 찍어 봐야 헛일이다. 항목만 있고 선택지가 없는 \.{DLX}
 파일은 해결기가 곧바로 ``해 없음''이라 답할 뿐이다.
 
 @<읽다가 탈이 났으면 접는다@>=
-	if err := sc.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	if len(words) == 0 {
-		fmt.Fprintf(os.Stderr, "파일 %s에 %d글자 낱말이 하나도 없다!\n", wordFile, n)
-		os.Exit(1)
-	}
+if err := sc.Err(); err != nil {
+	fmt.Fprintln(os.Stderr, err)
+	os.Exit(1)
+}
+if len(words) == 0 {
+	fmt.Fprintf(os.Stderr, "파일 %s에 %d글자 낱말이 하나도 없다!\n", wordFile, n)
+	os.Exit(1)
+}
 
 @ 다 찍었으면 버퍼를 비우고, 무엇을 얼마나 찍었는지 표준 오류로 알린다. 표준 출력은
 해결기에게 그대로 흘려 보내야 하므로 여기에 아무것도 섞지 않는다.
 
 @<마무리하고 알린다@>=
-	out.Flush()
-	sec := cells
-	if distinct {
-		sec += len(words)
-	}
-	fmt.Fprintf(os.Stderr, "낱말 %d개로 항목 %d+%d개, 선택지 %d개를 찍었다.\n",
-		len(words), lines, sec, lines*len(words))
+out.Flush()
+sec := cells
+if distinct {
+	sec += len(words)
+}
+fmt.Fprintf(os.Stderr, "낱말 %d개로 항목 %d+%d개, 선택지 %d개를 찍었다.\n",
+	len(words), lines, sec, lines*len(words))
 
 @* 돌려 보기.
 이제 겨루기다. 만든 파일을 춤추는 칸 해결기에 넘긴다.

@@ -137,22 +137,22 @@ commands:
 친다---원본은 이 경우를 살피지 않아 빈 명령을 끝없이 되풀이한다.
 
 @<명령 한 줄을 받는다@>=
-	if incl != nil {
-		if !incl.Scan() {
-			incl = nil
-			continue
-		}
-		line = incl.Text()
-		if vbose&echoIncl != 0 {
-			fmt.Println(line)
-		}
-	} else {
-		fmt.Print("> ")
-		if !stdin.Scan() {
-			break commands
-		}
-		line = stdin.Text()
+if incl != nil {
+	if !incl.Scan() {
+		incl = nil
+		continue
 	}
+	line = incl.Text()
+	if vbose&echoIncl != 0 {
+		fmt.Println(line)
+	}
+} else {
+	fmt.Print("> ")
+	if !stdin.Scan() {
+		break commands
+	}
+	line = stdin.Text()
+}
 
 @ 명령을 읽는 일은 모두 |scanner| 하나가 맡는다. 줄 하나와 다음에 읽을 자리만
 들고 있으면 되니 단출하다.
@@ -251,25 +251,25 @@ func (sc *scanner) tile() (pair, bool) {
 줄 끝 검사까지는 그대로 거친다. C의 |switch| 안 |break|가 하던 일과 똑같다.
 
 @<명령을 알아보고 시킨다@>=
-	sc.skip()
-	if sc.eof() {
-		if incl == nil {
-			fmt.Println("명령을 입력하시라. 그만두려면 q.")
-		}
-		continue
+sc.skip()
+if sc.eof() {
+	if incl == nil {
+		fmt.Println("명령을 입력하시라. 그만두려면 q.")
 	}
-	switch sc.peek() {
-	case 'q':
-		break commands
-	case '%':
-		continue
-	case 'i':
-		@<파일에서 명령을 읽어 온다@>@;
-	case 'v':
-		sc.get()
-		vbose = int(sc.num())
-	@<나머지 명령들@>@;
-	}
+	continue
+}
+switch sc.peek() {
+case 'q':
+	break commands
+case '%':
+	continue
+case 'i':
+	@<파일에서 명령을 읽어 온다@>@;
+case 'v':
+	sc.get()
+	vbose = int(sc.num())
+@<나머지 명령들@>@;
+}
 
 @ 말수는 비트 세 개로 정한다. \.{v-1}이면 모든 비트가 서므로 가장 수다스럽다.
 
@@ -287,29 +287,29 @@ var vbose int // 말수
 닫을 때를 살펴야 했지만, 통째로 읽어 두면 그럴 일이 없다.
 
 @<파일에서 명령을 읽어 온다@>=
-	if incl != nil {
-		fmt.Println("파일 안에서 또 파일을 부를 수는 없다.")
-		continue
-	}
-	sc.get()
-	sc.skip()
-	name := sc.rest()
-	data, err := os.ReadFile(name)
-	if err != nil {
-		fmt.Printf("파일 `%s'를 읽을 수 없다!\n", name)
-		continue
-	}
-	incl = bufio.NewScanner(bytes.NewReader(data))
+if incl != nil {
+	fmt.Println("파일 안에서 또 파일을 부를 수는 없다.")
 	continue
+}
+sc.get()
+sc.skip()
+name := sc.rest()
+data, err := os.ReadFile(name)
+if err != nil {
+	fmt.Printf("파일 `%s'를 읽을 수 없다!\n", name)
+	continue
+}
+incl = bufio.NewScanner(bytes.NewReader(data))
+continue
 
 @ 명령 하나를 다 처리하고도 줄에 무엇이 남아 있으면 알려 준다. 잘못 친 명령이
 어디서 걸렸는지 이 줄이 일러 준다.
 
 @<줄 끝에 남은 것을 나무란다@>=
-	sc.skip()
-	if !sc.eof() {
-		fmt.Printf("명령 뒤에 남은 것은 무시했다: %s\n", sc.rest())
-	}
+sc.skip()
+if !sc.eof() {
+	fmt.Printf("명령 뒤에 남은 것은 무시했다: %s\n", sc.rest())
+}
 
 @* 지그재그 경로.
 경로는 길이가 $s$인 방향열 $d_0d_1\ldots d_{s-1}$이다. 방향 $k$는 복소평면에서
@@ -350,145 +350,145 @@ func reset() {
 단위 경로로 바꾸고 빠져나가므로, 뒤따르는 코드가 그대로 되돌리기 노릇까지 한다.
 
 @<나머지 명령들@>=
-	case 'p':
+case 'p':
+	sc.get()
+	var nd []byte
+	for c := sc.peek(); c >= '0' && c <= '3'; c = sc.peek() {
+		@<이 방향이 옳은지 살핀다@>@;
+		nd = append(nd, c-'0')
 		sc.get()
-		var nd []byte
-		for c := sc.peek(); c >= '0' && c <= '3'; c = sc.peek() {
-			@<이 방향이 옳은지 살핀다@>@;
-			nd = append(nd, c-'0')
-			sc.get()
-		}
-		@<모은 방향을 현재 경로로 삼는다@>@;
+	}
+	@<모은 방향을 현재 경로로 삼는다@>@;
 
 @ 첫 방향은 \.0이어야 하고, 그다음부터는 짝홀이 번갈아야 한다. 방향 $k$가 자리
 $j$에 오려면 $k\equiv j\pmod2$라는 말이다.
 
 @<이 방향이 옳은지 살핀다@>=
-			if len(nd) == 0 && c != '0' {
-				fmt.Println("경로는 방향 0에서 시작해야 한다!")
-				nd = []byte{0}
-				break
-			}
-			if (int(c-'0')^len(nd))&1 != 0 {
-				fmt.Printf("짝홀이 어긋난 방향이다: %c\n", c)
-				nd = []byte{0}
-				break
-			}
+if len(nd) == 0 && c != '0' {
+	fmt.Println("경로는 방향 0에서 시작해야 한다!")
+	nd = []byte{0}
+	break
+}
+if (int(c-'0')^len(nd))&1 != 0 {
+	fmt.Printf("짝홀이 어긋난 방향이다: %c\n", c)
+	nd = []byte{0}
+	break
+}
 
 @ @<모은 방향을 현재 경로로 삼는다@>=
-		if len(nd) > maxm {
-			@<너무 길다고 알린다@>@;
-			nd = nd[:1]
-		}
-		dir, s = nd, len(nd)
-		@<방향에서 |z|를 셈한다@>@;
-		@<방향을 접기열로 바꾼다@>@;
-		@<접기열을 보인다@>@;
-		@<경로의 값을 알린다@>@;
+if len(nd) > maxm {
+	@<너무 길다고 알린다@>@;
+	nd = nd[:1]
+}
+dir, s = nd, len(nd)
+@<방향에서 |z|를 셈한다@>@;
+@<방향을 접기열로 바꾼다@>@;
+@<접기열을 보인다@>@;
+@<경로의 값을 알린다@>@;
 
 @ @<너무 길다고 알린다@>=
-			fmt.Printf("경로가 %d보다 길어지면 감당할 수 없다!\n", maxm)
+fmt.Printf("경로가 %d보다 길어지면 감당할 수 없다!\n", maxm)
 
 @ @<방향에서 |z|를 셈한다@>=
-		z = pair{}
-		for _, d := range dir {
-			z = z.add(ipower[d])
-		}
+z = pair{}
+for _, d := range dir {
+	z = z.add(ipower[d])
+}
 
 @ 트는 쪽은 방향의 차이가 알려 준다. 차이가 $\pm1$인데 $-1$은 $3$과 같으므로,
 비트 $2$가 서 있는지만 보면 \.U인지 \.D인지 갈린다.
 
 @<방향을 접기열로 바꾼다@>=
-		fold = make([]byte, 0, s)
-		for j := 0; j+1 < s; j++ {
-			if (int(dir[j+1])-int(dir[j]))&2 != 0 {
-				fold = append(fold, 'U')
-			} else {
-				fold = append(fold, 'D')
-			}
-		}
+fold = make([]byte, 0, s)
+for j := 0; j+1 < s; j++ {
+	if (int(dir[j+1])-int(dir[j]))&2 != 0 {
+		fold = append(fold, 'U')
+	} else {
+		fold = append(fold, 'D')
+	}
+}
 
 @ \.D나 \.U로 시작하는 명령은 접기열을 통째로 준 것이다.
 
 @<나머지 명령들@>=
-	case 'D', 'U':
-		var nf []byte
-		for c := sc.peek(); c == 'D' || c == 'U'; c = sc.peek() {
-			nf = append(nf, c)
-			sc.get()
-		}
-		if len(nf)+1 > maxm {
-			@<너무 길다고 알린다@>@;
-			nf = nil
-		}
-		fold, s = nf, len(nf)+1
-		@<접기열을 방향으로 바꾼다@>@;
-		@<방향들을 보인다@>@;
-		@<경로의 값을 알린다@>@;
+case 'D', 'U':
+	var nf []byte
+	for c := sc.peek(); c == 'D' || c == 'U'; c = sc.peek() {
+		nf = append(nf, c)
+		sc.get()
+	}
+	if len(nf)+1 > maxm {
+		@<너무 길다고 알린다@>@;
+		nf = nil
+	}
+	fold, s = nf, len(nf)+1
+	@<접기열을 방향으로 바꾼다@>@;
+	@<방향들을 보인다@>@;
+	@<경로의 값을 알린다@>@;
 
 @ 거꾸로 가는 길. 방향 $0$에서 떠나 접기열대로 틀면서 $z$도 함께 모은다. C판은
 접기열 뒤에 붙은 널 문자를 파수꾼 삼아 마지막 한 번을 거저 돌지만, \GO/의 슬라이스에는
 그런 것이 없으므로 마지막 자리를 따로 살핀다.
 
 @<접기열을 방향으로 바꾼다@>=
-		dir = make([]byte, s)
-		z = pair{}
-		cur := 0
-		for k := 0; k < s; k++ {
-			dir[k] = byte(cur)
-			z = z.add(ipower[cur])
-			if k+1 < s {
-				if fold[k] == 'D' {
-					cur = (cur + 1) & 3
-				} else {
-					cur = (cur + 3) & 3
-				}
-			}
+dir = make([]byte, s)
+z = pair{}
+cur := 0
+for k := 0; k < s; k++ {
+	dir[k] = byte(cur)
+	z = z.add(ipower[cur])
+	if k+1 < s {
+		if fold[k] == 'D' {
+			cur = (cur + 1) & 3
+		} else {
+			cur = (cur + 3) & 3
 		}
+	}
+}
 
 @ 말수에 따라 방향열이나 접기열을 되비쳐 준다. 방향을 준 사람에게는 접기열을,
 접기열을 준 사람에게는 방향을 보이는 셈이다.
 
 @<접기열을 보인다@>=
-		if vbose&tellFolds != 0 {
-			fmt.Printf(" %s,", fold)
-		}
+if vbose&tellFolds != 0 {
+	fmt.Printf(" %s,", fold)
+}
 
 @ @<방향들을 보인다@>=
-		if vbose&tellDirs != 0 {
-			fmt.Print(" ")
-			for _, d := range dir {
-				fmt.Print(d)
-			}
-		}
+if vbose&tellDirs != 0 {
+	fmt.Print(" ")
+	for _, d := range dir {
+		fmt.Print(d)
+	}
+}
 
 @ 경로가 바뀔 때마다 길이와 끝점을 알리고, 곁들여 두었던 표들을 지운다.
 
 @<경로의 값을 알린다@>=
-		fmt.Printf(" s=%d, z=", s)
-		@<복소수 |z|를 찍는다@>@;
-		fmt.Println()
-		@<곁들인 표를 지운다@>@;
+fmt.Printf(" s=%d, z=", s)
+@<복소수 |z|를 찍는다@>@;
+fmt.Println()
+@<곁들인 표를 지운다@>@;
 
 @ 가우스 정수를 사람이 읽는 꼴로 적는다. $1$과 $-1$은 계수를 적지 않고, 실수부가
 $0$이면 아예 빼먹되 허수부까지 $0$이면 그냥 \.0이라고 쓴다.
 
 @<복소수 |z|를 찍는다@>=
-		if z.x != 0 {
-			fmt.Print(z.x)
-		} else if z.y == 0 {
-			fmt.Print(0)
-		}
-		switch {
-		case z.y == 1:
-			fmt.Print("+i")
-		case z.y == -1:
-			fmt.Print("-i")
-		case z.y > 0:
-			fmt.Printf("+%di", z.y)
-		case z.y < 0:
-			fmt.Printf("-%di", -z.y)
-		}
+if z.x != 0 {
+	fmt.Print(z.x)
+} else if z.y == 0 {
+	fmt.Print(0)
+}
+switch {
+case z.y == 1:
+	fmt.Print("+i")
+case z.y == -1:
+	fmt.Print("-i")
+case z.y > 0:
+	fmt.Printf("+%di", z.y)
+case z.y < 0:
+	fmt.Printf("-%di", -z.y)
+}
 
 @* 접기 곱.
 Dekking의 접기 곱은 접기열 둘을 엮어 더 긴 접기열을 만든다. 현재 접기열이 $F$이고
@@ -519,37 +519,37 @@ $$
 접기열을 먼저, 방향열을 받으면 방향열을 먼저 보인다.
 
 @<나머지 명령들@>=
-	case '*':
-		sc.get()
-		var nf []byte
-		switch c := sc.peek(); {
-		case c == 'D' || c == 'U':
-			for c := sc.peek(); c == 'D' || c == 'U'; c = sc.peek() {
-				nf = append(nf, c)
-				sc.get()
-			}
-		case c == '0':
-			@<방향열을 읽어 접기열 |nf|로 바꾼다@>@;
-		default:
-			fmt.Println("무엇을 곱하라는 것인지 모르겠다!")
-			break
+case '*':
+	sc.get()
+	var nf []byte
+	switch c := sc.peek(); {
+	case c == 'D' || c == 'U':
+		for c := sc.peek(); c == 'D' || c == 'U'; c = sc.peek() {
+			nf = append(nf, c)
+			sc.get()
 		}
-		@<접기 곱을 셈한다@>@;
+	case c == '0':
+		@<방향열을 읽어 접기열 |nf|로 바꾼다@>@;
+	default:
+		fmt.Println("무엇을 곱하라는 것인지 모르겠다!")
+		break
+	}
+	@<접기 곱을 셈한다@>@;
 
 @ 곱할 방향열도 \.0으로 시작하고 짝홀이 번갈아야 한다. 어긋나는 글자를 만나면
 거기서 멈추므로, 남은 것은 줄 끝 검사가 알려 준다.
 
 @<방향열을 읽어 접기열 |nf|로 바꾼다@>=
-			prev := sc.get()
-			for c := sc.peek(); c >= '0' && c <= '3' && (c^prev)&1 != 0; c = sc.peek() {
-				if (int(c)-int(prev))&2 != 0 {
-					nf = append(nf, 'U')
-				} else {
-					nf = append(nf, 'D')
-				}
-				prev = c
-				sc.get()
-			}
+prev := sc.get()
+for c := sc.peek(); c >= '0' && c <= '3' && (c^prev)&1 != 0; c = sc.peek() {
+	if (int(c)-int(prev))&2 != 0 {
+		nf = append(nf, 'U')
+	} else {
+		nf = append(nf, 'D')
+	}
+	prev = c
+	sc.get()
+}
 
 @ 곱셈 자체. |j|가 사본의 방향을 기억한다. |j|가 양수면 뒤집힌 사본을 거꾸로 훑으며
 붙이고 그러면서 $0$이 되고, $0$이면 바른 사본을 앞에서부터 붙이고 다시 $s-1$이 된다.
@@ -557,29 +557,29 @@ $$
 새로 붙인 글자가 아직 읽어야 할 글자를 덮을 걱정은 없다.
 
 @<접기 곱을 셈한다@>=
-		j := s - 1
-		for _, c := range nf {
-			if len(fold)+s >= maxm {
-				@<너무 길다고 알린다@>@;
-				reset()
-				break
-			}
-			fold = append(fold, c)
-			if j > 0 {
-				for ; j > 0; j-- {
-					fold = append(fold, 'U'+'D'-fold[j-1])
-				}
-			} else {
-				for ; j < s-1; j++ {
-					fold = append(fold, fold[j])
-				}
-			}
+j := s - 1
+for _, c := range nf {
+	if len(fold)+s >= maxm {
+		@<너무 길다고 알린다@>@;
+		reset()
+		break
+	}
+	fold = append(fold, c)
+	if j > 0 {
+		for ; j > 0; j-- {
+			fold = append(fold, 'U'+'D'-fold[j-1])
 		}
-		s = len(fold) + 1
-		@<접기열을 방향으로 바꾼다@>@;
-		@<접기열을 보인다@>@;
-		@<방향들을 보인다@>@;
-		@<경로의 값을 알린다@>@;
+	} else {
+		for ; j < s-1; j++ {
+			fold = append(fold, fold[j])
+		}
+	}
+}
+s = len(fold) + 1
+@<접기열을 방향으로 바꾼다@>@;
+@<접기열을 보인다@>@;
+@<방향들을 보인다@>@;
+@<경로의 값을 알린다@>@;
 
 @* 가우스 정수와 타일.
 좌표 둘을 묶은 |pair|는 이 프로그램에서 두 가지 노릇을 한다. 하나는 복소평면의
@@ -641,20 +641,20 @@ func fprod(v, w pair) pair {
 자리에서 받는다.
 
 @<나머지 명령들@>=
-	default:
-		v, ok := sc.tile()
-		if !ok {
-			break
-		}
-		if !sc.must('*') {
-			break
-		}
-		w, ok := sc.tile()
-		if !ok {
-			break
-		}
-		u := fprod(v, w)
-		fmt.Printf(" %d,%d\n", u.x, u.y)
+default:
+	v, ok := sc.tile()
+	if !ok {
+		break
+	}
+	if !sc.must('*') {
+		break
+	}
+	w, ok := sc.tile()
+	if !ok {
+		break
+	}
+	u := fprod(v, w)
+	fmt.Printf(" %d,%d\n", u.x, u.y)
 
 @* 폴리오미노.
 경로가 지나간 변들을 모두 모은 것이 그 경로의 {\it 폴리오미노\/}다. 타일 하나가
@@ -682,27 +682,27 @@ func makePoly() {
 var poly []pair // 현재 경로의 폴리오미노
 
 @ @<곁들인 표를 지운다@>=
-	poly, cclass, fill = nil, nil, nil
+poly, cclass, fill = nil, nil, nil
 
 @ \.{a*} 명령은 폴리오미노의 타일 모두에 주어진 타일을 곱한다. \.{a*1,0}은 단위
 타일을 곱하는 것이니 폴리오미노를 그냥 늘어놓는 셈이다.
 
 @<나머지 명령들@>=
-	case 'a':
-		sc.get()
-		makePoly()
-		if !sc.must('*') {
-			break
-		}
-		w, ok := sc.tile()
-		if !ok {
-			break
-		}
-		for _, v := range poly {
-			u := fprod(v, w)
-			fmt.Printf(" %d,%d", u.x, u.y)
-		}
-		fmt.Println()
+case 'a':
+	sc.get()
+	makePoly()
+	if !sc.must('*') {
+		break
+	}
+	w, ok := sc.tile()
+	if !ok {
+		break
+	}
+	for _, v := range poly {
+		u := fprod(v, w)
+		fmt.Printf(" %d,%d", u.x, u.y)
+	}
+	fmt.Println()
 
 @* 합동류.
 이제 가장 재미있는 대목, 두 타일이 합동인지 가리는 일이다.
@@ -731,23 +731,23 @@ func makeClasses() {
 }
 
 @ @<격자의 기저 |uu|와 |vv|를 얻는다@>=
-	uu = z.mul(pair{2, 2})
-	vv = pair{-uu.y, uu.x}
-	if uu.y < 0 {
-		uu = pair{-uu.x, -uu.y}
+uu = z.mul(pair{2, 2})
+vv = pair{-uu.y, uu.x}
+if uu.y < 0 {
+	uu = pair{-uu.x, -uu.y}
+}
+if vv.y < 0 {
+	vv = pair{-vv.x, -vv.y}
+}
+for uu.y != 0 {
+	for vv.y >= uu.y {
+		vv = vv.sub(uu)
 	}
-	if vv.y < 0 {
-		vv = pair{-vv.x, -vv.y}
-	}
-	for uu.y != 0 {
-		for vv.y >= uu.y {
-			vv = vv.sub(uu)
-		}
-		uu, vv = vv, uu
-	}
-	if uu.x < 0 {
-		uu.x = -uu.x
-	}
+	uu, vv = vv, uu
+}
+if uu.x < 0 {
+	uu.x = -uu.x
+}
 
 @ @<전역 변수@>=
 var (
@@ -763,35 +763,35 @@ $[0,D)$에 있고 두 좌표의 합은 홀수이므로, 허수부를 반으로 �
 $4$바이트로 쳐도 $134$메가바이트다. 여기서는 경로마다 꼭 필요한 만큼만 잡는다.
 
 @<합동류 표를 채운다@>=
-	rows, cols := int(vv.y>>1), int(uu.x)
-	cclass = make([][]int, rows)
-	for j := range cclass {
-		cclass[j] = make([]int, cols)
-		for k := range cclass[j] {
-			cclass[j][k] = -1
-		}
+rows, cols := int(vv.y>>1), int(uu.x)
+cclass = make([][]int, rows)
+for j := range cclass {
+	cclass[j] = make([]int, cols)
+	for k := range cclass[j] {
+		cclass[j][k] = -1
 	}
-	@<아직 번호가 없는 칸마다 새 합동류를 준다@>@;
+}
+@<아직 번호가 없는 칸마다 새 합동류를 준다@>@;
 
 @ 표를 훑다가 아직 번호가 없는 칸을 만나면 새 번호를 주고, 거기에 $i$, $i^2$, $i^3$을
 곱해 나오는 세 칸에도 같은 번호를 준다. 그 넷이 한 합동류다.
 
 @<아직 번호가 없는 칸마다 새 합동류를 준다@>=
-	c := 0
-	for j := 0; j < rows; j++ {
-		for k := 0; k < cols; k++ {
-			if cclass[j][k] >= 0 {
-				continue
-			}
-			cclass[j][k] = c
-			v := pair{int64(k), int64(2*j + 1 - (k & 1))}
-			for d := 1; d < 4; d++ {
-				r := reduce(v.mul(ipower[d]))
-				cclass[r.y>>1][r.x] = c
-			}
-			c++
+c := 0
+for j := 0; j < rows; j++ {
+	for k := 0; k < cols; k++ {
+		if cclass[j][k] >= 0 {
+			continue
 		}
+		cclass[j][k] = c
+		v := pair{int64(k), int64(2*j + 1 - (k & 1))}
+		for d := 1; d < 4; d++ {
+			r := reduce(v.mul(ipower[d]))
+			cclass[r.y>>1][r.x] = c
+		}
+		c++
 	}
+}
 
 @ 나머지 줄이기. 값을 받아 값을 돌려주므로 부른 쪽의 타일은 그대로 남는다.
 
@@ -823,36 +823,36 @@ $z=0$이면 $Z=0$이라 나눌 것이 없다. 원본은 이 경우를 살피지 
 그런 경우다.
 
 @<나머지 명령들@>=
-	case 'c':
-		sc.get()
-		if z.norm() == 0 {
-			fmt.Println("z가 0이라 합동류를 따질 수 없다!")
-			break
-		}
-		makeClasses()
-		sc.skip()
-		if sc.eof() {
-			@<폴리오미노 전체의 합동류를 보인다@>@;
-			break
-		}
-		w, ok := sc.tile()
-		if !ok {
-			break
-		}
-		@<타일 하나의 합동류와 형을 보인다@>@;
+case 'c':
+	sc.get()
+	if z.norm() == 0 {
+		fmt.Println("z가 0이라 합동류를 따질 수 없다!")
+		break
+	}
+	makeClasses()
+	sc.skip()
+	if sc.eof() {
+		@<폴리오미노 전체의 합동류를 보인다@>@;
+		break
+	}
+	w, ok := sc.tile()
+	if !ok {
+		break
+	}
+	@<타일 하나의 합동류와 형을 보인다@>@;
 
 @ 보이는 꼴은 `타일: 류\_형'이다. 원본은 이 자리에서 타일인지 아닌지를 살피지 않아,
 홀짝이 어긋난 값을 주면 엉뚱한 칸을 읽고 엉뚱한 번호를 답한다. |tile|이 이미 살피므로
 여기서는 그럴 일이 없다.
 
 @<타일 하나의 합동류와 형을 보인다@>=
-		fmt.Printf(" %d,%d: %d_%d\n", w.x, w.y, classOf(reduce(w)), w.typ())
+fmt.Printf(" %d,%d: %d_%d\n", w.x, w.y, classOf(reduce(w)), w.typ())
 
 @ @<폴리오미노 전체의 합동류를 보인다@>=
-			makePoly()
-			for _, w := range poly {
-				@<타일 하나의 합동류와 형을 보인다@>@;
-			}
+makePoly()
+for _, w := range poly {
+	@<타일 하나의 합동류와 형을 보인다@>@;
+}
 
 @* 인수분해.
 경로가 {\it 판을 채운다\/}(plane-filling)는 것은 $s=\vert z\vert^2$이고 폴리오미노의
@@ -868,79 +868,79 @@ var fill []int // 합동류마다 폴리오미노의 타일 번호
 표를 버린다---|fill|이 비어 있다는 것이 곧 ``판을 채우지 않는다''는 표시다.
 
 @<판을 채우는 경로인지 살펴본다@>=
-		if fill == nil && z.norm() == int64(s) {
-			makePoly()
-			makeClasses()
-			fill = make([]int, s)
-			for j := range fill {
-				fill[j] = -1
-			}
-			for k, t := range poly {
-				c := classOf(reduce(t))
-				if fill[c] >= 0 {
-					fill = nil
-					break
-				}
-				fill[c] = k
-			}
+if fill == nil && z.norm() == int64(s) {
+	makePoly()
+	makeClasses()
+	fill = make([]int, s)
+	for j := range fill {
+		fill[j] = -1
+	}
+	for k, t := range poly {
+		c := classOf(reduce(t))
+		if fill[c] >= 0 {
+			fill = nil
+			break
 		}
+		fill[c] = k
+	}
+}
 
 @ \.f는 한 번만 쪼개고 \.F는 되돌이에 들어설 때까지 쪼갠다.
 
 @<나머지 명령들@>=
-	case 'f', 'F':
-		all := sc.get() == 'F'
-		@<판을 채우는 경로인지 살펴본다@>@;
-		if fill == nil {
-			fmt.Println("지금 경로는 판을 채우지 않는다!")
+case 'f', 'F':
+	all := sc.get() == 'F'
+	@<판을 채우는 경로인지 살펴본다@>@;
+	if fill == nil {
+		fmt.Println("지금 경로는 판을 채우지 않는다!")
+		break
+	}
+	u, ok := sc.tile()
+	if !ok {
+		break
+	}
+	cyc := []pair{u}
+	for {
+		@<|u|를 |v*w|로 쪼갠다@>@;
+		if !all {
 			break
 		}
-		u, ok := sc.tile()
-		if !ok {
-			break
-		}
-		cyc := []pair{u}
-		for {
-			@<|u|를 |v*w|로 쪼갠다@>@;
-			if !all {
-				break
-			}
-			@<되돌이에 들어섰으면 그만둔다@>@;
-			u = w
-		}
+		@<되돌이에 들어섰으면 그만둔다@>@;
+		u = w
+	}
 
 @ 쪼개는 식은 곱셈 식을 뒤집은 것이다. $u$와 합동인 폴리오미노의 타일 $v$를 찾고,
 두 형의 차이 $k$만큼 되돌린 다음 $z$로 나눈다. 이론은 ``다이아몬드와 용'' 노트에 있다.
 
 @<|u|를 |v*w|로 쪼갠다@>=
-			v := poly[fill[classOf(reduce(u))]]
-			k := (u.typ() - v.typ()) & 3
-			e := u.sub(v.mul(ipower[(-k)&3])).div(z)
-			w := e.add(ipower[(-k)&3])
-			fmt.Printf(" %d,%d = %d,%d * %d,%d\n", u.x, u.y, v.x, v.y, w.x, w.y)
+v := poly[fill[classOf(reduce(u))]]
+k := (u.typ() - v.typ()) & 3
+e := u.sub(v.mul(ipower[(-k)&3])).div(z)
+w := e.add(ipower[(-k)&3])
+fmt.Printf(" %d,%d = %d,%d * %d,%d\n", u.x, u.y, v.x, v.y, w.x, w.y)
 
 @ |cyc[0]|에는 지금까지 본 것 가운데 가장 작은 것을 둔다. $\vert w\vert=1$이면
 $1*w=w$이므로 더 쪼갤 것이 없다.
 
 @<되돌이에 들어섰으면 그만둔다@>=
-			if w.norm() == 1 {
-				break
-			}
-			if w.norm() < cyc[0].norm() {
-				cyc = append(cyc[:0], w)
-			} else {
-				seen := false
-				for _, y := range cyc {
-					if y == w {
-						seen = true
-						break
-					}
-				}
-				if seen {
-					break
-				}
-				cyc = append(cyc, w)
-			}
+if w.norm() == 1 {
+	break
+}
+if w.norm() < cyc[0].norm() {
+	cyc = append(cyc[:0], w)
+} else {
+	seen := false
+	for _, y := range cyc {
+		if y == w {
+			seen = true
+			break
+		}
+	}
+	if seen {
+		break
+	}
+	cyc = append(cyc, w)
+}
 
 @* 그림 그리기.
 마지막으로, 일반화된 용 곡선을 눈으로 볼 수 있게 {\logo METAPOST} 명령을 뱉는다.
@@ -984,27 +984,27 @@ def O = zz:=origin; dd:=-90; D; enddef;
 @ \.m 명령. 접기열을 한 줄에 서른두 개씩 끊어 적는다.
 
 @<나머지 명령들@>=
-	case 'm':
-		sc.get()
-		openOut()
-		count++
-		fmt.Fprintf(out, "\nbeginfig(%d)\n O", count)
-		for k, c := range fold {
-			if k%32 == 31 {
-				fmt.Fprintln(out)
-			}
-			fmt.Fprintf(out, " %c", c)
+case 'm':
+	sc.get()
+	openOut()
+	count++
+	fmt.Fprintf(out, "\nbeginfig(%d)\n O", count)
+	for k, c := range fold {
+		if k%32 == 31 {
+			fmt.Fprintln(out)
 		}
-		fmt.Fprint(out, ";\nendfig;\n")
+		fmt.Fprintf(out, " %c", c)
+	}
+	fmt.Fprint(out, ";\nendfig;\n")
 
 @ 그만둘 때 파일을 닫는다. 그림을 하나도 뱉지 않았으면 파일을 열지도 않았을 테니
 할 일이 없다.
 
 @<{\logo METAPOST} 파일을 닫는다@>=
-	if out != nil {
-		fmt.Fprint(out, "\nbye.\n")
-		out.Close()
-		fmt.Fprintf(os.Stderr, "경로 %d개의 그림을 %s에 적었다.\n", count, mpFile)
-	}
+if out != nil {
+	fmt.Fprint(out, "\nbye.\n")
+	out.Close()
+	fmt.Fprintf(os.Stderr, "경로 %d개의 그림을 %s에 적었다.\n", count, mpFile)
+}
 
 @* 색인.

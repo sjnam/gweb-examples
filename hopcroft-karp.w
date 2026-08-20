@@ -128,27 +128,27 @@ var vbose uint = showRounds // 켜진 비트마다 곁들이는 출력이 늘어
 켜고, 나머지는 말수준으로 읽는다.
 
 @<명령줄을 살핀다@>=
-	for _, a := range os.Args[1:] {
-		if a == "-g" {
-			greedy = true
-			continue
-		}
-		v, err := strconv.ParseUint(a, 0, 32)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "쓰는 법: %s [말수준] [-g]\n", os.Args[0])
-			os.Exit(1)
-		}
-		vbose = uint(v)
+for _, a := range os.Args[1:] {
+	if a == "-g" {
+		greedy = true
+		continue
 	}
+	v, err := strconv.ParseUint(a, 0, 32)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "쓰는 법: %s [말수준] [-g]\n", os.Args[0])
+		os.Exit(1)
+	}
+	vbose = uint(v)
+}
 
 @ 여기 모아 둔 것들이 판마다 쓰이는 값이다. 짝 없는 소녀의 수~|f|, 소년의 수~|m|,
 소녀의 수~|n|, 판 번호~|r|, 변의 수~|t|, 그리고 dag의 꼭대기 층인 |finalLevel|.
 
 @<지역 변수@>=
-	var b, f, g, i, j, k, l, m, n, p, q, qq, r, t, tt, marks, finalLevel int
-	var buf string
-	var in *bufio.Scanner
-	var greedy bool
+var b, f, g, i, j, k, l, m, n, p, q, qq, r, t, tt, marks, finalLevel int
+var buf string
+var in *bufio.Scanner
+var greedy bool
 
 @* 쉬운 것 (입력).
 이 부분은 시시하지만, 대개 HK 알고리즘 자체보다 시간이 더 걸린다. ($0$--$1$ 행렬은
@@ -156,72 +156,72 @@ var vbose uint = showRounds // 켜진 비트마다 곁들이는 출력이 늘어
 물리친다.
 
 @<행렬을 읽어 성긴 자료 구조로 바꾼다@>=
-	@<첫 줄을 읽어 |n|을 정한다@>@;
-	@<소녀가 몇인지 따져 본다@>@;
-	for t, m = 0, 1; ; m++ {
-		if m > n {
-			fmt.Fprintf(os.Stderr, "소녀가 %d명뿐이니 소년이 %d명을 넘을 수 없다!\n", n, n)
-			os.Exit(3)
-		}
-		@<소년 |m|이 짝지을 수 있는 소녀들을 적어 둔다@>@;
-		if !in.Scan() {
-			break
-		}
-		buf = in.Text()
-		@<줄 길이를 따져 본다@>@;
+@<첫 줄을 읽어 |n|을 정한다@>@;
+@<소녀가 몇인지 따져 본다@>@;
+for t, m = 0, 1; ; m++ {
+	if m > n {
+		fmt.Fprintf(os.Stderr, "소녀가 %d명뿐이니 소년이 %d명을 넘을 수 없다!\n", n, n)
+		os.Exit(3)
 	}
-	fmt.Fprintf(os.Stderr, "좋다, 소년 %d명, 소녀 %d명, 있을 수 있는 짝 %d개짜리 행렬을 읽었다.\n",
-		m, n, t)
-	@<나머지 자료 구조를 채비한다@>@;
+	@<소년 |m|이 짝지을 수 있는 소녀들을 적어 둔다@>@;
+	if !in.Scan() {
+		break
+	}
+	buf = in.Text()
+	@<줄 길이를 따져 본다@>@;
+}
+fmt.Fprintf(os.Stderr, "좋다, 소년 %d명, 소녀 %d명, 있을 수 있는 짝 %d개짜리 행렬을 읽었다.\n",
+	m, n, t)
+@<나머지 자료 구조를 채비한다@>@;
 
 @ @<첫 줄을 읽어 |n|을 정한다@>=
-	in = bufio.NewScanner(os.Stdin)
-	in.Buffer(make([]byte, maxn+2), maxn+2)
-	if in.Scan() {
-		buf = in.Text()
-	}
-	n = len(buf)
+in = bufio.NewScanner(os.Stdin)
+in.Buffer(make([]byte, maxn+2), maxn+2)
+if in.Scan() {
+	buf = in.Text()
+}
+n = len(buf)
 
 @ @<소녀가 몇인지 따져 본다@>=
-	if n == 0 {
-		fmt.Fprintln(os.Stderr, "소녀가 적어도 하나는 있어야 한다!")
-		os.Exit(2)
-	} else if n >= maxn {
-		fmt.Fprintf(os.Stderr, "나를 다시 컴파일해 다오: 소녀 %d명 이상은 감당하지 못한다!\n", maxn)
-		os.Exit(2)
-	}
+if n == 0 {
+	fmt.Fprintln(os.Stderr, "소녀가 적어도 하나는 있어야 한다!")
+	os.Exit(2)
+} else if n >= maxn {
+	fmt.Fprintf(os.Stderr, "나를 다시 컴파일해 다오: 소녀 %d명 이상은 감당하지 못한다!\n", maxn)
+	os.Exit(2)
+}
 
 @ @<줄 길이를 따져 본다@>=
-		if len(buf) != n {
-			fmt.Fprintf(os.Stderr, "소년 %d에 대한 입력이 소녀 %d명을 적고 있지 않다!\n", m+1, n)
-			os.Exit(4)
-		}
+if len(buf) != n {
+	fmt.Fprintf(os.Stderr, "소년 %d에 대한 입력이 소녀 %d명을 적고 있지 않다!\n", m+1, n)
+	os.Exit(4)
+}
 
 @ 입력을 담는 자료 구조는 단순하다. 소녀~|j|와 짝지을 수 있는 소년들은 |glink[j]|에서
 시작해 |next|로 이어지고 $0$으로 끝나는 목록에 들어 있다. 이음줄~|l|이 가리키는
 소년은 |tip[l]|이다.
 
 @<소년 |m|이 짝지을 수 있는 소녀들을 적어 둔다@>=
-		for j = n; j != 0; j-- {
-			p = int(buf[j-1]) - '0'
-			if p < 0 || p > 1 {
-				fmt.Fprintf(os.Stderr, "소년 %d의 입력에 이상한 글자 `%c'가 있다!\n", m, buf[j-1])
-				os.Exit(5)
-			}
-			if p != 0 {
-				@<변 하나를 적어 넣는다@>@;
-			}
-		}
+for j = n; j != 0; j-- {
+	p = int(buf[j-1]) - '0'
+	if p < 0 || p > 1 {
+		fmt.Fprintf(os.Stderr, "소년 %d의 입력에 이상한 글자 `%c'가 있다!\n", m, buf[j-1])
+		os.Exit(5)
+	}
+	if p != 0 {
+		@<변 하나를 적어 넣는다@>@;
+	}
+}
 
 @ @<변 하나를 적어 넣는다@>=
-				t++
-				if t >= maxt {
-					fmt.Fprintf(os.Stderr, "나를 다시 컴파일해 다오: 있을 수 있는 짝 %d개 이상은 감당하지 못한다!\n", maxt)
-					os.Exit(6)
-				}
-				tip[t] = m
-				next[t] = glink[j]
-				glink[j] = t
+t++
+if t >= maxt {
+	fmt.Fprintf(os.Stderr, "나를 다시 컴파일해 다오: 있을 수 있는 짝 %d개 이상은 감당하지 못한다!\n", maxt)
+	os.Exit(6)
+}
+tip[t] = m
+next[t] = glink[j]
+glink[j] = t
 
 @ 뒤에 가서 소년 쪽 짝 후보에도 비슷한 자료 구조를 쓴다. 그래서 |next|와 |tip|은
 $2t+m$개를 담을 수 있어야 한다: 원래 그래프에 $t$개, $0$번째 판의 변에 $t$개,
@@ -242,15 +242,15 @@ var mate, imate [maxn]int
 @ 여기까지의 짝을 알리려면 소년마다 그 짝을 보이면 된다.
 
 @<지금까지의 짝짓기를 보인다@>=
-		for p = 1; p <= m; p++ {
-			fmt.Fprintf(os.Stderr, " %d", mate[p])
-		}
-		fmt.Fprintln(os.Stderr)
+for p = 1; p <= m; p++ {
+	fmt.Fprintf(os.Stderr, " %d", mate[p])
+}
+fmt.Fprintln(os.Stderr)
 
 @ @<판이 시작됨을 알린다@>=
-		if vbose&showRounds != 0 {
-			fmt.Fprintf(os.Stderr, "%d번째 판을 시작한다...\n", r)
-		}
+if vbose&showRounds != 0 {
+	fmt.Fprintf(os.Stderr, "%d번째 판을 시작한다...\n", r)
+}
 
 @ 여기서 찍는 등급은 |finalLevel|에 하나를 더한 값이다. |finalLevel|은 증대 경로
 하나가 깨뜨리는 기존의 짝의 수이고, 앞에서 정의한 등급---길이가 $2k-1$인 경로의
@@ -259,27 +259,27 @@ var mate, imate [maxn]int
 두 뜻 사이를 오간다. 여기서는 정의를 따랐다.
 
 @ @<판이 끝났음을 알린다@>=
-		if vbose&showRounds != 0 {
-			fmt.Fprintf(os.Stderr, " ... 이제 %d쌍이 짝지어졌다 (등급 %d).\n", n-f, finalLevel+1)
-		}
-		if vbose&showPartials != 0 {
-			@<지금까지의 짝짓기를 보인다@>@;
-		}
+if vbose&showRounds != 0 {
+	fmt.Fprintf(os.Stderr, " ... 이제 %d쌍이 짝지어졌다 (등급 %d).\n", n-f, finalLevel+1)
+}
+if vbose&showPartials != 0 {
+	@<지금까지의 짝짓기를 보인다@>@;
+}
 
 @ 크누스의 원본은 판이 하나일 때 ``round''를, 여럿일 때 ``rounds''를 쓰려고
 삼항 연산자를 두 번 겹쳐 썼다. 한국어에는 그런 수고가 없다.
 
 @<답을 알린다@>=
-	if f == n-m {
-		r-- // 마지막 판은 돌지 않았다
-	}
-	fmt.Fprintf(os.Stderr, "크기 %d짜리 최대 짝짓기를 %d판 만에 찾았다.\n", n-f, r)
-	if vbose&showAnswer != 0 {
-		@<지금까지의 짝짓기를 보인다@>@;
-	}
-	if vbose&showCover != 0 {
-		@<최소 꼭짓점 덮개를 알린다@>@;
-	}
+if f == n-m {
+	r-- // 마지막 판은 돌지 않았다
+}
+fmt.Fprintf(os.Stderr, "크기 %d짜리 최대 짝짓기를 %d판 만에 찾았다.\n", n-f, r)
+if vbose&showAnswer != 0 {
+	@<지금까지의 짝짓기를 보인다@>@;
+}
+if vbose&showCover != 0 {
+	@<최소 꼭짓점 덮개를 알린다@>@;
+}
 
 @* 멋진 것 (최단 증대 경로의 dag).
 너비 우선 탐색을 쓰면, $\top$이라 부르는 가짜 꼭짓점에서 $\bot$이라 부르는 또 다른
@@ -296,71 +296,71 @@ var mate, imate [maxn]int
 시작할 때 모든 표시는 $0$이어야 한다.
 
 @<최단 증대 경로의 dag를 짓는다@>=
-		finalLevel, tt = -1, t
-		marks, l, i, q = 0, 0, 0, f
-		for {
-			qq = q
-			for ; i < qq; i++ {
-				g = queue[i]
-				@<소녀 |g|를 원하는 소년들을 훑는다@>@;
-			}
-			if q == qq {
-				break // 다음 층으로 넘길 것이 없다
-			}
-			l++
-		}
+finalLevel, tt = -1, t
+marks, l, i, q = 0, 0, 0, f
+for {
+	qq = q
+	for ; i < qq; i++ {
+		g = queue[i]
+		@<소녀 |g|를 원하는 소년들을 훑는다@>@;
+	}
+	if q == qq {
+		break // 다음 층으로 넘길 것이 없다
+	}
+	l++
+}
 
 @ @<소녀 |g|를 원하는 소년들을 훑는다@>=
-				for k = glink[g]; k != 0; k = next[k] {
-					b = tip[k]
-					p = mark[b]
-					if p == 0 {
-						@<소년 |b|를 dag에 들인다@>@;
-					} else if p <= l {
-						continue
-					}
-					@<|b|에서 |g|로 가는 화살을 놓는다@>@;
-				}
+for k = glink[g]; k != 0; k = next[k] {
+	b = tip[k]
+	p = mark[b]
+	if p == 0 {
+		@<소년 |b|를 dag에 들인다@>@;
+	} else if p <= l {
+		continue
+	}
+	@<|b|에서 |g|로 가는 화살을 놓는다@>@;
+}
 
 @ 화살은 소년~|b|에서 소녀~|g|로, 그리고 곧바로 그의 짝으로 이어진다.
 
 @<|b|에서 |g|로 가는 화살을 놓는다@>=
-					if vbose&showDags != 0 {
-						fmt.Fprintf(os.Stderr, " %d->%d=>%d\n", b, g, imate[g])
-					}
-					tt++
-					tip[tt] = g
-					next[tt] = blink[b]
-					blink[b] = tt
+if vbose&showDags != 0 {
+	fmt.Fprintf(os.Stderr, " %d->%d=>%d\n", b, g, imate[g])
+}
+tt++
+tip[tt] = g
+next[tt] = blink[b]
+blink[b] = tt
 
 @ 꼭대기 층에 이르렀다는 것을 안 뒤로는, 그 층에 짝 없는 소년만 더 들인다.
 아울러 |q|를 |qq|로 되돌려, dag가 더 높은 층으로 자라지 못하게 한다.
 
 @<소년 |b|를 dag에 들인다@>=
-						if finalLevel >= 0 && mate[b] != 0 {
-							continue
-						} else if finalLevel < 0 && mate[b] == 0 {
-							finalLevel, dlink, q = l, 0, qq
-						}
-						mark[b] = l + 1
-						marked[marks] = b
-						marks++
-						blink[b] = 0
-						if mate[b] != 0 {
-							queue[q] = mate[b]
-							q++
-						} else {
-							@<짝 없는 소년 |b|를 $\top$의 목록에 붙인다@>@;
-						}
+if finalLevel >= 0 && mate[b] != 0 {
+	continue
+} else if finalLevel < 0 && mate[b] == 0 {
+	finalLevel, dlink, q = l, 0, qq
+}
+mark[b] = l + 1
+marked[marks] = b
+marks++
+blink[b] = 0
+if mate[b] != 0 {
+	queue[q] = mate[b]
+	q++
+} else {
+	@<짝 없는 소년 |b|를 $\top$의 목록에 붙인다@>@;
+}
 
 @ @<짝 없는 소년 |b|를 $\top$의 목록에 붙인다@>=
-							if vbose&showDags != 0 {
-								fmt.Fprintf(os.Stderr, " top->%d\n", b)
-							}
-							tt++
-							tip[tt] = b
-							next[tt] = dlink
-							dlink = tt
+if vbose&showDags != 0 {
+	fmt.Fprintf(os.Stderr, " top->%d\n", b)
+}
+tt++
+tip[tt] = b
+next[tt] = dlink
+dlink = tt
 
 @ @<전역 변수@>=
 var (
@@ -372,10 +372,10 @@ var (
 )
 
 @ @<모든 표시를 지운다@>=
-	for marks != 0 {
-		marks--
-		mark[marked[marks]] = 0
-	}
+for marks != 0 {
+	marks--
+	mark[marked[marks]] = 0
+}
 
 @* 나아가기.
 방금 우리는 최단 증대 경로의 dag를 지었다. 바닥의 가짜 꼭짓점 $\bot$에서 시작해
@@ -391,13 +391,13 @@ var (
 있다. |l=0|이고 |g|가 원래 짝이 없던 소녀였더라도 그렇다.
 
 @<겹치지 않는 최단 증대 경로를 끝까지 거둔다@>=
-		for dlink != 0 {
-			b, dlink = tip[dlink], next[dlink]
-			l = finalLevel
-			boy[l] = b
-			@<한 갈래를 깊이 우선으로 따라간다@>@;
-		}
-		@<모든 표시를 지운다@>@;
+for dlink != 0 {
+	b, dlink = tip[dlink], next[dlink]
+	l = finalLevel
+	boy[l] = b
+	@<한 갈래를 깊이 우선으로 따라간다@>@;
+}
+@<모든 표시를 지운다@>@;
 
 @ 크누스는 이 대목을 |goto| 둘---|enter_level|과 |advance|---로 적었다. \GO/에도
 |goto|가 있지만, 여기서는 반복문 하나로 고쳐 적는 편이 낫다. |continue|가 곧
@@ -405,67 +405,67 @@ var (
 하던 일이다. |break|는 이 갈래를 접고 $\top$의 다음 소년으로 넘어간다는 뜻이다.
 
 @<한 갈래를 깊이 우선으로 따라간다@>=
-			for {
-				if blink[b] != 0 {
-					@<화살을 하나 따라간다@>@;
-				}
-				l++
-				if l > finalLevel {
-					break // 이 갈래에는 증대 경로가 없다
-				}
-				b = boy[l] // 한 층 물러선다
-			}
+for {
+	if blink[b] != 0 {
+		@<화살을 하나 따라간다@>@;
+	}
+	l++
+	if l > finalLevel {
+		break // 이 갈래에는 증대 경로가 없다
+	}
+	b = boy[l] // 한 층 물러선다
+}
 
 @ 소년~|b|에게 아직 안 써 본 화살이 있으면 그것을 뽑아 쓴다. 그 끝의 소녀가
 짝이 없으면 증대 경로를 하나 찾은 것이고, 아니면 그의 짝에게로 한 층 내려간다.
 |mark|가 음수인 소년은 이미 다른 경로가 데려갔으니 건너뛴다.
 
 @<화살을 하나 따라간다@>=
-					g = tip[blink[b]]
-					blink[b] = next[blink[b]]
-					if imate[g] == 0 {
-						@<짝짓기를 늘리고 이 갈래를 접는다@>@;
-					}
-					if mark[imate[g]] >= 0 {
-						b, l = imate[g], l-1
-						boy[l] = b
-					}
-					continue
+g = tip[blink[b]]
+blink[b] = next[blink[b]]
+if imate[g] == 0 {
+	@<짝짓기를 늘리고 이 갈래를 접는다@>@;
+}
+if mark[imate[g]] >= 0 {
+	b, l = imate[g], l-1
+	boy[l] = b
+}
+continue
 
 @ 여기서 $|g|=g_0$이고 $|b|=|boy[0]|=b_0$이 증대 경로의 첫머리다. 나머지 소년들은
 |boy[1]|, |boy[2]|, 하는 식으로 놓여 있다. 짝을 바꿔 나가면서 |mark|를 $-1$로
 찍어 두어, 이 판에서 다시 쓰이지 않게 한다.
 
 @<짝짓기를 늘리고 이 갈래를 접는다@>=
-						if l != 0 {
-							fmt.Fprintln(os.Stderr, "어리둥절하다!")
-						} // 짝 없는 소녀는 $0$층에만 있어야 한다
-						@<짝 없는 소녀 목록에서 |g|를 뺀다@>@;
-						for {
-							@<짝 하나가 바뀌었음을 알린다@>@;
-							mark[b] = -1
-							j = mate[b]
-							mate[b] = g
-							imate[g] = b
-							if j == 0 {
-								break // |b|에게 짝이 없었다
-							}
-							l++
-							g, b = j, boy[l]
-						}
-						if vbose&showUpdates != 0 {
-							fmt.Fprintln(os.Stderr)
-						}
-						break
+if l != 0 {
+	fmt.Fprintln(os.Stderr, "어리둥절하다!")
+} // 짝 없는 소녀는 $0$층에만 있어야 한다
+@<짝 없는 소녀 목록에서 |g|를 뺀다@>@;
+for {
+	@<짝 하나가 바뀌었음을 알린다@>@;
+	mark[b] = -1
+	j = mate[b]
+	mate[b] = g
+	imate[g] = b
+	if j == 0 {
+		break // |b|에게 짝이 없었다
+	}
+	l++
+	g, b = j, boy[l]
+}
+if vbose&showUpdates != 0 {
+	fmt.Fprintln(os.Stderr)
+}
+break
 
 @ @<짝 하나가 바뀌었음을 알린다@>=
-							if vbose&showUpdates != 0 {
-								head := " 짝"
-								if l != 0 {
-									head = ","
-								}
-								fmt.Fprintf(os.Stderr, "%s %d-%d", head, b, g)
-							}
+if vbose&showUpdates != 0 {
+	head := " 짝"
+	if l != 0 {
+		head = ","
+	}
+	fmt.Fprintf(os.Stderr, "%s %d-%d", head, b, g)
+}
 
 @ @<전역 변수@>=
 var boy [maxn]int // 깊이 우선 탐색에서 훑고 있는 소년들
@@ -475,21 +475,21 @@ dag를 지을 때는 |blink[b]|를 그때그때 $0$으로 놓았다. |queue|와 
 아닌 값으로 채워야 하니 여기서 해 둔다.
 
 @<나머지 자료 구조를 채비한다@>=
-	for g = 1; g <= n; g++ {
-		queue[g-1] = g
-		iqueue[g] = g - 1
-	}
+for g = 1; g <= n; g++ {
+	queue[g-1] = g
+	iqueue[g] = g - 1
+}
 
 @ 짝 없는 소녀는 |queue|의 앞쪽 |f|칸에 모여 있고, |iqueue|가 그 자리를 알려 준다.
 하나를 뺄 때는 맨 뒤의 것을 빈자리로 옮기면 된다. 너비 우선 탐색의 대기열이 같은
 배열을 이어 쓰지만, 그 탐색은 이미 끝난 뒤라 |queue[f]| 자리를 덮어써도 괜찮다.
 
 @<짝 없는 소녀 목록에서 |g|를 뺀다@>=
-						f-- // |f|는 짝 없는 소녀의 수
-						j = iqueue[g]
-						i = queue[f]
-						queue[j] = i
-						iqueue[i] = j
+f-- // |f|는 짝 없는 소녀의 수
+j = iqueue[g]
+i = queue[f]
+queue[j] = i
+iqueue[i] = j
 
 @* 왜 되는가.
 HK 알고리즘은 그래프의 짝짓기에 대한 간단한 보조정리 셋에 기대고 있다. 그래프~$G$의
@@ -662,33 +662,33 @@ $$\bigl(n-f-\vert Z\cap\hbox{소년}\vert\bigr)+\vert Z\cap\hbox{소년}\vert=n-
 최소다.
 
 @<최소 꼭짓점 덮개를 알린다@>=
-		fmt.Fprintf(os.Stderr, "크기 %d짜리 최소 꼭짓점 덮개:", n-f)
-		if f == n-m {
-			@<소년 모두가 덮개다@>@;
-		} else {
-			@<마지막 탐색이 남긴 것으로 덮개를 만든다@>@;
-		}
-		fmt.Fprintln(os.Stderr)
+fmt.Fprintf(os.Stderr, "크기 %d짜리 최소 꼭짓점 덮개:", n-f)
+if f == n-m {
+	@<소년 모두가 덮개다@>@;
+} else {
+	@<마지막 탐색이 남긴 것으로 덮개를 만든다@>@;
+}
+fmt.Fprintln(os.Stderr)
 
 @ @<소년 모두가 덮개다@>=
-			for b = 1; b <= m; b++ {
-				fmt.Fprintf(os.Stderr, " b%d", b)
-			}
+for b = 1; b <= m; b++ {
+	fmt.Fprintf(os.Stderr, " b%d", b)
+}
 
 @ @<마지막 탐색이 남긴 것으로 덮개를 만든다@>=
-			for i = 0; i < q; i++ {
-				inz[queue[i]] = true
-			}
-			for b = 1; b <= m; b++ {
-				if mark[b] != 0 {
-					fmt.Fprintf(os.Stderr, " b%d", b)
-				}
-			}
-			for g = 1; g <= n; g++ {
-				if !inz[g] {
-					fmt.Fprintf(os.Stderr, " g%d", g)
-				}
-			}
+for i = 0; i < q; i++ {
+	inz[queue[i]] = true
+}
+for b = 1; b <= m; b++ {
+	if mark[b] != 0 {
+		fmt.Fprintf(os.Stderr, " b%d", b)
+	}
+}
+for g = 1; g <= n; g++ {
+	if !inz[g] {
+		fmt.Fprintf(os.Stderr, " g%d", g)
+	}
+}
 
 @ @<전역 변수@>=
 var inz [maxn]bool // 소녀가 $Z$ 안에 있는가
@@ -766,17 +766,17 @@ $0$으로 정해진다. dag는 한 층도 더 자라지 않는다.
 |next|에는 한 글자도 쓰지 않고, |mark|와 |marked|와 |blink|는 건드리지도 않는다.
 
 @<욕심쟁이로 극대 짝짓기를 만든다@>=
-			for g = 1; g <= n; g++ {
-				for k = glink[g]; k != 0; k = next[k] {
-					b = tip[k]
-					if mate[b] == 0 {
-						mate[b] = g
-						imate[g] = b
-						@<짝 없는 소녀 목록에서 |g|를 뺀다@>@;
-						break
-					}
-				}
-			}
+for g = 1; g <= n; g++ {
+	for k = glink[g]; k != 0; k = next[k] {
+		b = tip[k]
+		if mate[b] == 0 {
+			mate[b] = g
+			imate[g] = b
+			@<짝 없는 소녀 목록에서 |g|를 뺀다@>@;
+			break
+		}
+	}
+}
 
 @ 이래도 극대다. 짝을 못 얻고 지나간 소녀는 그 순간 이웃이 모두 차 있었다는
 뜻인데, 욕심쟁이는 한번 지은 짝을 풀지 않으니 그 소년들은 끝까지 짝이 있다.
@@ -787,12 +787,12 @@ $0$으로 정해진다. dag는 한 층도 더 자라지 않는다.
 때문이다. 첫 판의 증대 경로는 변 하나짜리이니 등급~$1$이다.
 
 @<첫 판이라면 욕심껏 해치우고 다음 판으로@>=
-		if r == 1 && greedy {
-			@<욕심쟁이로 극대 짝짓기를 만든다@>@;
-			finalLevel = 0
-			@<판이 끝났음을 알린다@>@;
-			continue
-		}
+if r == 1 && greedy {
+	@<욕심쟁이로 극대 짝짓기를 만든다@>@;
+	finalLevel = 0
+	@<판이 끝났음을 알린다@>@;
+	continue
+}
 
 @ 재 보았다. 아래는 짝짓기 단계만 잰 것이고(입력 읽기는 뺐다), 소녀와 소년이
 같은 수인 무작위 그래프다. 소녀 천 명이 이 프로그램의 한계이므로 |maxn|과 |maxt|를
