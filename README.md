@@ -122,9 +122,6 @@ does not reach into them — build those from inside (`cd life-game && make`).
   bomba, Pyry, Turing, Welchman. Korean (typeset with **luatex**), two MetaPost
   figures. Needs Knuth's `VOL1TEXT` (a 900 KB file on his site) for the five-gram
   counts, and about two hours to run.
-* [fast_cancel.w](fast_cancel.w) — It shows a complementary pattern
-  useful in any concurrent Go program: how to propagate a first-error signal to all
-  sibling goroutines cleanly.
 * [floyd.w](floyd.w) — Floyd's partition problem, the classic
   "toy problem" Knuth discusses in *Are Toy Problems Useful?*: partition
   √1…√50 into two nearly-equal halves. A worked literate solution
@@ -175,10 +172,6 @@ does not reach into them — build those from inside (`cd life-game && make`).
   multiply-add differently. That they still produce the identical tiling is
   exactly what the fuzzy binary-search dictionary is for. Korean (typeset with
   **luatex**), four MetaPost figures.
-* [intersect.w](intersect.w) — Codeforces 1093E *Intersection
-  of Permutations*: each value becomes a 2-D point, reducing the queries to
-  rectangle counting with point updates — a **Fenwick tree of Fenwick trees**
-  with offline coordinate compression. Korean (typeset with **luatex**).
 * [koda-ruskey.w](koda-ruskey.w) — Knuth's **koda-ruskey**: generate every
   *ideal of a forest poset* — all bitstrings in which a bit may be 1 only if
   its parent's is — as a generalized reflected Gray code, one bit changing per
@@ -256,10 +249,6 @@ does not reach into them — build those from inside (`cd life-game && make`).
   both. Uses range-over-func and a pocket `errgroup`.
 * [pmap.w](pmap.w) — a generic concurrent `map` over a slice,
   exercising generics, goroutines, channels, and `sync.WaitGroup`.
-* [pqundo.w](pqundo.w) — the **priority-queue undo trick**:
-  a rollback DSU extended to delete the max-priority element from the middle of
-  its update stack in amortized O(log²n), applied to Codeforces 603E. Korean
-  (typeset with **luatex**).
 * [prjeuler152.w](prjeuler152.w) — Project Euler Problem 152,
   The key challenge—and the appeal—is that you cannot compare the sums using
   floating-point arithmetic. When adding the $1/n^2$ terms, precise rational
@@ -276,9 +265,6 @@ does not reach into them — build those from inside (`cd life-game && make`).
   running it needs that module (`go get github.com/sjnam/go-sgb`); the commentary
   is newly written. Shows GWEB handling an external dependency and a real Knuth
   program.
-* [slidingmax.w](slidingmax.w) — LeetCode's *Sliding Window
-  Maximum*, solved in O(n) with a **monotonic deque**. A Korean literate essay
-  (typeset with **luatex**, like `hangul.w`).
 * [spiders.w](spiders.w) — Knuth's **spiders**, which closes the trilogy and
   makes `koda-ruskey` and `li-ruskey` obsolete: the same problem — list every
   0/1 labeling of a totally acyclic digraph respecting `x → y ⟹ bit x ≤ bit y`
