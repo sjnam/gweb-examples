@@ -256,9 +256,6 @@ does not reach into them — build those from inside (`cd life-game && make`).
   both. Uses range-over-func and a pocket `errgroup`.
 * [pmap.w](pmap.w) — a generic concurrent `map` over a slice,
   exercising generics, goroutines, channels, and `sync.WaitGroup`.
-* [poison.w](poison.w) — HackerRank's *Poisonous Plants*:
-  how many days until no plant dies, in O(n) with an increasing stack that gives
-  each plant its day of death. Korean (typeset with **luatex**).
 * [pqundo.w](pqundo.w) — the **priority-queue undo trick**:
   a rollback DSU extended to delete the max-priority element from the middle of
   its update stack in amortized O(log²n), applied to Codeforces 603E. Korean
@@ -268,9 +265,6 @@ does not reach into them — build those from inside (`cd life-game && make`).
   floating-point arithmetic. When adding the $1/n^2$ terms, precise rational
   number operations are required, and a brute-force approach that simply cycles
   through all $2^{79}$ subsets is impossible.
-* [runningmedian.w](runningmedian.w) — HackerRank's *Find the
-  Running Median*: the median of a growing stream, kept in O(log n) per value
-  with two heaps (a max-heap and a min-heap). Korean (typeset with **luatex**).
 * [seq.w](seq.w) — a tiny lazy-sequence library (`Map`,
   `Filter`, `Take` over infinite Fibonacci numbers), showing off the Go features
   C has no answer to: first-class functions and closures, anonymous functions,
@@ -304,10 +298,6 @@ does not reach into them — build those from inside (`cd life-game && make`).
   channel networks (sum, product, composition, reciprocal, functional inverse,
   and differential equations like `exp`), after McIlroy's *Squinting at Power
   Series*.
-* [suffixautomaton.w](suffixautomaton.w) — an exposition of the
-  **suffix automaton** (after cp-algorithms): the online O(n) construction with
-  suffix links and the clone/split step, applied to counting distinct
-  substrings. Korean (typeset with **luatex**).
 * [topswops.w](topswops.w) — Conway's *topswops* game, solved
   by A. Pepperdine's backward search (run the game in reverse from its ending
   state). A Korean literate essay retelling of Knuth's CWEB `topswops.w`, with
@@ -318,12 +308,6 @@ does not reach into them — build those from inside (`cd life-game && make`).
   pruning bound, written as a `goto` state machine. A Korean literate essay
   retelling of Knuth's CWEB `topswops-fwd.w`, with MetaPost figures (the
   five-label state machine, and the pruning bound). Typeset with **luatex**.
-* [trucktour.w](trucktour.w) — HackerRank's *Truck Tour* (the
-  circular gas-station problem), solved in O(n) by a greedy single pass; the
-  essay explains *why* one pass suffices. Korean (typeset with **luatex**).
-* [waiter.w](waiter.w) — HackerRank's *Waiter*: a stack
-  simulation that splits plates by successive primes. A Korean literate essay
-  (typeset with **luatex**).
 * [wc.w](wc.w) — a literate word-count program; its tangled
   output matches the system `wc`. It also shows `@f` setting a user type in bold.
 * [word-cube-dlx.w](word-cube-dlx.w) — the same symmetric word cubes as
