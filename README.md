@@ -284,6 +284,25 @@ does not reach into them — build those from inside (`cd life-game && make`).
   channel networks (sum, product, composition, reciprocal, functional inverse,
   and differential equations like `exp`), after McIlroy's *Squinting at Power
   Series*.
+* [tarjan-strong-and-weak.w](tarjan-strong-and-weak.w) — Knuth's companion to
+  `tarjan-strong.w`: Algorithm 7.4.1.2T again, now carrying **Algorithm
+  7.4.1.2W** alongside it.
+  Knuth's *weak components* are not the usual weakly-connected ones — an
+  arc-less digraph has **one**, a path of *k* vertices has ***k***. With no copy
+  of prefascicle 12a to consult, the document works the definition out
+  experimentally and lands on it: a weak component is a connected component of
+  the *incomparability* graph of the reachability order, i.e. a block of the
+  finest ordinal decomposition `P₁ ⊕ P₂ ⊕ ⋯ ⊕ Pₘ` of the condensation poset —
+  checked against brute force on 2500 digraphs, weak-component counts ranging 1
+  to 20. That view is what makes the algorithm legible: blocks are consecutive
+  runs of Tarjan's output order, so W only ever asks whether a cut fits above
+  the newest component. Where C must allocate n+1 shadow vertices to scrape
+  together five more utility fields, the Go record just names all nine. Verified against the C
+  original — output and mems byte-identical — on the SGB Roget graph and 2230
+  random digraphs, including chains, transitive tournaments, and layered graphs
+  built to exercise W's merge loop and its path-compressed `src` walk. Uses
+  [go-sgb](https://github.com/sjnam/go-sgb). Korean (typeset with **luatex**),
+  two MetaPost figures sharing `tarjan-strong.mp`'s helpers.
 * [tarjan-strong.w](tarjan-strong.w) — **Tarjan's strong components**, after
   Knuth's CWEB `tarjan-strong.w` (Algorithm 7.4.1.2T of the forthcoming
   prefascicle 12a). One depth-first pass finds every strong component, and the
