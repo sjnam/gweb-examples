@@ -33,15 +33,17 @@ Build one example at a time (there is no `make all`): nearly every tangled
 directory at once would make Go refuse to compile (`main` redeclared).
 
 The TeX engine is chosen automatically — **luatex** for Korean documents (those
-with `\input kotexgweb.tex`, see below), **pdftex** otherwise.
+with `\input kotexgweb.tex`, see below) and for illustrated ones (`\input
+luamplib.sty`), **pdftex** otherwise.
 
-Figures need no build step of their own. Every illustrated document here is a
-Korean one, hence typeset with luatex, so **luamplib** runs MetaPost inline
-while the document is being typeset — no `mpost` pass, no intermediate PDFs,
-and figure labels are set in the document's own fonts. A document with a single
-figure carries the MetaPost right inside its `.w`; one with several keeps them
-in `<name>.mp` as named macros (`fig_...`) and pulls them in with
-`\everymplib{input <name>;}`, calling each by name where it belongs.
+Figures need no build step of their own. **luamplib** runs MetaPost inline while
+the document is being typeset — no `mpost` pass, no intermediate PDFs, and
+figure labels are set in the document's own fonts. It needs luatex, which is why
+an illustrated document is typeset with luatex whatever language it is in. A
+document with a single figure carries the MetaPost right inside its `.w`; one
+with several keeps them in `<name>.mp` as named macros (`fig_...`) and pulls
+them in with `\everymplib{input <name>;}`, calling each by name where it
+belongs.
 
 Only sources are tracked: the `.w`/`.ch` programs and the MetaPost figure
 libraries (`*.mp`). Every `.go` and every PDF here is generated, so you will
@@ -84,6 +86,18 @@ does not reach into them — build those from inside (`cd life-game && make`).
   +6 / −6 carry trick, with a worked figure). A Go/GWEB port of Knuth's CWEB
   program; its node counts match the original exactly. Korean (typeset with
   **luatex**), one MetaPost figure.
+* [chain_bound.w](chain_bound.w) — the **football-chain challenge** from the
+  Stanford GraphBase page, settled exactly: how many points can Stanford run up
+  over Harvard through a simple chain of 1990 results? Longest path is NP-hard,
+  but dropping connectivity leaves an assignment problem, and the Hungarian
+  algorithm's O(n³) answer is an upper bound; branch on an edge of a cycle when
+  the assignment is not already a path. The bound is so tight that best-first
+  search proves 2473 (Stanford–Harvard) in 351 nodes, 2358 (Harvard–Stanford) in
+  51, and 2542 (Penn State–Columbia) — the maximum over all pairs — in one,
+  matching the three values the challenge page records. A chapter dissects the
+  root relaxation to show why. Uses
+  [go-sgb](https://github.com/sjnam/go-sgb); needs `games.dat`. English, typeset
+  with **pdftex**.
 * [dragon-calc.w](dragon-calc.w) — Knuth's **dragon-calc**: an interactive
   calculator for Dekking's generalized dragon curves and the calculus of tiles
   from his *diamonds and dragons* notes. Fold sequences of `D`s and `U`s, the
