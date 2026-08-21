@@ -236,6 +236,18 @@ does not reach into them — build those from inside (`cd life-game && make`).
   largest pair-product sum over all subarrays. The identity value = (S²−Q)/2
   and a prefix-sum twist turn it into the upper envelope of a family of lines,
   solved with a **Li Chao tree** in O(n log n).
+* [perec.w](perec.w) — Georges Perec's *Life A User's Manual* rebuilt from its
+  two constraints. The novel's 99 chapters walk a knight's tour of a 10×10 grid
+  of rooms, all but the cellar at (1,10) — the *clinamen*, Perec's deliberate
+  flaw, which forces one illegal diagonal step between chapters 65 and 66. The
+  program builds the knight board with SGB's `Board`, then verifies Perec's
+  order **against the board's own arcs** rather than trusting the transcription;
+  it also runs Warnsdorff's rule to produce a genuinely flawless tour for
+  comparison, and reconstructs the order-10 Graeco-Latin square that decides
+  what each chapter contains (99 of its 100 pairs are used; the missing one is
+  the clinamen's share). Uses
+  [go-sgb](https://github.com/sjnam/go-sgb). English, typeset with **luatex**,
+  three MetaPost figures drawn inline by luamplib.
 * [perm.w](perm.w) — **Floyd's random-sampling algorithm**
   (from Bentley's *More Programming Pearls*): draw M distinct integers from
   1…N uniformly in O(M), every subset equally likely, without the collision
