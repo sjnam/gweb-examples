@@ -284,6 +284,22 @@ does not reach into them — build those from inside (`cd life-game && make`).
   channel networks (sum, product, composition, reciprocal, functional inverse,
   and differential equations like `exp`), after McIlroy's *Squinting at Power
   Series*.
+* [tarjan-strong.w](tarjan-strong.w) — **Tarjan's strong components**, after
+  Knuth's CWEB `tarjan-strong.w` (Algorithm 7.4.1.2T of the forthcoming
+  prefascicle 12a). One depth-first pass finds every strong component, and the
+  program also emits a certificate: the `tree` and `inner` arcs that keep each
+  component strongly connected, and one `link` per arc of the condensation.
+  Knuth's own note records a rule he first got wrong — dropping a parent's inner
+  arc when a tree child ties its LOW — and the document reproduces the failure by
+  building the mistaken variant and running it on his five-arc counterexample.
+  The port replaces C's `low`/`rep` union with the encoding the *book* specifies
+  (`SENT + v′` in one field), which is what makes the mem counts match and which
+  deletes the original's `exit(-666)` check on pointer addresses. Verified
+  against the C original — output and mems byte-identical — on the SGB Roget
+  graph (1022 vertices, 77 components) and 1615 random digraphs, plus a separate
+  semantic check of the certificate on 1500 more. Uses
+  [go-sgb](https://github.com/sjnam/go-sgb). Korean (typeset with **luatex**),
+  three MetaPost figures.
 * [topswops.w](topswops.w) — Conway's *topswops* game, solved
   by A. Pepperdine's backward search (run the game in reverse from its ending
   state). A Korean literate essay retelling of Knuth's CWEB `topswops.w`, with
