@@ -288,15 +288,19 @@ does not reach into them — build those from inside (`cd life-game && make`).
   `tarjan-strong.w`: Algorithm 7.4.1.2T again, now carrying **Algorithm
   7.4.1.2W** alongside it.
   Knuth's *weak components* are not the usual weakly-connected ones — an
-  arc-less digraph has **one**, a path of *k* vertices has ***k***. With no copy
-  of prefascicle 12a to consult, the document works the definition out
-  experimentally and lands on it: a weak component is a connected component of
-  the *incomparability* graph of the reachability order, i.e. a block of the
-  finest ordinal decomposition `P₁ ⊕ P₂ ⊕ ⋯ ⊕ Pₘ` of the condensation poset —
-  checked against brute force on 2500 digraphs, weak-component counts ranging 1
-  to 20. That view is what makes the algorithm legible: blocks are consecutive
-  runs of Tarjan's output order, so W only ever asks whether a cut fits above
-  the newest component. Where C must allocate n+1 shadow vertices to scrape
+  arc-less digraph has **one**, a path of *k* vertices has ***k***; he calls the
+  familiar notion *undirected components* instead. Weak equivalence is the
+  transitive closure of "mutually reachable **or** mutually unreachable"
+  (Graham, Knuth & Motzkin, 1972), which on the condensation is exactly
+  connectivity in the *incomparability* graph — a block of the finest ordinal
+  decomposition `P₁ ⊕ P₂ ⊕ ⋯ ⊕ Pₘ` of the reachability poset, what Knuth's index
+  calls a poset's series decomposition. (The definition was reverse-engineered
+  from the program and checked against brute force on 2500 digraphs with
+  weak-component counts from 1 to 20, then confirmed against prefascicle 12a.)
+  That view is what makes the algorithm legible: blocks are consecutive runs of
+  Tarjan's output order, so W only ever asks whether a cut fits above the newest
+  component — concretely, whether every *source* of the block above was hit,
+  walking a source list kept accurate by Tarjan's HIT/WHIT lazy deletion. Where C must allocate n+1 shadow vertices to scrape
   together five more utility fields, the Go record just names all nine. Verified against the C
   original — output and mems byte-identical — on the SGB Roget graph and 2230
   random digraphs, including chains, transitive tournaments, and layered graphs
@@ -311,6 +315,10 @@ does not reach into them — build those from inside (`cd life-game && make`).
   Knuth's own note records a rule he first got wrong — dropping a parent's inner
   arc when a tree child ties its LOW — and the document reproduces the failure by
   building the mistaken variant and running it on his five-arc counterexample.
+  LOW here is the Eve–Kurki-Suonio variant the fascicle defines via *downpaths*
+  and arc *maturation*, not Tarjan's 1972 lowlink: a nontree arc `v→u` hands back
+  LOW(u), not PRE(u). Consequently "same LOW ⇒ same component" is false — it
+  failed on 168 of 500 random digraphs — which is why the pop test is `≥`.
   The port replaces C's `low`/`rep` union with the encoding the *book* specifies
   (`SENT + v′` in one field), which is what makes the mem counts match and which
   deletes the original's `exit(-666)` check on pointer addresses. Verified
