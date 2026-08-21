@@ -1,6 +1,12 @@
 \input kotexgweb
 \input luamplib.sty
 
+% macros for non-centered displays
+\outer\def\begindisplay{\obeylines\startdisplay}
+{\obeylines\gdef\startdisplay#1
+  {\catcode`\^^M=5$$#1\halign\bgroup\parindent=3pc\indent##\hfil&&\qquad##\hfil\cr}}
+\outer\def\enddisplay{\crcr\egroup$$}
+
 % 그림 셋(fig_digraph, fig_low, fig_fallacy)은 tarjan-strong.mp 안에 있다.
 \everymplib{input tarjan-strong;}
 
@@ -85,19 +91,21 @@ $$\mplibcode fig_digraph; \endmplibcode$$
 $f\dadj d\dadj b\dadj c\dadj a$로 내려간다.}
 
 @ 이 그래프를 넣으면 프로그램은 이렇게 찍는다.
-$$\vbox{\halign{#\hfil\cr
-\.{Strong components of example:}\cr
-\kern1em\.{inner e->d}\cr
-\kern1em\.{inner a->b}\cr
-\.{strong component b:}\cr
-\kern1em\.{tree b->c}\cr
-\kern1em\.{tree c->a}\cr
-\.{strong component d:}\cr
-\kern1em\.{tree d->e}\cr
-\.{strong component f:}\cr
-\kern1em\.{link f to d: f->d}\cr
-\kern1em\.{link f to b: f->a}\cr
-\kern1em\.{link d to b: d->b}\cr}}$$
+\begindisplay
+	\vbox{\halign{#\hfil\cr
+	\.{Strong components of example:}\cr
+	\kern1em\.{inner e->d}\cr
+	\kern1em\.{inner a->b}\cr
+	\.{strong component b:}\cr
+	\kern1em\.{tree b->c}\cr
+	\kern1em\.{tree c->a}\cr
+	\.{strong component d:}\cr
+	\kern1em\.{tree d->e}\cr
+	\.{strong component f:}\cr
+	\kern1em\.{link f to d: f->d}\cr
+	\kern1em\.{link f to b: f->a}\cr
+	\kern1em\.{link d to b: d->b}\cr}}
+\enddisplay
 
 @ 그림~1의 그래프는 화살 여덟을 $a\dadj b$, $b\dadj c$, $c\dadj a$, $d\dadj e$,
 $d\dadj b$, $e\dadj d$, $f\dadj d$, $f\dadj a$의 차례로 넣어 \.{.gb} 파일로 써

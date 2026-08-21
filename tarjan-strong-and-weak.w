@@ -1,6 +1,12 @@
 \input kotexgweb
 \input luamplib.sty
 
+% macros for non-centered displays
+\outer\def\begindisplay{\obeylines\startdisplay}
+{\obeylines\gdef\startdisplay#1
+  {\catcode`\^^M=5$$#1\halign\bgroup\parindent=3pc\indent##\hfil&&\qquad##\hfil\cr}}
+\outer\def\enddisplay{\crcr\egroup$$}
+
 % 그림 둘(fig_wdigraph, fig_weak)은 tarjan-strong-and-weak.mp 안에 있다.
 % 그 파일은 앞 글의 tarjan-strong.mp를 읽어 도우미 매크로를 나눠 쓴다.
 \everymplib{input tarjan-strong-and-weak;}
@@ -648,23 +654,24 @@ fmt.Fprintf(os.Stderr, " %d+%d mems.\n", mems, xmems)
 @* 돌려 보기.
 그림~1의 그래프를 넣으면 이렇게 찍힌다.
 
-$\vbox{\halign{#\hfil\cr
-\.{Strong components of example:}\cr
-\.{strong component a(6):}\cr
-\kern1em\.{weak to END(7)}\cr
-\.{strong component b(5):}\cr
-\kern1em\.{weak to a(6)}\cr
-\.{strong component c(4):}\cr
-\.{+d}\cr
-\kern1em\.{weak to a(6)}\cr
-\.{strong component g(3):}\cr
-\kern1em\.{weak to c(4)}\cr
-\.{strong component f(2):}\cr
-\kern1em\.{weak to c(4)}\cr
-\.{strong component e(1):}\cr
-\kern1em\.{weak to c(4)}\cr}}$
+\begindisplay
+	\vbox{\halign{#\hfil\cr
+	\.{Strong components of example:}\cr
+	\.{strong component a(6):}\cr
+	\kern1em\.{weak to END(7)}\cr
+	\.{strong component b(5):}\cr
+	\kern1em\.{weak to a(6)}\cr
+	\.{strong component c(4):}\cr
+	\.{+d}\cr
+	\kern1em\.{weak to a(6)}\cr
+	\.{strong component g(3):}\cr
+	\kern1em\.{weak to c(4)}\cr
+	\.{strong component f(2):}\cr
+	\kern1em\.{weak to c(4)}\cr
+	\.{strong component e(1):}\cr
+	\kern1em\.{weak to c(4)}\cr}}
+\enddisplay
 
-\smallskip
 \noindent 그리고 표준 오류로 ``\.{Altogether 6 strong components and 3 weak
 components; 107+181 mems.}''
 
