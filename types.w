@@ -13,3 +13,9 @@
 @s Context int
 @s WaitGroup int
 @s CancelFunc int
+
+% from SGB
+@s Arc int
+@s Vertex int
+@s Graph int
+@s Util int

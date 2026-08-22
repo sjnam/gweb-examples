@@ -353,7 +353,7 @@ b5:
 한 줄 찍어 진척을 알린다.
 @<mem이 문턱을 넘었으면 중간 상태를 보고한다@>=
 if mems >= thresh {
-	thresh += 10000000000
+	thresh += 10_000_000_000
 	fmt.Fprintf(os.Stderr, "%d mem 지난 뒤:", mems)
 	for k = 2; k <= l; k++ {
 		fmt.Fprintf(os.Stderr, " %d", profile[k])
