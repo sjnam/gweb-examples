@@ -1370,7 +1370,7 @@ $$\.{\$ back-20q 0 0}$$
 그 세 장 가운데 20번까지 맞힌 것은 딱 한 장이다.
 $$\mplibcode sheet := "DCEABEBCEABEAEDBDABB"; wrongq := 19; fig_answer;
   \endmplibcode$$
-\figcap{{\it 그림\/} 3: \.{back-20q 19 0}이 찾아낸 단 하나의 답안지.
+\figcap{{\it 그림\/} 3: \.{back-20q 19 0}이 찾아낸 단 하나의 답안지
 \.{DCEABEBCEABEAEDBDABB}. 20번의 답 B는 ``최고 점수는 19''라는 뜻이고,
 실제로 이 답안지의 점수가 19다---앞뒤가 맞는다.}
 
@@ -1396,7 +1396,7 @@ $$\mplibcode sheet := "DCEABEBCEABEAEDBDABB"; wrongq := 19; fig_answer;
 @ 옮긴 것이 맞는지는 세 갈래로 확인했다.
 
 첫째, 위의 두 자리를 고친 \.{CWEB} 원본과 211가지 무늬를 모두 견주었다.
-답안지도, 검색나무의 노드 수도 한 자리 다르지 않았다. mem 수는 두 경우에서
+답안지도, 검색나무의 노드 수도 한 자리 다르지 않았다. 다만 mem 수는 두 경우에서
 $1$과 $3$만큼 달랐는데, 19번의 미룬 확인에서 원문이 논리곱 대신 비트곱을 써
 짧은 회로가 끊기지 않는 자리 때문이다.
 
