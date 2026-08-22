@@ -51,12 +51,12 @@ beginfig(2);
   draw (0, y) -- (120, y);
   draw (0, y-3) -- (0, y+3);
   draw (120, y-3) -- (120, y+3);
-  label.bot("c", (60, y-4));
+  label.bot(btex$c$etex, (60, y-4));
   % the best the unknown remainder could still add
   drawarrow (120, y) -- (200, y) dashed evenly;
-  label.bot("f(m)", (160, y-4));
+  label.bot(btex$f(m)$etex, (160, y-4));
   % the record to beat sits out of reach
   draw (235, y-15) -- (235, y+22) dashed evenly;
-  label.top("r", (235, y+22));
+  label.top(btex$r$etex, (235, y+22));
 endfig;
 enddef;
