@@ -47,8 +47,7 @@ $u\dadj v$가 빠진다. 한 성분을 둘로 쪼개는 호가 무엇인지 손�
 
 @ 이 프로그램은 스탠퍼드 그래프베이스(\.{SGB})의 그래프 자료형을 그대로 쓴다. Go
 판은 \pdfURL{\.{go-sgb}}{https://github.com/sjnam/go-sgb}에 있고, 돌리려면 그
-모듈이 있어야 한다(\.{go get github.com/sjnam/go-sgb}). 이 저장소에서
-\.{SGB}에 기대는 두 번째 프로그램이다---앞엣것은 \.{sham.w}였다.
+모듈이 있어야 한다(\.{go get github.com/sjnam/go-sgb}).
 
 @c
 package main
@@ -566,7 +565,7 @@ if lowv < vert[u].low {
 원본에 이렇게 적혀 있다:
 
 \smallskip
-{\narrower\noindent ``나는 처음에 \.{u->link}가 \.{sent}가 아니면 그것을 |NULL|로
+{\narrower\noindent ``나는 처음에 \.{u->link}가 \.{sent}가 아니면 그것을 \.{NULL}로
 두어도 된다고 생각했다. 꼭짓점 $v$가 이미 넉넉한 안쪽 화살을 내놓았으니 $u$가
 \.{u->link}로 가는 화살을 또 내놓을 까닭이 없다고 여긴 것이다. 그것은 틀렸다.
 꼭짓점 $v$가 $u$의 낮은 값을 그대로 베껴 왔을 수 있고, 그렇다면 $v$는 $u$로 가는
