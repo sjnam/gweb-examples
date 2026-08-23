@@ -4,8 +4,6 @@
 % 그림들은 hopcroft-karp.mp 안에 fig_... 라는 이름으로 있다.
 \everymplib{input hopcroft-karp;}
 
-\def\title{호프크로프트--카프}
-
 % 짝지어진 변(=), 짝 아닌 변(-), 새로 짝지어진 변(≡).
 \def\adj{\mathrel{\!\mathrel-\mkern-8mu\mathrel-\mkern-8mu\mathrel-\!}}
 \def\addj{\mathrel{\!\mathrel=\mkern-8mu\mathrel=\mkern-8mu\mathrel=\!}}
@@ -37,7 +35,7 @@
 알고리즘을 구현하고 설명한다 [``An $n^{5/2}$ algorithm for maximum matchings in
 bipartite graphs,'' {\sl SIAM Journal on Computing\/} {\bf 2} (1973), 225--231].
 
-표준 입력 \.{stdin}으로 들어오는 것은 $0$과 $1$로 이루어진 $m\times n$ 행렬
+표준 입력 |stdin|으로 들어오는 것은 $0$과 $1$로 이루어진 $m\times n$ 행렬
 $(a_{ij})$이고, 한 줄이 한 행이다. 여기서 행은 ``소년,'' 열은 ``소녀''에
 대응한다. (크누스는 이렇게 적어 두었다: ``물론 나는 영어의 표현력을 빌리려고
 이렇게 하는 것이지, 남녀에 어떤 구별을 두려는 것이 아니다.'') 소년~$i$는
