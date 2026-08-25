@@ -20,7 +20,7 @@ ${2,3,4,6,7,9,10,20,28,35,36,45}$ and ${2,3,4,6,7,9,12,15,28,30,35,36,45}$.
 \smallskip
 }
 
-\noindent The official answer is 301. A naïve search would examine every subset of
+\noindent The official answer is 301. A na\"\i ve search would examine every subset of
 $\{2,\ldots,80\}$, requiring $2^{79}$ possibilities, which is completely
 infeasible.
 The purpose of this program is to exploit several number-theoretic observations
@@ -219,7 +219,7 @@ func findSolutions(items []item, vals []int64, target int64) [][]int64 {
 		}
 	})
 
-	slices.SortFunc(sols, slices.Compare) // 사전식 정렬로 출력 결정적
+	slices.SortFunc(sols, slices.Compare) // lexicographic, for deterministic output
 	return sols
 }
 
@@ -228,7 +228,7 @@ sols := findSolutions(items, vals, target)
 for i, ds := range sols {
 	terms := make([]string, len(ds))
 	for j, d := range ds {
-		terms[j] = fmt.Sprintf("1/%d²", d)
+		terms[j] = fmt.Sprintf("1/%d\u00b2", d)
 	}
 	fmt.Printf("%3d: 1/2 = %s\n", i+1, strings.Join(terms, " + "))
 }
