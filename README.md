@@ -231,8 +231,22 @@ does not reach into them — build those from inside (`cd life-game && make`).
   where 61 is right. Knuth revised the file on 2026-08-21, while this was being
   written, and fixed exactly those two places: the array grows by one entry, as
   here, and the missing slot is filled a different way at the same cost, so the mem
-  counts now agree with his on every input tested. Korean, three MetaPost
-  figures.
+  counts now agree with his on every input tested. A companion change file
+  `matula-big.ch` (`gtangle matula.w matula-big.ch`), ported from Knuth's own,
+  swaps the command-line parent-pointer strings for *rectree* files, so maxn
+  grows from 62 to 2000; since that format does not promise S's root is a leaf,
+  it also re-roots S and renumbers it internally, reporting the user's own
+  numbers back. It matches Knuth's C to the mem as well — 3221+14939 on his
+  example, and on 660 random tree pairs the answers, exit codes and mem counts
+  all agree. A second one, `matula-big-planted.ch`, takes only T and grows S by
+  deleting d random leaves from it — SGB's `gb_flip` through
+  [go-sgb](https://github.com/sjnam/go-sgb), so the same seed deletes the same
+  leaves as Knuth's C — which makes S certainly a subtree and turns the
+  question into how fast the algorithm finds it; 500 more random trees agree to
+  the mem. Its prose documents a defect it faithfully inherits: when the root
+  itself is deleted, the still-unrepaired `child` pointer can name an
+  already-deleted node, and both programs then stop with "I'm confused!" — 134
+  of 200 seeds when 124 of 127 nodes go. Korean, three MetaPost figures.
 * [ntt.w](ntt.w) — a friendly guide to the **fast Fourier
   transform** and its integer cousin, the **number theoretic transform**: the
   evaluate–multiply–interpolate detour, why squaring folds the roots of unity
