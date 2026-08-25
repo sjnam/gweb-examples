@@ -32,18 +32,17 @@ Build one example at a time (there is no `make all`): nearly every tangled
 `.go` is a `package main` with its own `main()`, so emitting them into one
 directory at once would make Go refuse to compile (`main` redeclared).
 
-The TeX engine is chosen automatically — **luatex** for Korean documents (those
-with `\input kotexgweb.tex`, see below) and for illustrated ones (`\input
-luamplib.sty`), **pdftex** otherwise.
+Everything is typeset with **luatex**, whatever the language and whether or not
+there are figures. Korean documents (`\input kotexgweb.tex`, see below) and
+illustrated ones (`\input luamplib.sty`) need it; the rest come out the same as
+they did under `pdftex`, table of contents and all.
 
 Figures need no build step of their own. **luamplib** runs MetaPost inline while
 the document is being typeset — no `mpost` pass, no intermediate PDFs, and
-figure labels are set in the document's own fonts. It needs luatex, which is why
-an illustrated document is typeset with luatex whatever language it is in. A
-document with a single figure carries the MetaPost right inside its `.w`; one
-with several keeps them in `<name>.mp` as named macros (`fig_...`) and pulls
-them in with `\everymplib{input <name>;}`, calling each by name where it
-belongs.
+figure labels are set in the document's own fonts. A document with a single
+figure carries the MetaPost right inside its `.w`; one with several keeps them
+in `<name>.mp` as named macros (`fig_...`) and pulls them in with
+`\everymplib{input <name>;}`, calling each by name where it belongs.
 
 Only sources are tracked: the `.w`/`.ch` programs and the MetaPost figure
 libraries (`*.mp`). Every `.go` and every PDF here is generated, so you will
@@ -77,15 +76,15 @@ does not reach into them — build those from inside (`cd life-game && make`).
   first of them shows where the question-15 bug most likely came from, since
   under its wording the five options line up and the offending case disappears.
   Apply them the CWEB way: `gtangle back-20q.w back-20q-backmod9,15.ch`.
-  Korean (typeset with **luatex**), three MetaPost figures.
+  Korean, three MetaPost figures.
 * [back-pdi.w](back-pdi.w) — Knuth's **back-pdi**: find every
   *perfect digital invariant* of order m — an integer equal to the sum of the
   m-th powers of its own digits, like 153 = 1³ + 5³ + 3³. A backtrack that picks
   the digits in nonincreasing order and prunes hard with sharp lower/upper
   bounds, over a binary-coded-decimal bignum that needs only addition (the
   +6 / −6 carry trick, with a worked figure). A Go/GWEB port of Knuth's CWEB
-  program; its node counts match the original exactly. Korean (typeset with
-  **luatex**), one MetaPost figure.
+  program; its node counts match the original exactly. Korean, one MetaPost
+  figure.
 * [chain_bound.w](chain_bound.w) — the **football-chain challenge** from the
   Stanford GraphBase page, settled exactly: how many points can Stanford run up
   over Harvard through a simple chain of 1990 results? Longest path is NP-hard,
@@ -96,8 +95,7 @@ does not reach into them — build those from inside (`cd life-game && make`).
   51, and 2542 (Penn State–Columbia) — the maximum over all pairs — in one,
   matching the three values the challenge page records. A chapter dissects the
   root relaxation to show why. Uses
-  [go-sgb](https://github.com/sjnam/go-sgb); needs `games.dat`. English, typeset
-  with **pdftex**.
+  [go-sgb](https://github.com/sjnam/go-sgb); needs `games.dat`. English.
 * [dragon-calc.w](dragon-calc.w) — Knuth's **dragon-calc**: an interactive
   calculator for Dekking's generalized dragon curves and the calculus of tiles
   from his *diamonds and dragons* notes. Fold sequences of `D`s and `U`s, the
@@ -107,8 +105,7 @@ does not reach into them — build those from inside (`cd life-game && make`).
   over plane-filling paths, and MetaPost output. A Go/GWEB port of Knuth's 2010
   CWEB program whose answers match the original line for line; the `goto` web
   became a labeled loop, the 134 MB static table became an exact allocation, and
-  a divide-by-zero on closed paths is now caught. Korean (typeset with
-  **luatex**), two MetaPost figures.
+  a divide-by-zero on closed paths is now caught. Korean, two MetaPost figures.
 * [enigmatic-puzzle.w](enigmatic-puzzle.w) — Knuth's **enigmatic-puzzle**,
   which breaks the 125-character Enigma message posed in TAOCP 7.2.2.8. Given
   nothing but the ciphertext and one crib word (`ENIGMATICALLY`), it recovers the
@@ -133,9 +130,9 @@ does not reach into them — build those from inside (`cd life-game && make`).
   `max vars 79`; `plugs[…][26]` has no room for the sentinel when a
   plugboard has no plugs at all; and an at-least-one clause with no literals reads
   an unwritten cell. Woven with the history — Scherbius, Rejewski and the Polish
-  bomba, Pyry, Turing, Welchman. Korean (typeset with **luatex**), two MetaPost
-  figures. Needs Knuth's `VOL1TEXT` (a 900 KB file on his site) for the five-gram
-  counts, and about two hours to run.
+  bomba, Pyry, Turing, Welchman. Korean, two MetaPost figures. Needs Knuth's
+  `VOL1TEXT` (a 900 KB file on his site) for the five-gram counts, and about
+  two hours to run.
 * [floyd.w](floyd.w) — Floyd's partition problem, the classic
   "toy problem" Knuth discusses in *Are Toy Problems Useful?*: partition
   √1…√50 into two nearly-equal halves. A worked literate solution
@@ -167,8 +164,7 @@ does not reach into them — build those from inside (`cd life-game && make`).
   the running time down to 41%) and the whole matching 1.6-2.3x faster, at the
   cost of a different starting matching that changes the round count either way in
   about one instance in five. Behind a flag, so the default still reproduces
-  Knuth's output exactly. Korean (typeset with **luatex**), three MetaPost
-  figures.
+  Knuth's output exactly. Korean, three MetaPost figures.
 * [hyperbolic.w](hyperbolic.w) — Knuth's **hyperbolic**, which computes the
   unique tiling of the hyperbolic plane by 36°-45°-90° triangles. Points live in
   the upper half plane, "lines" are semicircles centred on the real axis, and the
@@ -184,8 +180,8 @@ does not reach into them — build those from inside (`cd life-game && make`).
   itself — all 667 arcs agree with his to the last printed digit, even though the
   underlying coordinates differ by up to 3.3e-13 because compilers fuse
   multiply-add differently. That they still produce the identical tiling is
-  exactly what the fuzzy binary-search dictionary is for. Korean (typeset with
-  **luatex**), four MetaPost figures.
+  exactly what the fuzzy binary-search dictionary is for. Korean, four MetaPost
+  figures.
 * [koda-ruskey.w](koda-ruskey.w) — Knuth's **koda-ruskey**: generate every
   *ideal of a forest poset* — all bitstrings in which a bit may be 1 only if
   its parent's is — as a generalized reflected Gray code, one bit changing per
@@ -194,7 +190,7 @@ does not reach into them — build those from inside (`cd life-game && make`).
   operations on a four-link *fringe*. Where the CWEB original hand-simulates
   coroutines with a ten-state `switch`, this port writes them out as goroutines
   rendezvousing on unbuffered channels, so the six-line coroutine body survives
-  intact. Korean (typeset with **luatex**), three MetaPost figures.
+  intact. Korean, three MetaPost figures.
 * [li-ruskey.w](li-ruskey.w) — Knuth's **li-ruskey**, the sequel to
   `koda-ruskey`: the constraints now carry *directions*, so instead of a forest
   poset the input is any totally acyclic digraph, and the job is to list every
@@ -208,7 +204,7 @@ does not reach into them — build those from inside (`cd life-game && make`).
   stack *is* the parent pointer) and each coroutine picks its entry point by
   reading its own bit as it first wakes. Both implementations run in one
   program and agree line for line with the CWEB original, `-v` output included.
-  Korean (typeset with **luatex**), four MetaPost figures.
+  Korean, four MetaPost figures.
 * [matula.w](matula.w) — Knuth's **matula**: is the free tree *S* isomorphic to a
   subtree of the free tree *T*? Subgraph isomorphism is NP-complete in general —
   clique and Hamiltonian path are special cases — but for trees David W. Matula's
@@ -235,8 +231,8 @@ does not reach into them — build those from inside (`cd life-game && make`).
   where 61 is right. Knuth revised the file on 2026-08-21, while this was being
   written, and fixed exactly those two places: the array grows by one entry, as
   here, and the missing slot is filled a different way at the same cost, so the mem
-  counts now agree with his on every input tested. Korean (typeset with
-  **luatex**), three MetaPost figures.
+  counts now agree with his on every input tested. Korean, three MetaPost
+  figures.
 * [ntt.w](ntt.w) — a friendly guide to the **fast Fourier
   transform** and its integer cousin, the **number theoretic transform**: the
   evaluate–multiply–interpolate detour, why squaring folds the roots of unity
@@ -245,7 +241,7 @@ does not reach into them — build those from inside (`cd life-game && make`).
   998244353 = 119·2²³+1), and the surprising history from Gauss (1805) to
   Harvey–van der Hoeven (2021). Three MetaPost figures. The working program it
   builds toward solves Library Checker's *Convolution (mod 998244353)* —
-  polynomial multiplication in O(n log n). Korean (**luatex**).
+  polynomial multiplication in O(n log n). Korean.
 * [pairsums.w](pairsums.w) — HackerRank's *Pair Sums*: the
   largest pair-product sum over all subarrays. The identity value = (S²−Q)/2
   and a prefix-sum twist turn it into the upper envelope of a family of lines,
@@ -260,15 +256,15 @@ does not reach into them — build those from inside (`cd life-game && make`).
   comparison, and reconstructs the order-10 Graeco-Latin square that decides
   what each chapter contains (99 of its 100 pairs are used; the missing one is
   the clinamen's share). Uses
-  [go-sgb](https://github.com/sjnam/go-sgb). English, typeset with **luatex**,
-  three MetaPost figures drawn inline by luamplib.
+  [go-sgb](https://github.com/sjnam/go-sgb). English, three MetaPost figures
+  drawn inline by luamplib.
 * [perm.w](perm.w) — **Floyd's random-sampling algorithm**
   (from Bentley's *More Programming Pearls*): draw M distinct integers from
   1…N uniformly in O(M), every subset equally likely, without the collision
   retries of the naive approach. A Korean literate essay building a small
   `perm` library (plus a channel-based generator) with an extensive
   `@(perm_test.go@>` suite — properties, reproducibility, distribution, and
-  benchmarks. Typeset with **luatex**.
+  benchmarks.
 * [pipeline.w](pipeline.w) — a tutorial that bridges Go's two
   pipeline worlds: lazy `iter.Seq` transforms and a fan-out of channel workers,
   joined by two boundary adapters, with first-error cancellation flowing across
@@ -305,7 +301,7 @@ does not reach into them — build those from inside (`cd life-game && make`).
   through the failure and the fix (which Knuth adopted in June 2026 and
   credited to this repository's author) with a figure. Verified against the
   CWEB original on all 10,067 connected spiders of ≤ 7 vertices, `-v` output
-  included. Korean (typeset with **luatex**), four MetaPost figures.
+  included. Korean, four MetaPost figures.
 * [squint.w](squint.w) — lazy power series as demand-driven
   channel networks (sum, product, composition, reciprocal, functional inverse,
   and differential equations like `exp`), after McIlroy's *Squinting at Power
@@ -331,8 +327,8 @@ does not reach into them — build those from inside (`cd life-game && make`).
   original — output and mems byte-identical — on the SGB Roget graph and 2230
   random digraphs, including chains, transitive tournaments, and layered graphs
   built to exercise W's merge loop and its path-compressed `src` walk. Uses
-  [go-sgb](https://github.com/sjnam/go-sgb). Korean (typeset with **luatex**),
-  two MetaPost figures sharing `tarjan-strong.mp`'s helpers.
+  [go-sgb](https://github.com/sjnam/go-sgb). Korean, two MetaPost figures
+  sharing `tarjan-strong.mp`'s helpers.
 * [tarjan-strong.w](tarjan-strong.w) — **Tarjan's strong components**, after
   Knuth's CWEB `tarjan-strong.w` (Algorithm 7.4.1.2T of the forthcoming
   prefascicle 12a). One depth-first pass finds every strong component, and the
@@ -351,18 +347,17 @@ does not reach into them — build those from inside (`cd life-game && make`).
   against the C original — output and mems byte-identical — on the SGB Roget
   graph (1022 vertices, 77 components) and 1615 random digraphs, plus a separate
   semantic check of the certificate on 1500 more. Uses
-  [go-sgb](https://github.com/sjnam/go-sgb). Korean (typeset with **luatex**),
-  three MetaPost figures.
+  [go-sgb](https://github.com/sjnam/go-sgb). Korean, three MetaPost figures.
 * [topswops.w](topswops.w) — Conway's *topswops* game, solved
   by A. Pepperdine's backward search (run the game in reverse from its ending
   state). A Korean literate essay retelling of Knuth's CWEB `topswops.w`, with
   MetaPost figures (a sample game, and the complete backward search tree for
-  n=3) and a proof of Conway's halting argument. Typeset with **luatex**.
+  n=3) and a proof of Conway's halting argument.
 * [topswops_fwd.w](topswops_fwd.w) — the same game solved
   *forwards*: a branch-and-bound search with placeholder cards and an `f(m)`
   pruning bound, written as a `goto` state machine. A Korean literate essay
   retelling of Knuth's CWEB `topswops-fwd.w`, with MetaPost figures (the
-  five-label state machine, and the pruning bound). Typeset with **luatex**.
+  five-label state machine, and the pruning bound).
 * [wc.w](wc.w) — a literate word-count program; its tangled
   output matches the system `wc`. It also shows `@f` setting a user type in bold.
 * [word-cube-dlx.w](word-cube-dlx.w) — the same symmetric word cubes as
@@ -384,8 +379,8 @@ does not reach into them — build those from inside (`cd life-game && make`).
   98.0M — yet loses on the clock, because a cell item sits in 3·|W| options, so one
   coloring walks thousands of them where the backtrack does one binary search. The
   gap does narrow with scale, as covered items shorten the lists (92× at 2000 words,
-  39× at 3500, 16× on the full list: 26m36s against 1m41s). Korean (typeset with
-  **luatex**), with one inline MetaPost figure and one borrowed from `wordcube.mp`.
+  39× at 3500, 16× on the full list: 26m36s against 1m41s). Korean, with one
+  inline MetaPost figure and one borrowed from `wordcube.mp`.
 * [wordcube.w](wordcube.w) — how many **symmetric 5×5×5 word
   cubes** can be built from the Stanford GraphBase's 5757 five-letter words? A
   fully symmetric cube reads the same word along any of its three axes; a clean
@@ -394,11 +389,11 @@ does not reach into them — build those from inside (`cd life-game && make`).
   answer is 83,576 (75,130 if all fifteen words must differ). The base program adds
   *preclusion* (forward-checking): after each word is placed it verifies every
   not-yet-filled line can still be completed from the dictionary, pruning the tree
-  from 4.6B search nodes to 98M (~1½ min sequentially). A Korean literate essay
-  (typeset with **luatex**), with a MetaPost figure. A companion change file
-  `wordcube-par.ch` (`gtangle wordcube.w wordcube-par.ch`) forks a goroutine-parallel
-  build — the independent first-word choices fan out across workers, giving the same
-  counts in ~13 s on 10 cores.
+  from 4.6B search nodes to 98M (~1½ min sequentially). A Korean literate
+  essay, with a MetaPost figure. A companion change file `wordcube-par.ch`
+  (`gtangle wordcube.w wordcube-par.ch`) forks a goroutine-parallel build — the
+  independent first-word choices fan out across workers, giving the same counts
+  in ~13 s on 10 cores.
 * [ziptree.w](ziptree.w) — the **zip tree** of Tarjan, Levy,
   and Timmel: a randomized BST that is max-heap-ordered by a geometric random
   *rank* (ties favoring the smaller key), updated by *unzipping* and *zipping*
@@ -409,8 +404,7 @@ does not reach into them — build those from inside (`cd life-game && make`).
   variant that drops the rank field entirely (computing it from the key). The
   `@(zip_test.go@>` test file (run with `go test`) reproduces the paper's
   Figure 1 exactly, cross-checks all three representations, fuzz-checks the
-  BST/heap invariants, and benchmarks allocations. Korean (typeset with
-  **luatex**).
+  BST/heap invariants, and benchmarks allocations. Korean.
 * [cdq-dc/](cdq-dc/) — **CDQ divide and conquer**, the offline technique that
   splits not the problem but the *set of pairs*, letting an earlier half pay its
   contribution forward to a later one. One axis per weapon: sorting, divide and
@@ -463,8 +457,8 @@ does not reach into them — build those from inside (`cd life-game && make`).
 
 ### Korean (and other non-English) documentation
 
-The woven output can be written in Korean by processing it with **`luatex`**
-(not `pdftex`) and putting one line in the `.w` file's limbo:
+The woven output can be written in Korean by putting one line in the `.w`
+file's limbo:
 
 ```tex
 \input kotexgweb

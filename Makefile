@@ -7,14 +7,16 @@
 # 예제마다 한 번에 하나씩 빌드한다(`make all`은 없다). 거의 모든 .go 가 package main
 # 의 main() 을 가져, 한 디렉토리에 동시에 풀면 Go 가 main 중복으로 컴파일을 거부한다.
 #
-# 조판 엔진은 문서가 무엇을 부르는지 보고 고른다. 한글 문서(\input kotexgweb.tex)와
-# 그림 있는 문서(\input luamplib.sty)는 luatex로, 그 밖은 pdftex로 조판한다.
-# luamplib 은 \directlua 를 쓰므로 pdftex 로는 돌지 않는다. 매크로(gwebmac.tex,
-# kotexgweb.tex)는 설치된 texmf 트리에서 자동으로 찾는다. 변경 파일 .ch 를
-# 적용하려면 수작업으로 부른다(예: gtangle wc.w wc.ch).
+# 조판은 문서를 가리지 않고 luatex 하나로 한다. 한글 문서(\input kotexgweb.tex)와
+# 그림 있는 문서(\input luamplib.sty)는 luatex라야 하고---luamplib 은 \directlua 를
+# 쓰므로 pdftex 로는 돌지 않는다---나머지 영문 문서도 목차까지 그대로 나온다.
+# 매크로(gwebmac.tex, kotexgweb.tex)는 설치된 texmf 트리에서 자동으로 찾는다.
+# 변경 파일 .ch 를 적용하려면 수작업으로 부른다(예: gtangle wc.w wc.ch).
 
 GTANGLE ?= gtangle
 GWEAVE  ?= gweave
+# 이름을 TEX 로 두면 안 된다. make 의 내장 변수(TEX=tex)라 ?= 가 먹지 않는다.
+LUATEX  ?= luatex
 
 WFILES := $(wildcard *.w)
 NAMES  := $(WFILES:.w=)
@@ -41,8 +43,7 @@ $(NAMES): %: %.go %.pdf
 # `input <name>;` 으로 읽어들인다.
 %.pdf: %.w
 	$(GWEAVE) $<
-	@if grep -q 'kotexgweb\|luamplib' $<; then eng=luatex; else eng=pdftex; fi; \
-	echo ">> $$eng $*.tex"; $$eng $*.tex </dev/null
+	$(LUATEX) $*.tex </dev/null
 
 # 생성물만 삭제한다. 소스(.w, .ch, .mp)는 남긴다. 특히 woven 출력만 골라 지운다:
 # `*.tex`로 싹 지우면 손으로 쓴 .tex 가 있을 때 함께 날아가므로, .w 에 대응하는
