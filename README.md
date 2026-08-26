@@ -322,6 +322,22 @@ does not reach into them — build those from inside (`cd life-game && make`).
   channel networks (sum, product, composition, reciprocal, functional inverse,
   and differential equations like `exp`), after McIlroy's *Squinting at Power
   Series*.
+* [ssham.w](ssham.w) — Knuth's **SSHAM**: every Hamiltonian cycle of a
+  graph, found by an algorithm that picks the edges of subpaths without knowing
+  where in the final cycle they will land — Selby's idea (1970), which Knuth
+  rediscovered in 2001 in a more symmetric form where all subpaths have equal
+  status. Not to be confused with [sham.w](sham.w) beside it: same three letters,
+  a wholly different algorithm. The shrinking graph lives in **sparse sets**
+  (`nbr`/`adj`, with `adj` doubling as the adjacency matrix), vertices are *bare*,
+  *outer*, or *inner*, and a degree-2 bare vertex goes on a `trigger` list that
+  forces its two edges. Input is an SGB `.gb` file, read by
+  [go-sgb](https://github.com/sjnam/go-sgb)'s `gbsave.RestoreGraph`; go-sgb's own
+  `gbbasic.Board` + `gbsave.SaveGraph` writes files byte-identical to the C SGB's.
+  The `goto` web ports straight across, needing exactly one extra label (Go
+  cannot jump into a block). Verified against the CWEB original on 845
+  graph/option pairs — solutions, verbose logs, profiles, progress strings and
+  mem counts all identical, `gb_flip` randomization included; the 6×6 knight
+  graph gives 9862 cycles at 2265+4671495 mems on both. Korean.
 * [tarjan-strong-and-weak.w](tarjan-strong-and-weak.w) — Knuth's companion to
   `tarjan-strong.w`: Algorithm 7.4.1.2T again, now carrying **Algorithm
   7.4.1.2W** alongside it.
