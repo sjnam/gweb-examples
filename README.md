@@ -292,6 +292,18 @@ does not reach into them — build those from inside (`cd life-game && make`).
   floating-point arithmetic. When adding the $1/n^2$ terms, precise rational
   number operations are required, and a brute-force approach that simply cycles
   through all $2^{79}$ subsets is impossible.
+* [queenon-partition.w](queenon-partition.w) — Knuth's
+  **QUEENON-PARTITION**: Michael Simkin's curious mapping from an n×n grid onto a
+  2N×2N grid truncated to a diamond and turned 45°, the cell decomposition behind
+  his 2021 asymptotics for the n-queens count. The rule — take the smallest *I*
+  whose cell meets *(ij)* in positive area, and on a tie the *larger* *J* — falls
+  out of packing the pair as `I<<16 - J` and keeping the minimum; the areas
+  themselves are settled by brute force over an nN×nN pixel grid. The program
+  emits a MetaPost file drawing the assignment, so Go's raw strings replace two
+  dozen `fprintf` calls and let the MetaPost be read as MetaPost. Verified
+  byte-identical to the CWEB original — stdout, the emitted `.mp`, and exit codes
+  — on 649 (N, n) pairs. Korean, two luamplib figures in
+  [queenon-partition.mp](queenon-partition.mp).
 * [seq.w](seq.w) — a tiny lazy-sequence library (`Map`,
   `Filter`, `Take` over infinite Fibonacci numbers), showing off the Go features
   C has no answer to: first-class functions and closures, anonymous functions,
