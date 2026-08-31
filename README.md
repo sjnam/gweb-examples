@@ -231,8 +231,8 @@ does not reach into them — build those from inside (`cd life-game && make`).
   where 61 is right. Knuth revised the file on 2026-08-21, while this was being
   written, and fixed exactly those two places: the array grows by one entry, as
   here, and the missing slot is filled a different way at the same cost, so the mem
-  counts now agree with his on every input tested. Knuth keeps two change files
-  beside his own program, and both are ported here.
+  counts now agree with his on every input tested. Knuth keeps three change files
+  beside his own program, and all three are ported here.
   [matula-big.ch](matula-big.ch) swaps the command-line parent-pointer strings
   for *rectree* files, so maxn grows from 62 to 2000; since that format does
   not promise S's root is a leaf, it also re-roots S and renumbers it
@@ -248,7 +248,19 @@ does not reach into them — build those from inside (`cd life-game && make`).
   planted one's prose documents a defect it faithfully inherits: when the root
   itself is deleted, the still-unrepaired `child` pointer can name an
   already-deleted node, and both programs then stop with "I'm confused!" — 134
-  of 200 seeds when 124 of 127 nodes go. Korean, three MetaPost figures.
+  of 200 seeds when 124 of 127 nodes go.
+  [matula-exhaustive.ch](matula-exhaustive.ch) drops the command line's two trees
+  for two *counts* and runs every pair of free trees on *m* and *n* nodes, so maxn
+  falls from 62 to 16. Getting each free tree exactly once is the interesting
+  part: a trie of canonical level sequences for oriented forests (TAOCP exercise
+  7.2.1.6–90) yields the centroidal trees, and pairs of half-size forests yield
+  the bicentroidal ones. Knuth writes that machinery twice, once for S and once
+  for T; here it is one `family` type with `first`/`next`/`nth`, which also
+  merges his two `make_?string` routines into one. It reports Welford mean and
+  variance of the mems per pair, the hardest pair, and which trees embed into the
+  most and fewest others. Matched against the C on all 79 (m, n) pairs whose tree
+  counts multiply to at most 200000 — output, exit codes and mems identical, e.g.
+  2407+426125 at m = n = 8. Korean, three MetaPost figures.
 * [ntt.w](ntt.w) — a friendly guide to the **fast Fourier
   transform** and its integer cousin, the **number theoretic transform**: the
   evaluate–multiply–interpolate detour, why squaring folds the roots of unity
