@@ -96,6 +96,24 @@ does not reach into them — build those from inside (`cd life-game && make`).
   matching the three values the challenge page records. A chapter dissects the
   root relaxation to show why. Uses
   [go-sgb](https://github.com/sjnam/go-sgb); needs `games.dat`. English.
+* [dlx-pre.w](dlx-pre.w) — Knuth's **DLX-PRE**, the *preprocessor* of his
+  exact-cover series: it reads a `.dlx` problem and writes an equivalent one with
+  the unnecessary options and items removed. Two rules do the work — if every
+  option containing a primary item *p* also contains an uncolored *c*, then *c*
+  and every option holding *c* without *p* can go; and if every option containing
+  *p* clashes with option *r*, then *r* can go — applied by hiding one item at a
+  time in the dancing-links structure, with no auxiliary tables, since nodes
+  pulled from a doubly linked list still remember their neighbours. The knot in
+  the port is a `goto` Knuth is proud of: on hitting a blocked item he jumps out
+  of the hiding loop straight into the *middle* of the undoing loop, the trick he
+  defended in "Structured programming with go to statements" (1974). Go cannot
+  jump into a block, so a `blocked` flag plus a labelled `break` reproduces the
+  flow exactly. Verified against the CWEB original — stdout byte-identical, mems
+  and verbose logs identical — on 2496 runs over 612 generated problems, the
+  pentomino and filomino boards from
+  [dancing-cells](https://github.com/sjnam/dancing-cells), and every panic path.
+  The document also notes two slips in the original's §3, where the sample output
+  shows `C` for `E` and a `|` that the program does not print. Korean.
 * [dragon-calc.w](dragon-calc.w) — Knuth's **dragon-calc**: an interactive
   calculator for Dekking's generalized dragon curves and the calculus of tiles
   from his *diamonds and dragons* notes. Fold sequences of `D`s and `U`s, the
