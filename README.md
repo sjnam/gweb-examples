@@ -96,6 +96,18 @@ does not reach into them — build those from inside (`cd life-game && make`).
   matching the three values the challenge page records. A chapter dissects the
   root relaxation to show why. Uses
   [go-sgb](https://github.com/sjnam/go-sgb); needs `games.dat`. English.
+* [commafree-eastman.w](commafree-eastman.w) — Knuth's **COMMAFREE-EASTMAN**:
+  Eastman's 1965 algorithm, iteratively. Given a sequence of odd length that
+  equals none of its cyclic shifts, it picks the one shift such that the chosen
+  shifts form a comma-free code — the construction that settled a conjecture of
+  Golomb, Gordon and Welch. The word is cut into subwords by boundary markers,
+  and each phase keeps just one marker in every odd-length *range* between
+  consecutive *basins* (the Nevada terminology is Knuth's), so ⌊log₃ n⌋ phases
+  suffice. Checked against the CWEB original on 26830 runs — every sequence of
+  length 3, 5, 7 or 9 over a two- or three-letter alphabet, plus 4000 random
+  ones up to length 105 — with one deliberate difference: `strconv.Atoi` refuses
+  the trailing garbage that `sscanf("%d")` quietly accepts. Korean, one MetaPost
+  figure.
 * [dlx-pre.w](dlx-pre.w) — Knuth's **DLX-PRE**, the *preprocessor* of his
   exact-cover series: it reads a `.dlx` problem and writes an equivalent one with
   the unnecessary options and items removed. Two rules do the work — if every
