@@ -17,9 +17,7 @@
 $x$는 제 순환 자리옮김 $x_k\ldots x_{n-1}x_0\ldots x_{k-1}$ ($1\le k<n$) 가운데
 어느 것과도 같지 않다. 이 프로그램은 그런 $x$를 받아 순환 자리옮김 $\sigma x$를
 하나 고른다. 그렇게 고른 $\sigma x$를 모두 모으면 (무한 알파벳 위에서) 블록 길이가
-$n$인 콤마 없는 부호를 이룬다.
-
-정수는 명령줄 인자로 준다.
+$n$인 콤마 없는 부호를 이룬다. 정수는 명령줄 인자로 준다.
 
 @ 콤마 없는 부호(comma-free code)란 무엇인가. 길이가 $n$인 낱말의 집합 $C$를 두고,
 $C$에 든 어떤 두 낱말 $u$와 $v$를 이어 붙인 $uv$의 한가운데 $n$글자---곧 $1\le k<n$
@@ -53,10 +51,10 @@ $a$, $b$, $c$가 모두 같지는 않다면, 순환 자리옮김 $y_0y_1y_2=abc$
 
 @ 이것은 크누스의 \.{CWEB} 프로그램 \pdfURL{\.{commafree-eastman.w}}%
 {https://www-cs-faculty.stanford.edu/\TILDE/knuth/programs/commafree-eastman.w}를
-\.{GWEB}으로 옮긴 것이다. 원본의 머리글 \.{Last-Modified}는
-\.{Thu, 03 Dec 2015 00:17:23 GMT}다.
-
-@ 큰 얼개는 이렇다.
+\.{GWEB}으로 옮긴 것이다.% 원본의 머리글 \.{Last-Modified}는
+%\.{Thu, 03 Dec 2015 00:17:23 GMT}다.
+%
+큰 얼개는 이렇다.
 
 @c
 package main
@@ -72,7 +70,7 @@ import (
 @<함수들@>@;
 
 func main() {
-	@<지역 변수@>@;
+	var i, j, k, n, p, q, t, tt int
 	@<명령줄을 처리한다@>@;
 	@<이스트먼의 알고리즘을 돌린다@>@;
 }
@@ -90,9 +88,6 @@ var (
 	b  [3 * maxn]int
 	bb [maxn]int
 )
-
-@ @<지역 변수@>=
-var i, j, k, n, p, q, t, tt int
 
 @ 인자는 적어도 셋이라야 한다. 길이가 홀수이면서 $1$일 수는 없으니 가장 작은 것이
 $3$이기 때문이다.
