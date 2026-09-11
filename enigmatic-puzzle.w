@@ -1,6 +1,9 @@
 \input kotexgweb
 \input luamplib.sty
 
+\font\eightss=cmssq8
+\font\eightssi=cmssqi8
+
 % 그림들은 enigmatic-puzzle.mp 안에 fig_... 라는 이름으로 있다.
 \everymplib{input enigmatic-puzzle;}
 
@@ -1314,12 +1317,20 @@ PHILO SOPHE RSWHE NTHEY WROTE ANYTH INGTO OEXCE LLENT FORTH EVULG ARTOK\cr
 NOWEX PRESS EDITE NIGMA TICAL LYTHA TTHES ONSOF ARTON LYMIG HTUND ERSTA NDITX\cr}}$$
 빈칸을 도로 넣으면 이렇다.
 
-\smallskip
-{\narrower\noindent {\it Philosophers when they wrote any thing too excellent
-for the vulgar to know, expressed it enigmatically, that the sons of Art only
-might understand it.\/}
-\smallskip
-\hfill---John French, {\it The Art of Distillation\/} (1653)\par}
+{\eightpoint
+  \baselineskip 10pt
+  \parfillskip 0pt
+  \interlinepenalty 10000
+  \leftskip 0pt plus 40pc minus \parindent
+  \let\rm=\eightss \let\sl=\eightssi
+  \everypar{\sl}
+\def\author#1(#2){\smallskip\noindent\rm--- #1\unskip\enspace(#2)}
+Philosophers when they wrote any thing too excellent
+
+for the vulgar to know, expressed it enigmatically,
+
+that the sons of Art only might understand it.
+\author JOHN FRENCH, {\sl The Art of Distillation\/} (1653)\par}
 \smallskip
 
 \noindent 연금술을 다룬 1653년 책에서 따온 구절이다. 크립 \.{ENIGMATICALLY}는
