@@ -366,6 +366,23 @@ does not reach into them — build those from inside (`cd life-game && make`).
   running it needs that module (`go get github.com/sjnam/go-sgb`); the commentary
   is newly written. Shows GWEB handling an external dependency and a real Knuth
   program.
+* [skew-ternary-calc.w](skew-ternary-calc.w) — Knuth's
+  **skew-ternary-calc**: calculations with *skew ternary trees* and the
+  nonseparable planar maps they encode. A ternary tree gets buds in its empty
+  slots; every node and bud has a rank (left child −1, middle same, right +1);
+  the tree is *skew* when no rank goes negative. The pretty theorem is that each
+  cyclic family of 2n+2 such trees holds exactly four skew ones, proved by
+  letting an ant crawl the perimeter counting buds up and arcs down. The program
+  computes the three conjugates of a given tree, then builds the corresponding
+  planar map twice over — by Jacquard and Schaeffer's correspondence and by Del
+  Lungo, Del Ristoro and Penaud's — in a Guibas–Stolfi quad-edge structure,
+  which is where Knuth's own surprise lives: the four conjugates give four
+  *dual* maps, a conjecture Gilles Schaeffer then explained from his 1998
+  thesis. Verified against the CWEB original on 6333 cases per seed — random
+  skew trees up to 62 nodes, random non-trees, and every error path — with no
+  difference. All 68 of Knuth's MetaPost figures come along, converted from
+  `mpost`'s one-pass model (where figures inherit state from earlier ones) to
+  luamplib's per-figure one, so each now stands alone. Korean.
 * [spiders.w](spiders.w) — Knuth's **spiders**, which closes the trilogy and
   makes `koda-ruskey` and `li-ruskey` obsolete: the same problem — list every
   0/1 labeling of a totally acyclic digraph respecting `x → y ⟹ bit x ≤ bit y`
