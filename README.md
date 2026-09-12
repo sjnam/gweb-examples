@@ -366,23 +366,6 @@ does not reach into them — build those from inside (`cd life-game && make`).
   running it needs that module (`go get github.com/sjnam/go-sgb`); the commentary
   is newly written. Shows GWEB handling an external dependency and a real Knuth
   program.
-* [skew-ternary-calc.w](skew-ternary-calc.w) — Knuth's
-  **skew-ternary-calc**: calculations with *skew ternary trees* and the
-  nonseparable planar maps they encode. A ternary tree gets buds in its empty
-  slots; every node and bud has a rank (left child −1, middle same, right +1);
-  the tree is *skew* when no rank goes negative. The pretty theorem is that each
-  cyclic family of 2n+2 such trees holds exactly four skew ones, proved by
-  letting an ant crawl the perimeter counting buds up and arcs down. The program
-  computes the three conjugates of a given tree, then builds the corresponding
-  planar map twice over — by Jacquard and Schaeffer's correspondence and by Del
-  Lungo, Del Ristoro and Penaud's — in a Guibas–Stolfi quad-edge structure,
-  which is where Knuth's own surprise lives: the four conjugates give four
-  *dual* maps, a conjecture Gilles Schaeffer then explained from his 1998
-  thesis. Verified against the CWEB original on 6333 cases per seed — random
-  skew trees up to 62 nodes, random non-trees, and every error path — with no
-  difference. All 68 of Knuth's MetaPost figures come along, converted from
-  `mpost`'s one-pass model (where figures inherit state from earlier ones) to
-  luamplib's per-figure one, so each now stands alone. Korean.
 * [spiders.w](spiders.w) — Knuth's **spiders**, which closes the trilogy and
   makes `koda-ruskey` and `li-ruskey` obsolete: the same problem — list every
   0/1 labeling of a totally acyclic digraph respecting `x → y ⟹ bit x ≤ bit y`
@@ -566,6 +549,29 @@ does not reach into them — build those from inside (`cd life-game && make`).
   stones on a tea table, the $50 bet the glider gun settled, and Conway's
   late-life "I hate the Game of Life". `demos/` holds recordings made with
   [vhs](https://github.com/charmbracelet/vhs).
+* [skew-ternary/](skew-ternary/) — Knuth's **skew-ternary-calc**, plus the
+  interactive toy he wished someone would build. A ternary tree gets buds in
+  its empty slots; every node and bud has a rank (left child −1, middle same,
+  right +1); the tree is *skew* when no rank goes negative. The pretty theorem
+  is that each cyclic family of 2n+2 such trees holds exactly four skew ones,
+  proved by letting an ant crawl the perimeter counting buds up and arcs down.
+  The program computes the three conjugates of a tree, then builds the
+  corresponding planar map twice over — by Jacquard and Schaeffer's
+  correspondence and by Del Lungo, Del Ristoro and Penaud's — in a
+  Guibas–Stolfi quad-edge structure, which is where Knuth's own surprise
+  lives: the four conjugates give four *dual* maps, a conjecture Gilles
+  Schaeffer then explained from his 1998 thesis. Verified against the CWEB
+  original on 6333 cases per seed with no difference, and all 68 of Knuth's
+  MetaPost figures come along, converted from `mpost`'s one-pass model (where
+  figures inherit state from earlier ones) to luamplib's per-figure one.
+  Korean.
+  * `app/` — a single HTML page for the wish in Knuth's own introduction, that
+    someone build something to handle these trees interactively and bring out
+    their patterns in color. Step the ant around the perimeter and watch the
+    buds pile up and pair off, until the four that never pair are all that is
+    left; then rotate through the four conjugates they name. Its arithmetic is
+    the `.w`'s own parsing and state-table chapters ported to JavaScript,
+    checked against the Go program on 3510 random skew trees.
 
 ### Korean (and other non-English) documentation
 
