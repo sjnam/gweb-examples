@@ -160,15 +160,18 @@ does not reach into them — build those from inside (`cd life-game && make`).
   `max vars 79`; `plugs[…][26]` has no room for the sentinel when a
   plugboard has no plugs at all; and an at-least-one clause with no literals reads
   an unwritten cell. Woven with the history — Scherbius, Rejewski and the Polish
-  bomba, Pyry, Turing, Welchman. The sweep is also split across goroutines, one
-  unit per rotor arrangement: profiling put 72% of the time inside the bombe's
-  union step, where path compression, narrower arrays and a struct-of-fields
-  layout all turned out slower, but the 60 arrangements share nothing, so ten
-  workers cut a 2h04m run to 16m39s on an M1 Max. Output stays byte-identical:
-  each worker collects a superset of what could print, and the running best score
-  and the serial numbering are replayed in unit order afterwards, so even the 13
-  stderr progress lines land unchanged. Korean, two MetaPost figures. Needs
-  Knuth's `VOL1TEXT` (a 900 KB file on his site) for the five-gram counts.
+  bomba, Pyry, Turing, Welchman. The sweep is also split across goroutines:
+  profiling put 72% of the time inside the bombe's union step, where path
+  compression, narrower arrays and a struct-of-fields layout all turned out
+  slower, but the configurations share nothing, so ten workers cut a 2h04m26s run
+  to 16m10s on an M1 Max. Output stays byte-identical, and still streams: what to
+  print depends on everything before it, so a unit's lines are fixed only once
+  every earlier unit is done — each worker collects a superset of what could
+  print, then flushes the finished prefix in order. Slicing the sweep into 1560
+  units rather than 60 gets the first line out in 6.4 seconds, and turns out to
+  be *faster* overall (shorter tail) despite rebuilding the rotor table per unit.
+  Even the 13 stderr progress lines land unchanged. Korean, two MetaPost figures.
+  Needs Knuth's `VOL1TEXT` (a 900 KB file on his site) for the five-gram counts.
 * [floyd.w](floyd.w) — Floyd's partition problem, the classic
   "toy problem" Knuth discusses in *Are Toy Problems Useful?*: partition
   √1…√50 into two nearly-equal halves. A worked literate solution
