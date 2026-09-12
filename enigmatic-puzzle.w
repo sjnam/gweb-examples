@@ -1,8 +1,8 @@
 \input kotexgweb
 \input luamplib.sty
 
-\font\eightss=cmssq8
-\font\eightssi=cmssqi8
+\font\niness=cmssq8 at 9pt
+\font\ninessi=cmssqi8 at 9pt
 
 % 그림들은 enigmatic-puzzle.mp 안에 fig_... 라는 이름으로 있다.
 \everymplib{input enigmatic-puzzle;}
@@ -35,10 +35,11 @@ TAOCP 7.2.2.8절에 실린 퍼즐이다.
 플러그보드의 후보를 좁히는 장, 남은 것을 SAT로 푸는 장, 링 설정을 되짚는 장,
 그리고 마지막으로 나온 평문들 가운데 어느 것이 영어인지 가리는 장이다.
 
-옮기면서 두 가지를 바꿨다. 하나는 채점표다. 크누스는 \.{QUINGRAM-RATING}이 미리
+옮기면서 세 가지를 바꿨다. 하나는 채점표다. 크누스는 \.{QUINGRAM-RATING}이 미리
 만들어 둔 $26^5$개짜리 파일을 읽는데, 우리는 그 표를 뜨는 원문을 직접 읽어 그
 자리에서 센다---어차피 한 번 훑으면 되는 일이라 중간 파일을 둘 까닭이 없다.
-다른 하나는 되돌아가기 스택의 크기인데, 그 이야기는 SAT 장에서 하겠다.
+둘째는 되돌아가기 스택의 크기인데, 그 이야기는 SAT 장에서 하겠다. 셋째는 이 프로그램을
+고루틴 여럿에게 나누어 맡긴 것인데, 바로 다음 장이 그 이야기다.
 
 @c
 package main
@@ -46,7 +47,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
+	"sync"
+	"sync/atomic"
 )
 
 @<상수@>@;
@@ -58,9 +62,103 @@ func main() {
 	@<지역 변수@>@;
 	@<명령줄을 처리한다@>@;
 	@<자료 구조를 채비한다@>@;
-	@<백만 가지 바퀴 배치를 훑는다@>@;
+	@<일감을 나누어 고루틴에게 맡긴다@>@;
+	@<모은 것을 차례대로 되풀어 찍는다@>@;
 	@<셈한 것을 알린다@>@;
 }
+
+@* 나누어 맡기기.
+크누스의 원본은 처음부터 끝까지 한 줄기로 돈다. 내 노트북에서 CPU 시간으로 두 시간이
+넘게 걸리기에 프로파일을 떠 보았더니, 시간의 $72$퍼센트가 봄베의 합치기 함수
+|yewnion| 안에 있었다. 경로 압축을 넣어 보고, 배열을 $32$비트로 줄여 보고, 네 배열을
+구조체 하나로 묶어 보았지만 셋 다 도리어 느려졌다. 크누스가 이미 맞춰 놓은 자리였다.
+
+그렇지만 이 계산은 아름답도록 잘 쪼개진다. 바깥 고리가 도는 회전자 배치 $60$가지는
+서로 아무것도 주고받지 않는다. 그래서 그 $60$가지를 {\it 칸\/}으로 삼아 고루틴
+여럿에게 나누어 맡겼다. 코어가 열 개인 내 기계에서 일곱 배 반쯤 빨라진다.
+
+@ 나누어 맡기려면 먼저 상태를 갈라야 한다. 원본의 전역 변수 가운데 계산 중에 값이
+바뀌는 것은 모두 |worker| 하나에 담고 워커마다 제 것을 지니게 했다. 한 번 만들고 나면
+바뀌지 않는 것들---반사판 |refl|, 델타 나무 |delta|, 자리표 |locTab|, 다섯 글자 빈도표
+|score|---은 전역에 그대로 두고 함께 읽는다.
+
+재어 보니 이렇게 바꾸는 것이 공짜가 아니라 오히려 남는 장사였다. 전역 배열 넷을 따로
+짚는 것보다 구조체 하나에 모아 두고 수신자를 레지스터에 담아 짚는 편이, 한 줄기로 돌
+때에도 $7$퍼센트쯤 빨랐다.
+
+@<자료형@>=
+type worker struct {
+	@<워커가 지니는 것@>@;
+}
+
+@ 칸 하나는 회전자 배치 하나를 맡는다. 워커는 칸을 하나 집어 훑고, 훑은 결과를 그
+칸에 적어 둔다. 적어 두는 것은 세 가지다. 이 칸에서 들여다본 평문이 몇 개인가, 그
+평문마다 회전량이 무엇이었는가, 그리고 찍힐 만한 후보가 무엇이었는가.
+
+@<자료형@>=
+type unit struct {
+	r0, r1, r2 int      // 이 칸이 맡은 회전자 배치
+	nplain     int      // 이 칸에서 들여다본 평문의 수
+	pcode      []uint16 // 평문마다의 회전량 $(p_0,p_1,p_2)$를 $26$진수 세 자리로
+	hits       []cand   // 찍힐 수 있는 후보들
+}
+
+@ 후보는 줄 하나와 점수, 그리고 이 칸 안에서 몇 번째 평문이었는지로 적어 둔다.
+줄의 맨 끝에 붙는 일련번호만 빼 두는데, 그 번호는 앞 칸들을 다 세어 봐야 알 수 있기
+때문이다.
+
+@<자료형@>=
+type cand struct {
+	idx   int    // 이 칸 안에서 몇 번째 평문인가
+	score int    // 다섯 글자 빈도로 매긴 점수
+	line  string // 일련번호를 뺀 나머지
+}
+
+@ 칸 목록은 원본의 바깥 세 겹 고리를 그대로 펴 놓은 것이다.
+
+@<일감 목록을 만든다@>=
+var units []unit
+for r0 := 0; r0 < 5; r0++ {
+	for r1 := 0; r1 < 5; r1++ {
+		if r1 == r0 {
+			continue
+		}
+		for r2 := 0; r2 < 5; r2++ {
+			if r2 == r0 || r2 == r1 {
+				continue
+			}
+			units = append(units, unit{r0: r0, r1: r1, r2: r2})
+		}
+	}
+}
+
+@ 워커마다 고루틴을 하나씩 띄우고, 칸은 먼저 집는 워커가 가져간다. 칸의 품이 고르지
+않아도 저절로 고르게 나뉜다. 원자적으로 하나씩 올리는 |next|가 칸 목록의 문지기다.
+
+@<일감을 나누어 고루틴에게 맡긴다@>=
+@<일감 목록을 만든다@>@;
+nw := runtime.NumCPU()
+if nw > len(units) {
+	nw = len(units)
+}
+workers := make([]*worker, nw)
+var next int64
+var wg sync.WaitGroup
+for t := range workers {
+	workers[t] = new(worker)
+	wg.Add(1)
+	go func(w *worker) {
+		defer wg.Done()
+		for {
+			n := int(atomic.AddInt64(&next, 1)) - 1
+			if n >= len(units) {
+				return
+			}
+			w.scan(&units[n])
+		}
+	}(workers[t])
+}
+wg.Wait()
 
 @* 기계.
 에니그마 M3를 그림으로 그리면 이렇다. 자판에서 글자 하나를 누르면 전류가 흘러
@@ -77,7 +175,7 @@ $$
 나오는 탓에 들어간 글자와 나온 글자가 결코 같을 수 없다---이 프로그램은 그
 빈틈으로 들어간다.}
 
-@ 회전자는 다섯 개(\.I, \.{II}, \.{III}, \.{IV}, \.V) 가운데 셋을 골라 왼쪽부터
+@ 회전자는 다섯 개(I, II, III, IV, V) 가운데 셋을 골라 왼쪽부터
 꽂는다. 고르고 늘어놓는 방법이 $5\cdot4\cdot3=60$가지다. 아래 문자열은 각 회전자의
 배선이고, 반사판은 독일군이 오래 쓴 \.B판이다.
 
@@ -109,13 +207,15 @@ $\.A\mapsto0$으로 적는다. 나눗셈을 피하려고 $0\dts51$을 $0\dts25$�
 
 @<전역 변수@>=
 var (
-	perm  [3][26]int // 고른 회전자 셋의 치환
-	iperm [3][26]int // 그 역치환
-	refl  [26]int    // 반사판 치환
-	pos   [3]int     // 느린 것, 가운데 것, 빠른 것의 자리
-	off   [3]int     // 링 설정을 뺀 회전량
+	refl  [26]int // 반사판 치환
 	mod26 [26 + 26]int
 )
+
+@ @<워커가 지니는 것@>=
+perm  [3][26]int // 고른 회전자 셋의 치환
+iperm [3][26]int // 그 역치환
+pos   [3]int     // 느린 것, 가운데 것, 빠른 것의 자리
+off   [3]int     // 링 설정을 뺀 회전량
 
 @ 이제 기계의 심장이다. 오른쪽(빠른 회전자)부터 왼쪽으로 훑고, 반사한 뒤,
 왼쪽에서 오른쪽으로 거슬러 나온다. 회전량 |off[k]|만큼 돌아간 회전자를 지나는
@@ -241,8 +341,8 @@ for k = 2; k < 26; k++ {
 $26^4=456{,}976$칸이다. 값이 모두 $0\dts25$이므로 바이트 하나면 넉넉한데, 이
 표는 안쪽 고리에서 쉼 없이 읽히므로 작게 만들어 캐시에 앉히는 것이 실제로 값을 한다.
 
-@<전역 변수@>=
-var enc [26][26][26][26]uint8 // 지금 로터로 만든 치환들
+@<워커가 지니는 것@>=
+enc [26][26][26][26]uint8 // 지금 로터로 만든 치환들
 
 @ @<지금 로터로 치환표를 만든다@>=
 for off[0] = 0; off[0] < 26; off[0]++ {
@@ -352,20 +452,21 @@ func loc(i, j int) int { return locTab[i][j] }
 $-1$인 류는 이미 모순이다.
 
 @<전역 변수@>=
-var (
-	rep  [nn]int // 이 원소가 든 류의 대표
-	size [nn]int // 대표가 이끄는 류의 크기
-	bits [nn]int // 류에 나오는 글자들. 겹치면 $-1$
-	link [nn]int // 같은 류의 다음 원소
-	name [nn]string
-)
+var name [nn]string
+
+@ @<워커가 지니는 것@>=
+rep  [nn]int // 이 원소가 든 류의 대표
+size [nn]int // 대표가 이끄는 류의 크기
+bits [nn]int // 류에 나오는 글자들. 겹치면 $-1$
+link [nn]int // 같은 류의 다음 원소
 
 @ 합치기는 작은 쪽을 큰 쪽에 붙이는 흔한 방식이다. 크누스는 이 함수에 |yewnion|
 이라는 이름을 붙였는데, \CEE/에서 |union|이 예약어라 소리 나는 대로 적은 장난이다.
 \GO/에서는 |union|을 그대로 쓸 수 있지만, 이 농담이 아까워 그대로 둔다.
 
 @<함수들@>=
-func yewnion(u, v int) int {
+func (w *worker) yewnion(u, v int) int {
+	rep, size, bits, link := &w.rep, &w.size, &w.bits, &w.link
 	s, t := rep[u], rep[v]
 	if s == t {
 		return s
@@ -397,11 +498,13 @@ var (
 	ciphertext [maxmc]int // 주어진 암호문
 	plainsize  int
 	ciphersize int
-	fullswap   [maxm][26]int // 지금 다루는 치환들
 	pused      [26]int // 크립에 이 글자가 몇 번 나오는가
-	used       [26]int // 지금 다루는 글자들에 몇 번 나오는가
 	corpusFile = "VOL1TEXT"
 )
+
+@ @<워커가 지니는 것@>=
+fullswap [maxm][26]int // 지금 다루는 치환들
+used     [26]int       // 지금 다루는 글자들에 몇 번 나오는가
 
 @ @<명령줄을 처리한다@>=
 args := os.Args[1:]
@@ -453,25 +556,24 @@ for i := 0; i < 26; i++ {
 @<원문을 읽어 다섯 글자 빈도를 센다@>@;
 
 @ 회전자 셋을 고르는 $60$가지와 회전량 $26^3$가지를 곱하면 $1{,}054{,}560$가지,
-곧 백만 남짓이다. 이 여섯 겹 고리가 프로그램의 바깥 뼈대다.
+곧 백만 남짓이다. 원본에서 여섯 겹이던 이 고리가 여기서는 셋으로 줄었다. 바깥 세
+겹은 칸 목록이 되어 워커들에게 흩어졌기 때문이다.
 
-@<백만 가지 바퀴 배치를 훑는다@>=
-for r0 = 0; r0 < 5; r0++ {
+첫 줄에서 기계의 부품에 짧은 이름을 붙여 둔다. 배열을 가리키는 이 포인터들은
+레지스터에 머무르므로, 아래 절들의 코드는 크누스의 것과 글자 하나 다르지 않으면서도
+전역 변수를 짚을 때와 똑같이 빠르다.
+
+@<함수들@>=
+func (w *worker) scan(un *unit) {
+	perm, iperm, pos, off, enc := &w.perm, &w.iperm, &w.pos, &w.off, &w.enc
+	var k, jj, kk, pp, p0, p1, p2 int
+	r0, r1, r2 := un.r0, un.r1, un.r2
+	w.bestscore = 0 // 칸마다 새로 센다. 그래야 되풀 때 빠뜨리는 것이 없다
 	@<로터 $0$을 |r0|형으로 끼운다@>@;
-	for r1 = 0; r1 < 5; r1++ {
-		if r1 == r0 {
-			continue
-		}
-		@<로터 $1$을 |r1|형으로 끼운다@>@;
-		for r2 = 0; r2 < 5; r2++ {
-			if r2 == r0 || r2 == r1 {
-				continue
-			}
-			@<로터 $2$를 |r2|형으로 끼운다@>@;
-			@<지금 로터로 치환표를 만든다@>@;
-			@<회전량 세 개를 모두 훑는다@>@;
-		}
-	}
+	@<로터 $1$을 |r1|형으로 끼운다@>@;
+	@<로터 $2$를 |r2|형으로 끼운다@>@;
+	@<지금 로터로 치환표를 만든다@>@;
+	@<회전량 세 개를 모두 훑는다@>@;
 }
 
 @ 회전자를 끼우는 일은 배선 문자열을 숫자로 옮기고 그 역치환을 만드는 것이다.
@@ -530,7 +632,7 @@ for k, q := plainsize-1, pp; k >= 0; k, q = k-1, delta[q].parent {
 	d := delta[q].del
 	e := &enc[mod26[p0+d[0]]][mod26[p1+d[1]]][mod26[p2+d[2]]]
 	for j := 0; j < 26; j++ {
-		fullswap[k][j] = int(e[j])
+		w.fullswap[k][j] = int(e[j])
 	}
 }
 
@@ -550,9 +652,9 @@ if clash {
 }
 
 @ @<쓰인 글자를 센다@>=
-used = pused
+w.used = pused
 for i := 0; i < plainsize; i++ {
-	used[ciphertext[kk+i]]++
+	w.used[ciphertext[kk+i]]++
 }
 
 @ 봄베 자체는 짧다. 짝 $351$개를 저마다 홀로 두고 시작해서, 크립의 걸음마다
@@ -564,13 +666,13 @@ for i := 0; i < plainsize; i++ {
 전체에 쓰이기 때문이다.
 
 @<봄베를 돌린다@>=
-copy(rep[:], self[:])
-copy(link[:], self[:])
-copy(size[:], ones[:])
-copy(bits[:], bits0[:])
+copy(w.rep[:], self[:])
+copy(w.link[:], self[:])
+copy(w.size[:], ones[:])
+copy(w.bits[:], bits0[:])
 for k := 0; k < plainsize; k++ {
 	for i := 0; i < 26; i++ {
-		yewnion(loc(plaintext[k], i), loc(ciphertext[kk+k], fullswap[k][i]))
+		w.yewnion(loc(plaintext[k], i), loc(ciphertext[kk+k], w.fullswap[k][i]))
 	}
 }
 
@@ -593,7 +695,7 @@ for k := 0; k < plainsize; k++ {
 @<시험 해가 나왔으면 거대 강제류를 찾는다@>=
 giant, hit := -1, 0
 for i := 0; i < 26; i++ {
-	if used[i] == 0 {
+	if w.used[i] == 0 {
 		continue
 	}
 	@<글자 |i|를 담은 좋은 류를 센다@>@;
@@ -604,8 +706,8 @@ for i := 0; i < 26; i++ {
 		if giant < 0 {
 			giant = hit
 		} else if giant != hit {
-			giant = yewnion(giant, hit)
-			if bits[giant] < 0 {
+			giant = w.yewnion(giant, hit)
+			if w.bits[giant] < 0 {
 				continue nextkk
 			}
 		}
@@ -619,7 +721,7 @@ if giant >= 0 {
 @ @<글자 |i|를 담은 좋은 류를 센다@>=
 c := 0
 for j := 0; j < 26; j++ {
-	if s := rep[loc(i, j)]; bits[s] >= 0 {
+	if s := w.rep[loc(i, j)]; w.bits[s] >= 0 {
 		c, hit = c+1, s
 	}
 }
@@ -635,8 +737,8 @@ for j := 0; j < 26; j++ {
 for {
 	change := false
 	for k := 0; k < nn; k++ {
-		if rep[k] == k && bits[k] >= 0 && k != giant && bits[k]&bits[giant] != 0 {
-			change, bits[k] = true, -1
+		if w.rep[k] == k && w.bits[k] >= 0 && k != giant && w.bits[k]&w.bits[giant] != 0 {
+			change, w.bits[k] = true, -1
 		}
 	}
 	if !change {
@@ -647,7 +749,7 @@ for {
 
 @ @<새로 강제류가 된 것이 있으면 거대류에 합친다@>=
 for i := 0; i < 26; i++ {
-	if used[i] == 0 || (1<<i)&bits[giant] != 0 {
+	if w.used[i] == 0 || (1<<i)&w.bits[giant] != 0 {
 		continue
 	}
 	@<글자 |i|를 담은 좋은 류를 센다@>@;
@@ -655,8 +757,8 @@ for i := 0; i < 26; i++ {
 		continue nextkk
 	}
 	if c == 1 {
-		giant = yewnion(giant, hit)
-		if bits[giant] < 0 {
+		giant = w.yewnion(giant, hit)
+		if w.bits[giant] < 0 {
 			continue nextkk
 		}
 	}
@@ -673,31 +775,29 @@ SAT 해결기에게 물어본다.
 $\bigl(\bigvee\{x_j\mid l\in C_j\}\bigr)$가 생긴다. 이것을 다 풀면 쓸 수 있는
 플러그보드가 남김없이 나온다.
 
-@ @<전역 변수@>=
-var (
-	klass      [nn]int
-	kbits      [nn]int
-	konstraint [26]uint64
-	nvars      int
-)
+@ @<워커가 지니는 것@>=
+klass      [nn]int
+kbits      [nn]int
+konstraint [26]uint64
+nvars      int
 
 @ @<해를 살펴본다@>=
-cases++
-nvars = 0
+w.cases++
+w.nvars = 0
 for k := 0; k < nn; k++ {
-	if rep[k] == k && bits[k] >= 0 {
-		klass[nvars], kbits[nvars] = k, bits[k]
-		nvars++
+	if w.rep[k] == k && w.bits[k] >= 0 {
+		w.klass[w.nvars], w.kbits[w.nvars] = k, w.bits[k]
+		w.nvars++
 	}
 }
-if nvars > varsmax {
-	varsmax = nvars
+if w.nvars > w.varsmax {
+	w.varsmax = w.nvars
 }
-satSolve()
-if sols == 0 {
-	fails++
-	if nvars > 64 {
-		hardfails++
+w.satSolve()
+if w.sols == 0 {
+	w.fails++
+	if w.nvars > 64 {
+		w.hardfails++
 	}
 } else {
 	@<플러그보드와 링 설정마다 평문을 살펴본다@>@;
@@ -714,11 +814,20 @@ if sols == 0 {
 모양이 사납다. 뒷정리는 |defer|에 맡겨, 어디서 빠져나가든 반드시 치우도록 했다---
 원본에서 크누스가 ``자취를 지워야 한다''고 따로 당부한 대목이 \GO/에서는 한 줄이 된다.
 
+수신자만 |wk|로 적는다. 아래 되돌아가기 코드가 감시 리터럴을 담는 변수로 |w|를 쓰기
+때문인데, 크누스의 이름을 건드리는 것보다 수신자를 비켜 주는 편이 낫다.
+
 @<함수들@>=
-func satSolve() {
-	sols, vars = 0, nvars
-	clauses, nonspec, cells = nvars+nvars+2, nvars+nvars+2, 0
+func (wk *worker) satSolve() {
+	mem, cmem, move := &wk.mem, &wk.cmem, &wk.move
+	klass, kbits, konstraint := &wk.klass, &wk.kbits, &wk.konstraint
+	plugs, link := &wk.plugs, &wk.link
+	nvars := wk.nvars
+	sols, vars := 0, nvars
+	clauses, cells := nvars+nvars+2, 0
+	wk.nonspec = clauses
 	defer func() {
+		wk.sols = sols
 		@<|cmem|을 지운다@>@;
 	}()
 	@<제약을 만든다@>@;
@@ -745,15 +854,13 @@ type clauseRec struct {
 	wlink uint32 // 감시 목록의 다음 절
 }
 
-@ @<전역 변수@>=
-var (
-	mem     [memsize]uint32   // 리터럴 번호를 담는 칸들
-	cmem    [clausesize]clauseRec
-	nonspec int    // 진짜 절이 시작하는 자리
-	move    [nn + 2]int // 지금까지의 선택
-	vars, clauses, cells, sols int
-	plugs   [maxsols][27]int
-)
+@ @<워커가 지니는 것@>=
+mem     [memsize]uint32 // 리터럴 번호를 담는 칸들
+cmem    [clausesize]clauseRec
+nonspec int         // 진짜 절이 시작하는 자리
+move    [nn + 2]int // 지금까지의 선택
+sols    int         // 찾은 해의 수
+plugs   [maxsols][27]int
 
 @ 원본은 |move|를 예순네 칸으로 잡아 두었다. 그런데 변수의 수가 예순넷을 넘는
 경우가 있다는 것을 크누스 자신이 적어 두었고(``$1500$번에 한 번쯤''), 그때
@@ -854,7 +961,7 @@ for k, bb := 0, uint64(1); bb != 0 && bb <= konstraint[j]; k, bb = k+1, bb<<1 {
 하나씩 그냥 만든다. 크누스의 말대로, 그런 때는 좀 게을러도 괜찮다.
 
 @<적어도-하나 제약을 우격다짐으로 만든다@>=
-hardcases++
+wk.hardcases++
 for i := 0; i < 26; i++ {
 	st := cells
 	for k := 0; k < nvars; k++ {
@@ -955,18 +1062,18 @@ for k := 1; k < level; k++ {
 	plugs[sols][jj] = -1
 }
 sols++
-if sols > solsmax {
+if sols > wk.solsmax {
 	if sols >= maxsols {
 		fmt.Fprintln(os.Stderr, "SAT 해가 너무 많다!")
 		os.Exit(1)
 	}
-	solsmax = sols
+	wk.solsmax = sols
 }
-if cells > cellsmax {
-	cellsmax = cells
+if cells > wk.cellsmax {
+	wk.cellsmax = cells
 }
-if clauses > clausesmax {
-	clausesmax = clauses
+if clauses > wk.clausesmax {
+	wk.clausesmax = clauses
 }
 
 @ 다 풀고 나면 자취를 지워야 다음 일을 맡을 수 있다. 고리 |wlink|는 물론이고 |start|도
@@ -991,24 +1098,22 @@ for c := 0; c <= clauses; c++ {
 @<상수@>=
 const maxsetups = 500
 
-@ @<전역 변수@>=
-var (
-	startpos [maxsetups][3]int
-	rings    [maxsetups][3]int
-	start    [3]int
-	now      [3]int
-	root     [3]int
-	prefix   int
-	setups   int
-)
+@ @<워커가 지니는 것@>=
+startpos [maxsetups][3]int
+rings    [maxsetups][3]int
+start    [3]int
+now      [3]int
+root     [3]int
+prefix   int
+setups   int
 
 @ 경로의 첫 성분이 $1$이면 크립을 찍는 동안 큰 자리올림이 있었다는 뜻이고, 그 시각이
 정확히 언제인지도 알 수 있다. 가운데 성분만 $1$이면 작은 자리올림의 시각만 알고,
 둘 다 $0$이면 크립을 찍는 동안 아무 자리올림도 없었다는 뜻이라 경우가 가장 많다.
 
 @<있을 수 있는 설정을 모두 적는다@>=
-setups, prefix = 0, kk
-root[0], root[1], root[2] = p0, p1, p2
+w.setups, w.prefix = 0, kk
+w.root[0], w.root[1], w.root[2] = p0, p1, p2
 d := delta[pp].del
 switch {
 case d[0] != 0:
@@ -1018,19 +1123,19 @@ case d[1] != 0:
 default:
 	@<어려운 경우@>@;
 }
-if sols*setups > solsbysetupsmax {
-	solsbysetupsmax = sols * setups
+if w.sols*w.setups > w.solsbysetupsmax {
+	w.solsbysetupsmax = w.sols * w.setups
 }
 
 @ @<쉬운 경우@>=
 if d[1] == 1 {
-	outbig(prefix + 1)
+	w.outbig(w.prefix + 1)
 } else {
 	q := delta[pp].parent
 	for delta[q].del[0] != 0 {
 		q = delta[q].parent
 	}
-	outbig(prefix + 1 + delta[q].del[2])
+	w.outbig(w.prefix + 1 + delta[q].del[2])
 }
 
 @ @<중간 경우@>=
@@ -1038,21 +1143,23 @@ q := delta[pp].parent
 for delta[q].del[1] != 0 {
 	q = delta[q].parent
 }
-outmedium((prefix + 1 + delta[q].del[2]) % 26)
+w.outmedium((w.prefix + 1 + delta[q].del[2]) % 26)
 
 @ 남은 경우에는 크립을 찍는 동안 어떤 자리올림도 일어나지 않아야 한다. 그런 시각을
 모두 훑는다.
 
 @<어려운 경우@>=
-for k := (prefix + plainsize) % 26; k != (prefix+1)%26; k = (k + 1) % 26 {
-	outmedium(k)
+for k := (w.prefix + plainsize) % 26; k != (w.prefix+1)%26; k = (k + 1) % 26 {
+	w.outmedium(k)
 }
 
 @ 큰 자리올림이 |bigcarry|번째 글자에서 일어나도록 기계를 맞춘다. 느린 회전자의
 시작 자리는 늘 \.A로 두어도 일반성을 잃지 않는다.
 
 @<함수들@>=
-func outbig(bigcarry int) {
+func (w *worker) outbig(bigcarry int) {
+	start, now, root := &w.start, &w.now, &w.root
+	startpos, rings, prefix := &w.startpos, &w.rings, w.prefix
 	carry := (bigcarry - 1) % 26
 	start[2] = 25 - carry
 	start[1] = 24 - (bigcarry-1)/26
@@ -1068,16 +1175,16 @@ func outbig(bigcarry int) {
 
 @ @<이 설정을 목록에 적는다@>=
 for i := 0; i < 3; i++ {
-	startpos[setups][i] = start[i]
-	rings[setups][i] = (now[i] + 26 - root[i]) % 26
+	startpos[w.setups][i] = start[i]
+	rings[w.setups][i] = (now[i] + 26 - root[i]) % 26
 }
-setups++
-if setups > setupsmax {
-	if setups >= maxsetups {
+w.setups++
+if w.setups > w.setupsmax {
+	if w.setups >= maxsetups {
 		fmt.Fprintln(os.Stderr, "한 배치에 설정이 너무 많다!")
 		os.Exit(1)
 	}
-	setupsmax = setups
+	w.setupsmax = w.setups
 }
 
 @ 작은 자리올림은 |carry|번째 글자에서 일어나되 큰 자리올림은 (암호문이 $600$글자를
@@ -1085,11 +1192,13 @@ if setups > setupsmax {
 자리올림을 하나씩 더 넣어 본다.
 
 @<함수들@>=
-func outmedium(carry int) {
+func (w *worker) outmedium(carry int) {
+	start, now, root := &w.start, &w.now, &w.root
+	startpos, rings, prefix := &w.startpos, &w.rings, w.prefix
 	@<큰 자리올림 없이 작은 자리올림만 맞춘다@>@;
 	for bigcarry := carry + 1; bigcarry < ciphersize; bigcarry += 26 {
 		if bigcarry <= prefix || bigcarry > prefix+plainsize {
-			outbig(bigcarry)
+			w.outbig(bigcarry)
 		}
 	}
 }
@@ -1130,12 +1239,15 @@ const maxscore = 10000
 
 @ @<전역 변수@>=
 var (
-	score     [26][26][26][26][26]int32
-	bestscore int
-	plntxt    [maxmc]int
-	plugboard [26]int
-	tally     [maxscore]int
+	score [26][26][26][26][26]int32
+	tally [maxscore]int
 )
+
+@ @<워커가 지니는 것@>=
+bestscore int
+plntxt    [maxmc]int
+plugboard [26]int
+tally     [maxscore]int
 
 @ 원문을 한 번 훑으며 창을 다섯 글자씩 미끄러뜨린다. 창의 값은 $26$진수 다섯 자리로
 읽으면 되니, 맨 앞자리를 떼고 새 글자를 붙이는 일만 되풀이하면 된다.
@@ -1178,36 +1290,37 @@ for i := 4; i < len(text); i++ {
 
 @<플러그보드와 링 설정마다 평문을 살펴본다@>=
 @<있을 수 있는 설정을 모두 적는다@>@;
-for i := 0; i < setups; i++ {
-	for j := 0; j < sols; j++ {
+for i := 0; i < w.setups; i++ {
+	for j := 0; j < w.sols; j++ {
 		@<설정 |i|와 해 |j|로 암호문을 풀어 본다@>@;
 	}
 }
 
 @ @<설정 |i|와 해 |j|로 암호문을 풀어 본다@>=
-count++
+un.nplain++
+un.pcode = append(un.pcode, uint16((p0*26+p1)*26+p2))
 for k := 0; k < 3; k++ {
-	pos[k] = startpos[i][k]
-	off[k] = mod26[pos[k]+26-rings[i][k]]
+	pos[k] = w.startpos[i][k]
+	off[k] = mod26[pos[k]+26-w.rings[i][k]]
 }
 @<|plugs[j]|로 플러그보드를 맞춘다@>@;
 for k := 0; k < ciphersize; k++ {
 	c := ciphertext[k]
 	@<회전자를 돌린다@>@;
-	c = plugboard[c]
+	c = w.plugboard[c]
 	@<글자 |c|를 암호화한다@>@;
-	plntxt[k] = plugboard[c]
+	w.plntxt[k] = w.plugboard[c]
 }
 @<크립이 제자리에 나왔는지 다시 확인한다@>@;
-@<점수를 매기고 좋으면 찍는다@>@;
+@<점수를 매기고 좋으면 갈무리한다@>@;
 
 @ 고른 류들이 스물여섯 글자를 모두 덮으므로 플러그보드는 매번 통째로 다시 쓰인다.
 
 @<|plugs[j]|로 플러그보드를 맞춘다@>=
-for k := 0; plugs[j][k] >= 0; k++ {
-	nm := name[plugs[j][k]]
+for k := 0; w.plugs[j][k] >= 0; k++ {
+	nm := name[w.plugs[j][k]]
 	u, v := int(nm[0]-'A'), int(nm[1]-'A')
-	plugboard[u], plugboard[v] = v, u
+	w.plugboard[u], w.plugboard[v] = v, u
 }
 
 @ 스스로를 못 믿는 것이 아니라, 여태 세운 논리가 정말 맞는지 보는 것이다. 이 줄이
@@ -1215,48 +1328,105 @@ for k := 0; plugs[j][k] >= 0; k++ {
 
 @<크립이 제자리에 나왔는지 다시 확인한다@>=
 for k := 0; k < plainsize; k++ {
-	if plntxt[k+prefix] != plaintext[k] {
+	if w.plntxt[k+w.prefix] != plaintext[k] {
 		fmt.Fprintln(os.Stderr, "이런, 내가 뭔가 잘못했다.")
 	}
 }
 
 @ 점수는 $121$개 토막의 빈도를 더한 것이다. 여태까지의 최고와 같거나 그보다 나으면
-찍는다. 크누스는 $6000$점이 넘어도 찍게 해 두었는데, 그래야 상위 후보들을 놓치지
+갈무리한다. 크누스는 $6000$점이 넘어도 찍게 해 두었는데, 그래야 상위 후보들을 놓치지
 않기 때문이다.
 
-@<점수를 매기고 좋으면 찍는다@>=
+여기서 견주는 |w.bestscore|는 이 칸 안에서의 최고점이지 온 계산의 최고점이 아니다.
+칸마다 $0$에서 다시 세므로 칸의 최고점은 언제나 전체의 최고점 이하이고, 따라서 여기서
+갈무리하는 것은 나중에 실제로 찍을 것을 남김없이 담은 덧집합이다. 고르는 일은 되풀
+때 다시 한다.
+
+@<점수를 매기고 좋으면 갈무리한다@>=
 s := 0
 for k := 4; k < ciphersize; k++ {
-	s += int(score[plntxt[k-4]][plntxt[k-3]][plntxt[k-2]][plntxt[k-1]][plntxt[k]])
+	s += int(score[w.plntxt[k-4]][w.plntxt[k-3]][w.plntxt[k-2]][w.plntxt[k-1]][w.plntxt[k]])
 }
 if s < maxscore {
-	tally[s]++
+	w.tally[s]++
 }
-if s >= bestscore || s >= 6000 {
-	@<이 후보를 찍는다@>@;
-	bestscore = s
-}
-if count%250000 == 0 {
-	fmt.Fprintf(os.Stderr, "... 여기까지 평문 %d개, %s %s %s %c%c%c\n", count,
-		rotorName[r0], rotorName[r1], rotorName[r2], p0+'A', p1+'A', p2+'A')
+if s >= w.bestscore || s >= 6000 {
+	@<이 후보를 갈무리한다@>@;
+	w.bestscore = s
 }
 
-@ @<이 후보를 찍는다@>=
+@ @<이 후보를 갈무리한다@>=
 var b strings.Builder
 for k := 0; k < ciphersize; k++ {
-	b.WriteByte(byte('A' + plntxt[k]))
+	b.WriteByte(byte('A' + w.plntxt[k]))
 }
 fmt.Fprintf(&b, " %s %s %s %c%c%c %c%c%c", rotorName[r0], rotorName[r1], rotorName[r2],
-	startpos[i][0]+'A', startpos[i][1]+'A', startpos[i][2]+'A',
-	rings[i][0]+'A', rings[i][1]+'A', rings[i][2]+'A')
-for k := 0; plugs[j][k] >= 0; k++ {
-	if nm := name[plugs[j][k]]; nm[0] != nm[1] {
+	w.startpos[i][0]+'A', w.startpos[i][1]+'A', w.startpos[i][2]+'A',
+	w.rings[i][0]+'A', w.rings[i][1]+'A', w.rings[i][2]+'A')
+for k := 0; w.plugs[j][k] >= 0; k++ {
+	if nm := name[w.plugs[j][k]]; nm[0] != nm[1] {
 		b.WriteByte(' ')
 		b.WriteString(nm)
 	}
 }
-fmt.Fprintf(&b, " (%c%c%c) %6d %d", p0+'A', p1+'A', p2+'A', s, count)
-fmt.Println(b.String())
+fmt.Fprintf(&b, " (%c%c%c) %6d", p0+'A', p1+'A', p2+'A', s)
+un.hits = append(un.hits, cand{un.nplain, s, b.String()})
+
+@* 되풀기.
+이제 칸마다 갈무리해 둔 것을 차례대로 되푼다. 워커들이 제멋대로 끝냈더라도 여기서는
+칸 번호 순서로 훑으므로, 찍히는 줄도 일련번호도 한 줄기로 돌 때와 똑같아진다.
+
+일련번호는 앞 칸들에서 들여다본 평문의 수를 다 더한 것에 칸 안의 번호를 얹으면 된다.
+최고점 |best|는 원본이 하던 그대로 갱신한다---$6000$점이 넘어서 찍힌 후보가 그때까지의
+최고점보다 낮으면 최고점이 도리어 내려간다는, 크누스의 그 별난 규칙까지 그대로다.
+
+달라지는 것이 하나 있기는 하다. 원본은 후보를 찾는 족족 찍어 내지만 우리는 다 훑고
+나서야 찍는다. 나온 파일은 한 바이트도 다르지 않되, 화면을 지켜보는 사람에게는 한참
+잠잠하다가 마지막에 우르르 쏟아지는 것으로 보인다.
+
+@<모은 것을 차례대로 되풀어 찍는다@>=
+best, base := 0, 0
+for n := range units {
+	u := &units[n]
+	for _, h := range u.hits {
+		if h.score >= best || h.score >= 6000 {
+			fmt.Printf("%s %d\n", h.line, base+h.idx)
+			best = h.score
+		}
+	}
+	@<이 칸을 지나며 진행 상황을 알린다@>@;
+	base += u.nplain
+}
+count = base
+@<워커들이 센 것을 합친다@>@;
+
+@ 진행 상황을 알리는 줄은 평문 $25$만 개마다 하나씩 나온다. 그것까지 한 줄기로 돌
+때와 똑같이 내려면 그때의 회전량을 알아야 하므로, 워커가 평문마다 회전량을 |pcode|에
+적어 두었다. 평문 $333$만 개에 두 바이트씩이라 $7$메가바이트가 채 안 된다.
+
+@<이 칸을 지나며 진행 상황을 알린다@>=
+for m := (base/250000 + 1) * 250000; m <= base+u.nplain; m += 250000 {
+	pc := int(u.pcode[m-base-1])
+	fmt.Fprintf(os.Stderr, "... 여기까지 평문 %d개, %s %s %s %c%c%c\n", m,
+		rotorName[u.r0], rotorName[u.r1], rotorName[u.r2],
+		pc/676+'A', pc/26%26+'A', pc%26+'A')
+}
+
+@ 나머지 셈은 워커마다 따로 세어 둔 것이라, 더할 것은 더하고 최고 기록은 큰 쪽을
+남긴다. 어느 것이나 순서를 타지 않으므로 워커들이 어떤 차례로 끝났든 결과가 같다.
+
+@<워커들이 센 것을 합친다@>=
+for _, w := range workers {
+	for s := 0; s < maxscore; s++ {
+		tally[s] += w.tally[s]
+	}
+	cases, fails = cases+w.cases, fails+w.fails
+	hardcases, hardfails = hardcases+w.hardcases, hardfails+w.hardfails
+	varsmax, clausesmax = max(varsmax, w.varsmax), max(clausesmax, w.clausesmax)
+	cellsmax, solsmax = max(cellsmax, w.cellsmax), max(solsmax, w.solsmax)
+	setupsmax = max(setupsmax, w.setupsmax)
+	solsbysetupsmax = max(solsbysetupsmax, w.solsbysetupsmax)
+}
 
 @* 셈하기.
 마지막으로 점수 분포와 이런저런 최고 기록을 알린다. 크누스가 이 프로그램을 어디까지
@@ -1264,11 +1434,18 @@ fmt.Println(b.String())
 
 @<전역 변수@>=
 var (
-	count                                  int
-	cases, fails, hardcases, hardfails     int
-	varsmax, clausesmax, cellsmax          int
-	solsmax, setupsmax, solsbysetupsmax    int
+	count                               int
+	cases, fails, hardcases, hardfails  int
+	varsmax, clausesmax, cellsmax       int
+	solsmax, setupsmax, solsbysetupsmax int
 )
+
+@ 워커도 같은 것을 제 몫만큼 센다. 마지막에 더하거나 최댓값을 취해 위의 것에 모은다.
+
+@<워커가 지니는 것@>=
+cases, fails, hardcases, hardfails  int
+varsmax, clausesmax, cellsmax       int
+solsmax, setupsmax, solsbysetupsmax int
 
 @ @<셈한 것을 알린다@>=
 for s := 0; s < maxscore; s++ {
@@ -1283,23 +1460,34 @@ fmt.Fprintf(os.Stderr, "최대 변수 %d개, 절 %d개, 칸 %d개,\n", varsmax, 
 fmt.Fprintf(os.Stderr, " 최대 해 %d개, 설정 %d개, 해 곱하기 설정 %d개.\n",
 	solsmax, setupsmax, solsbysetupsmax)
 
-@ 남은 것은 |main|이 쓰는 지역 변수뿐이다. 여섯 겹 고리의 첨자들과, 이름 있는 절
-여기저기서 함께 쓰는 몇 개다.
+@ 이제 |main|에 남은 지역 변수는 하나뿐이다. 델타 나무를 지을 때 층을 가리키는
+|k|인데, 나무를 짓는 절과 노드를 다는 클로저가 이것을 함께 쓴다.
 
 @<지역 변수@>=
-var r0, r1, r2, p0, p1, p2, k, jj, kk, pp int
+var k int
 
 @* 돌려 보기.
 쓰는 법은 이렇다. 크립과 암호문을 명령줄로 주고, 다섯 글자 빈도를 뜰 원문 파일을
 셋째 인자로 준다.
 $$\vbox{\halign{\.{#}\hfil\cr
-enigmatic-puzzle ENIGMATICALLY WMGQR...QAEGI VOL1TEXT\cr}}$$
-원문 \.{VOL1TEXT}은 크누스의 사이트에 있다. TAOCP 1권의 본문에서 빈칸과 부호와
+enigmatic-puzzle ENIGMATICALLY WMGQR...QAEGI VOL1TEXT.txt\cr}}$$
+원문 \.{VOL1TEXT.txt}은 크누스의 사이트에 있다. TAOCP 1권의 본문에서 빈칸과 부호와
 숫자와 수식을 걷어내고 대문자로 바꾼 $90$만 자짜리 문자열이다.
 $$\vbox{\halign{\.{#}\hfil\cr
-curl -O https://www-cs-faculty.stanford.edu/\TILDE/knuth/programs/VOL1TEXT\cr}}$$
-내 노트북에서 CPU 시간으로 $2$시간 $4$분이 걸렸다. 크누스의 \CEE/ 원본을 같은
-기계에서 돌린 것과 견주면 찍히는 줄이 이천사십 개 모두 한 글자도 다르지 않다.
+curl -O https://www-cs-faculty.stanford.edu/\TILDE/knuth/programs/VOL1TEXT.txt\cr}}$$
+내 노트북은 Apple M1 Max다. 성능 코어가 여덟에 효율 코어가 둘이라
+|runtime.NumCPU|이 열을 내놓는다. 거기서 벽시계로 $16$분 $39$초가 걸렸다. 나누어
+맡기기 전에는 같은 기계에서 $2$시간 $4$분 $26$초가 걸렸으니 $7.47$배다.
+
+@ 크누스의 \CEE/ 원본을 같은 기계에서 돌린 것과 견주면 찍히는 줄이 이천사십 개 모두
+한 글자도 다르지 않다.
+
+나누어 맡긴 판은 나누기 전 판과 통째로 견주었다. 표준 출력 이천사십 줄은 말할 것도
+없고, 표준 오류로 나가는 진행 상황 열세 줄과 마지막 셈까지 한 바이트도 다르지 않았다.
+진행 상황 줄이 특히 마음에 걸렸는데---그 줄에 찍히는 회전량은 워커가 |pcode|에 적어
+둔 것을 칸 경계 너머로 되짚어 꺼낸 것이라 되풀기에서 가장 손이 많이 간 자리다---
+$25$만 번째부터 $325$만 번째까지 열세 줄이 모두 제자리에 제 값으로 찍혔다.
+|go build -race|로도 돌려 보았으나 아무 말이 없었다.
 
 @ 걸러지는 모습이 볼만하다. 시작할 때 따져야 할 시나리오는 크립을 놓을 자리
 $113$곳 가운데 반사판 규칙으로 살아남은 $63$곳에, 로터 고르기 $60$가지와 회전량
@@ -1317,12 +1505,12 @@ PHILO SOPHE RSWHE NTHEY WROTE ANYTH INGTO OEXCE LLENT FORTH EVULG ARTOK\cr
 NOWEX PRESS EDITE NIGMA TICAL LYTHA TTHES ONSOF ARTON LYMIG HTUND ERSTA NDITX\cr}}$$
 빈칸을 도로 넣으면 이렇다.
 
-{\eightpoint
-  \baselineskip 10pt
+{\ninepoint
+  \baselineskip 11pt
   \parfillskip 0pt
   \interlinepenalty 10000
   \leftskip 0pt plus 40pc minus \parindent
-  \let\rm=\eightss \let\sl=\eightssi
+  \let\rm=\niness \let\sl=\ninessi
   \everypar{\sl}
 \def\author#1(#2){\smallskip\noindent\rm--- #1\unskip\enspace(#2)}
 Philosophers when they wrote any thing too excellent
