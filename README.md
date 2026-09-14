@@ -453,6 +453,24 @@ does not reach into them — build those from inside (`cd life-game && make`).
   pruning bound, written as a `goto` state machine. A Korean literate essay
   retelling of Knuth's CWEB `topswops-fwd.w`, with MetaPost figures (the
   five-label state machine, and the pruning bound).
+* [ulam-gibbs.w](ulam-gibbs.w) — Knuth's **ULAM-GIBBS**, which computes
+  billions of *Ulam numbers* (1, 2, 3, 4, 6, 8, 11, … — each the least number
+  that is a sum of two earlier ones in exactly one way) by Philip Gibbs's
+  method. Steinerberger noticed that U_n/λ mod 1, with λ ≈ 2.443443, almost
+  always falls in [1/3..2/3]; Gibbs turned that into an O(N) algorithm that
+  settles each candidate either by a short brute-force search over a window of
+  recent Ulams or by anchoring on a short sorted list of *outliers*, while an
+  18-bits-per-byte code packs the ulamness table into .778N bytes. Porting it
+  turned up a real bug in the CWEB original: `else @<outlier tests@>;` tangles
+  without braces, so the `else` governs only the first statement, and the
+  anchor loops also run, with stale bounds, after every brute-force search that
+  finds no representation. With the default λ that happens once (u = 25) and
+  is harmless, but with coarse approximations the C program prints wrong Ulam
+  numbers — `p22 q9` goes astray from U₇₀₀ on — while the Go port, whose braces
+  are mandatory, agrees with a direct count. Verified against the C original
+  with those braces restored on 47 option combinations: stdout, stderr, mems
+  and the METAPOST histogram all identical. The histogram the program draws
+  for N = 10⁶ is inlined as the document's figure. Korean.
 * [wc.w](wc.w) — a literate word-count program; its tangled
   output matches the system `wc`. It also shows `@f` setting a user type in bold.
 * [word-cube-dlx.w](word-cube-dlx.w) — the same symmetric word cubes as
