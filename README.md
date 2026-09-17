@@ -325,6 +325,24 @@ does not reach into them — build those from inside (`cd life-game && make`).
   the clinamen's share). Uses
   [go-sgb](https://github.com/sjnam/go-sgb). English, three MetaPost figures
   drawn inline by luamplib.
+* [perfect-partition-square.w](perfect-partition-square.w) — Knuth's
+  **PERFECT-PARTITION-SQUARE**, on a puzzle of Michael Keller's: place seven
+  7s, …, seven 1s in a 7×7 square so that its 14 rows and columns exhibit all
+  14 partitions of 7 into more than one part. Knuth doubted there was a
+  solution, wrote the brute force "as fast as I can", and reported 30885 of
+  them. Porting it turned up a bug that changes the answer: the inner loop's
+  bound `1<<(7*l-m)` shifts a 32-bit `int` by as much as 42, which is undefined
+  in C and on real machines shifts by 42 mod 32 = 10 instead, so nearly all
+  placements of the remaining digits are never tried. Go's `int` is 64 bits, so
+  the same line searches the whole space — and the square turns out to have
+  **16,492,083** solutions, of which Knuth's count is 0.19%. That search is 57
+  core-hours, so the port hands the 1716 subproblems to goroutines and buffers
+  each one's solutions, which keeps the printed output in Knuth's exact order
+  (6h26m wall). Verified three ways: with the shift truncated back to 32 bits it
+  reproduces the original C byte-for-byte (308 lines of output, 1716 progress
+  lines, 30885 solutions); 38 subproblems match a 64-bit-fixed C exactly; and
+  all 164,920 printed solutions pass an independent checker. Knuth's own
+  random-probe estimator sized the job beforehand, 21% low. Korean.
 * [perm.w](perm.w) — **Floyd's random-sampling algorithm**
   (from Bentley's *More Programming Pearls*): draw M distinct integers from
   1…N uniformly in O(M), every subset equally likely, without the collision
