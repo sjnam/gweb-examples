@@ -85,6 +85,19 @@ does not reach into them — build those from inside (`cd life-game && make`).
   +6 / −6 carry trick, with a worked figure). A Go/GWEB port of Knuth's CWEB
   program; its node counts match the original exactly. Korean, one MetaPost
   figure.
+* [back-pi-day.w](back-pi-day.w) — Knuth's **BACK-PI-DAY**, on Johan de
+  Ruiter's puzzle for Pi Day 2018: a 10×10 grid whose cells each point north,
+  south, east or west, and each cell must hold the number of *distinct* labels
+  among the cells it points at; the 32 given labels spell the first 32 digits
+  of π. Candidate labels live in bitmaps, and a vertex is made "stable" by a
+  small backtrack over its successors' labels, pruned by `goal` masks computed
+  from ν, the population count — generalized arc consistency, in effect. An
+  active list picks the smallest unstable vertex round by round; after 301
+  tests in six rounds every bitmap is a singleton, so Knuth's optimism is
+  borne out and no case split is needed. The port matches the C byte-for-byte,
+  including all 197,802 lines of its debugging trace and its 6,865,501 mems,
+  and an independent solver confirms the answer is unique. A MetaPost figure
+  shows the grid with the given and derived labels. Korean.
 * [back-skeleton.w](back-skeleton.w) — Knuth's **BACK-SKELETON**, which
   *composes* multiplication-skeleton puzzles of the kind Junya Take invented:
   given a pattern of asterisks, find a multiplicand, multiplier and special
@@ -451,8 +464,10 @@ does not reach into them — build those from inside (`cd life-game && make`).
   That view is what makes the algorithm legible: blocks are consecutive runs of
   Tarjan's output order, so W only ever asks whether a cut fits above the newest
   component — concretely, whether every *source* of the block above was hit,
-  walking a source list kept accurate by Tarjan's HIT/WHIT lazy deletion. Where C must allocate n+1 shadow vertices to scrape
-  together five more utility fields, the Go record just names all nine. Verified against the C
+  walking a source list kept accurate by Tarjan's HIT/WHIT lazy deletion.
+  Where C must allocate n+1 shadow vertices to scrape
+  together five more utility fields, the Go record just names all nine.
+  Verified against the C
   original — output and mems byte-identical — on the SGB Roget graph and 2230
   random digraphs, including chains, transitive tournaments, and layered graphs
   built to exercise W's merge loop and its path-compressed `src` walk. Uses
