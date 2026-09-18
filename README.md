@@ -77,6 +77,23 @@ does not reach into them — build those from inside (`cd life-game && make`).
   under its wording the five options line up and the offending case disappears.
   Apply them the CWEB way: `gtangle back-20q.w back-20q-backmod9,15.ch`.
   Korean, three MetaPost figures.
+* [back-graceful.w](back-graceful.w) — Knuth's **BACK-GRACEFUL**, which finds
+  every *graceful labeling* of a graph read from a Stanford GraphBase file
+  (via [go-sgb](https://github.com/sjnam/go-sgb)'s `gbsave`): distinct vertex
+  labels in 0..m whose edge differences are exactly 1..m, optionally with some
+  labels prespecified as `VERTEX=label`. Walker's backtrack (Algorithm 7.2.2W)
+  aims each level at the largest missing edge label, keeps used and unused
+  labels in 64-bit maps, forces vertices whose domain has shrunk to one label,
+  and without prespecifications counts only "canonical" labelings, halving the
+  work by complementation. Porting it turned up three flaws, all fixed and
+  documented: `bad` is an `int`, so a duplicate edge label ≥ 32 goes unnoticed —
+  harmless to the answers (a popcount argument shows every printed labeling is
+  still valid) but costing up to 8.9× the nodes on dense graphs; a forced move
+  at level 2 skips the canonical restriction, so P₃ reports 4 canonical
+  labelings instead of 2; and two vertices may be prespecified with the same
+  label, yielding bogus output. Matches the corrected C byte-for-byte, nodes
+  included, on 382 runs, and a brute-force counter confirms the answers.
+  Korean.
 * [back-pdi.w](back-pdi.w) — Knuth's **back-pdi**: find every
   *perfect digital invariant* of order m — an integer equal to the sum of the
   m-th powers of its own digits, like 153 = 1³ + 5³ + 3³. A backtrack that picks
