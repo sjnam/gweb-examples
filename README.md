@@ -85,6 +85,22 @@ does not reach into them — build those from inside (`cd life-game && make`).
   +6 / −6 carry trick, with a worked figure). A Go/GWEB port of Knuth's CWEB
   program; its node counts match the original exactly. Korean, one MetaPost
   figure.
+* [back-skeleton.w](back-skeleton.w) — Knuth's **BACK-SKELETON**, which
+  *composes* multiplication-skeleton puzzles of the kind Junya Take invented:
+  given a pattern of asterisks, find a multiplicand, multiplier and special
+  digit d so that d occurs in the partial products and the product exactly
+  where the pattern says, for every way zeros in the multiplier can offset the
+  rows. A backtrack over the multiplicand's digits from the right, with a
+  choice list per constraint that forces multiplier digits as it goes, and an
+  inner loop over the surviving m-tuples to test the bottom line. Porting it
+  turned up a bug: in `o,tt=(constr[k][0]<=l? 0: o,constr[k][l+1])` the comma
+  binds looser than `?:`, so the length test vanishes and stale digits left by
+  the previous offset turn "must not be d" into "must be d". The original
+  therefore misses Take's own puzzle from its introduction (2208068 × 357029),
+  finding 4707 solutions for the O pattern where there are 68151. The port
+  matches the fixed C byte-for-byte, nodes and mems included, and an
+  independent checker that shares none of the pruning machinery finds the same
+  68151. Korean.
 * [chain_bound.w](chain_bound.w) — the **football-chain challenge** from the
   Stanford GraphBase page, settled exactly: how many points can Stanford run up
   over Harvard through a simple chain of 1990 results? Longest path is NP-hard,
