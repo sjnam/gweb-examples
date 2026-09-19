@@ -52,6 +52,24 @@ The entries below that name a directory rather than a `.w` are separate
 projects, each with its own `README.md`, `Makefile` and `go.mod`. This Makefile
 does not reach into them — build those from inside (`cd life-game && make`).
 
+* [15puzzle-korf1.w](15puzzle-korf1.w) — Knuth's **15PUZZLE-KORF1**, which
+  finds a minimum-move solution of the 15 puzzle by Korf's iterative
+  deepening on the Manhattan bound: first try only "happy" moves, then one
+  "sad" move more, and so on. The inner loop is a finite-state automaton of
+  152 hand-unrolled cases `(r,c,d,p)` — blank at `(r,c)`, entered from `p`,
+  trying `d` — chained by `goto`, with a stack of case codes for backtracking.
+  Go forbids jumping into a `case` block, so the 152 labels sit side by side
+  in one block and a separate `switch` only dispatches; each code is the hex
+  number `0xrcdp`, so the table reads off against the labels at a glance. All
+  152 transitions were machine-checked against Knuth's text and found
+  flawless; the one bug is that an already-solved start prints the seconds
+  since 1970. Matches the C byte-for-byte on 1800 positions (solutions
+  verified move by move). A first Go draft ran 25% slower than the C: `main`
+  holds all 152 cases, so Go's inliner calls it "big" and inlines only
+  functions of cost ≤ 20, and the two-result `east(r,c)` cost 26 — a real call
+  in every case, spilling `s` and `t` to memory. Reading the piece inline and
+  keeping only a one-result `happy(x)` (cost 8) fixed it; Korf's toughest
+  instance `ca6098dfb73254e1` now takes 22 s in Go against 24 s in C. Korean.
 * [back-20q.w](back-20q.w) — Knuth's **back-20q**, which solves Don Woods's
   *Twenty Questions*: a twenty-item multiple-choice quiz whose every question
   talks about the answer sheet it is printed on ("the first question whose
