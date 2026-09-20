@@ -22,8 +22,8 @@
 
 @ 이것은 크누스의 \.{CWEB} 프로그램 \pdfURL{\.{ssham.w}}%
 {https://www-cs-faculty.stanford.edu/\TILDE/knuth/programs/ssham.w}를
-\.{GWEB}으로 옮긴 것이다. 이 저장소에는 이미 \.{sham.w}가 있다. 그것은 크누스의
-\.{SGB} 시연 프로그램 {\mc SHAM}을 옮긴 것으로, $8\times9$ 판 기사 그래프의
+\.{GWEB}으로 옮긴 것이다. 크누스에게는 이름이 닮은 \.{sham.w}가 따로 있다. 그의
+\.{SGB} 시연 프로그램 {\mc SHAM}인데, $8\times9$ 판 기사 그래프의
 {\it 대칭\/} 해밀턴 회로만 센다. 이번 것은 앞에 \.s가 하나 더 붙은 {\mc SSHAM}이고,
 대칭이든 아니든 회로를 모두 센다. 이름이 닮았을 뿐 알고리즘은 전혀 다르다.
 

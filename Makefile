@@ -11,7 +11,7 @@
 # 그림 있는 문서(\input luamplib.sty)는 luatex라야 하고---luamplib 은 \directlua 를
 # 쓰므로 pdftex 로는 돌지 않는다---나머지 영문 문서도 목차까지 그대로 나온다.
 # 매크로(gwebmac.tex, kotexgweb.tex)는 설치된 texmf 트리에서 자동으로 찾는다.
-# 변경 파일 .ch 를 적용하려면 수작업으로 부른다(예: gtangle wc.w wc.ch).
+# 변경 파일 .ch 를 적용하려면 수작업으로 부른다(예: gtangle matula.w matula-big.ch).
 
 GTANGLE ?= gtangle
 GWEAVE  ?= gweave
