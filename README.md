@@ -1,723 +1,638 @@
-# GWEB examples
+# GWEB 예제
 
-[GWEB](https://github.com/sjnam/gweb) is a literate programming system for Go,
-modeled closely on Knuth and Levy's **CWEB**. You write one `.w` file that
-interleaves TeX prose with Go code, and two tools read it in opposite
-directions: `gtangle` extracts the compilable `.go` for the machine, `gweave`
-typesets a cross-referenced document for people. The program and the essay
-explaining it are not two artifacts kept in sync — they are one file.
+[GWEB](https://github.com/sjnam/gweb)은 Go를 위한 문학적 프로그래밍 시스템이다.
+크누스와 레비의 **CWEB**을 가까이 본떴다. 확장자 `.w` 파일 하나에 TeX 산문과 Go
+코드를 엮어 두면, 도구 둘이 그것을 서로 반대 방향으로 읽는다. 도구 `gtangle`은
+기계가 읽을 `.go`를 뽑아내고, `gweave`는 사람이 읽을 상호 참조 문서를 조판한다.
+프로그램과 그것을 설명하는 글은 따로 맞춰 두는 두 산출물이 아니다. 하나의
+파일이다.
 
-This repository collects programs written that way. The range is deliberate:
-tutorials on what Go itself can do (range-over-func iterators, channel
-pipelines, generics), expositions of algorithms worth understanding (zip trees,
-suffix automata, the FFT), contest problems from HackerRank, Codeforces,
-LeetCode, Library Checker and Project Euler, and ports of Knuth's own CWEB
-programs. Most of the recent ones are written as Korean essays.
+이 저장소는 그렇게 쓴 프로그램을 모은 것이다. 범위는 일부러 넓게 잡았다. Go
+자체가 무엇을 할 수 있는지 보여 주는 길잡이(range-over-func 이터레이터, 채널
+파이프라인, 제네릭), 알아 둘 만한 알고리즘의 해설(짚트리, 접미사 오토마톤, FFT),
+HackerRank·Codeforces·LeetCode·Library Checker·Project Euler의 문제 풀이, 그리고
+크누스의 CWEB 프로그램을 옮긴 것들이다. 최근 것은 대부분 한글 에세이로 썼다.
 
-They are here to show what GWEB looks like when actually used — and, one hopes,
-to be worth reading on their own. Start with the PDF a `.w` weaves into; that is
-the side meant for human eyes.
+이것들은 GWEB을 실제로 쓰면 어떤 모습인지 보이려고 있고, 바라건대 그 자체로도
+읽을 만하려고 있다. 파일 `.w`가 짜 내는 PDF부터 보기를 권한다. 그쪽이 사람의
+눈을 위한 면이다.
 
-## Building
+## 빌드
 
-A [Makefile](Makefile) builds any example by its name (the `.w` basename):
+[Makefile](Makefile)은 예제를 이름(`.w`의 기본 이름)으로 빌드한다.
 
 ```sh
-make ziptree   # ziptree.w -> ziptree.go (+ any @( ) files) + ziptree.pdf
-make           # show usage
-make clean     # remove all generated files, keeping the .w/.ch sources
+make ziptree   # ziptree.w -> ziptree.go (+ @( ) 로 뽑는 파일들) + ziptree.pdf
+make           # 사용법 보기
+make clean     # .w/.ch 원본만 남기고 생성물 삭제
 ```
 
-Build one example at a time (there is no `make all`): nearly every tangled
-`.go` is a `package main` with its own `main()`, so emitting them into one
-directory at once would make Go refuse to compile (`main` redeclared).
+예제는 한 번에 하나씩 빌드한다(`make all`은 없다). 짜 낸 `.go`는 거의 모두
+저마다 `main()`을 가진 `package main`이라, 한 디렉터리에 한꺼번에 풀면 Go가
+`main` 중복으로 컴파일을 거부한다.
 
-Everything is typeset with **luatex**, whatever the language and whether or not
-there are figures. Korean documents (`\input kotexgweb.tex`, see below) and
-illustrated ones (`\input luamplib.sty`) need it; the rest come out the same as
-they did under `pdftex`, table of contents and all.
+조판은 언어를 가리지 않고, 그림이 있든 없든 모두 **luatex**으로 한다. 한글
+문서(`\input kotexgweb.tex`, 아래 참조)와 그림 있는 문서(`\input
+luamplib.sty`)는 luatex이라야 하고, 나머지도 `pdftex`으로 뽑던 것과 목차까지
+그대로 나온다.
 
-Figures need no build step of their own. **luamplib** runs MetaPost inline while
-the document is being typeset — no `mpost` pass, no intermediate PDFs, and
-figure labels are set in the document's own fonts. A document with a single
-figure carries the MetaPost right inside its `.w`; one with several keeps them
-in `<name>.mp` as named macros (`fig_...`) and pulls them in with
-`\everymplib{input <name>;}`, calling each by name where it belongs.
+그림에는 따로 빌드 단계가 필요 없다. **luamplib**이 문서를 조판하는 동안
+MetaPost를 그 자리에서 돌린다. 따로 도는 `mpost` 단계도, 중간 PDF도 없고, 그림의
+라벨은 문서 자신의 글꼴로 짜인다. 그림이 하나뿐인 문서는 MetaPost를 `.w` 안에
+바로 담고, 여럿인 문서는 `<이름>.mp`에 이름 붙인 매크로(`fig_...`)로 두었다가
+`\everymplib{input <이름>;}`으로 읽어들여 필요한 자리마다 이름으로 부른다.
 
-Only sources are tracked: the `.w`/`.ch` programs and the MetaPost figure
-libraries (`*.mp`). Every `.go` and every PDF here is generated, so you will
-not find one until you build it.
+추적하는 것은 원본뿐이다. 곧 `.w`/`.ch` 프로그램과 MetaPost 그림
+라이브러리(`*.mp`)가 그것이다. 여기 있는 `.go`와 PDF는 모두 생성물이니, 빌드하기
+전에는 없다.
 
-The entries below that name a directory rather than a `.w` are separate
-projects, each with its own `README.md`, `Makefile` and `go.mod`. This Makefile
-does not reach into them — build those from inside (`cd life-game && make`).
+아래 목록에서 `.w`가 아니라 디렉터리를 가리키는 항목은 저마다 `README.md`,
+`Makefile`, `go.mod`를 갖춘 별개의 프로젝트다. 이 저장소의 Makefile은 그 안으로
+들어가지 않으니, 그것들은 안에서 빌드한다(`cd life-game && make`).
 
-* [15puzzle-korf1.w](15puzzle-korf1.w) — Knuth's **15PUZZLE-KORF1**, which
-  finds a minimum-move solution of the 15 puzzle by Korf's iterative
-  deepening on the Manhattan bound: first try only "happy" moves, then one
-  "sad" move more, and so on. The inner loop is a finite-state automaton of
-  152 hand-unrolled cases `(r,c,d,p)` — blank at `(r,c)`, entered from `p`,
-  trying `d` — chained by `goto`, with a stack of case codes for backtracking.
-  Go forbids jumping into a `case` block, so the 152 labels sit side by side
-  in one block and a separate `switch` only dispatches; each code is the hex
-  number `0xrcdp`, so the table reads off against the labels at a glance. All
-  152 transitions were machine-checked against Knuth's text and found
-  flawless; the one bug is that an already-solved start prints the seconds
-  since 1970. Matches the C byte-for-byte on 1800 positions (solutions
-  verified move by move). A first Go draft ran 25% slower than the C: `main`
-  holds all 152 cases, so Go's inliner calls it "big" and inlines only
-  functions of cost ≤ 20, and the two-result `east(r,c)` cost 26 — a real call
-  in every case, spilling `s` and `t` to memory. Reading the piece inline and
-  keeping only a one-result `happy(x)` (cost 8) fixed it; Korf's toughest
-  instance `ca6098dfb73254e1` now takes 22 s in Go against 24 s in C. Korean.
-* [back-20q.w](back-20q.w) — Knuth's **back-20q**, which solves Don Woods's
-  *Twenty Questions*: a twenty-item multiple-choice quiz whose every question
-  talks about the answer sheet it is printed on ("the first question whose
-  answer is A is…", "the maximum score that can be achieved on this test is…").
-  A backtrack over five-bit candidate sets, splitting each question into the
-  part that can be decided on the spot and the part that must wait until all
-  twenty letters are known, with one forced letter cascading down the row of
-  neighbours. The document quotes all twenty questions (try it yourself before
-  reading on) and then turns each into code, one section apiece. Two errors in
-  the published CWEB are found and fixed along the way — an unreachable line
-  that made question 18 impossible to get wrong, and an inverted test that let
-  question 15 be marked wrong while it was in fact right — costing the original
-  14 valid answer sheets and gaining it 5 invalid ones, though the puzzle's own
-  answer survives untouched: the best possible score is 19, and exactly one
-  sheet reaches it with question 20 answered correctly. Verified against the
-  corrected original on all 211 falsity patterns, against an independent
-  re-grader written from the English text, and against a dozen different search
-  orderings. Knuth's two change files come along as GWEB change files
-  ([back-20q-backmod9,15.ch](back-20q-backmod9,15.ch),
-  [back-20q-backmod9,15-indet.ch](back-20q-backmod9,15-indet.ch)), each
-  reworking a couple of the questions and reporting its own answer — and the
-  first of them shows where the question-15 bug most likely came from, since
-  under its wording the five options line up and the offending case disappears.
-  Apply them the CWEB way: `gtangle back-20q.w back-20q-backmod9,15.ch`.
-  Korean, three MetaPost figures.
-* [back-graceful.w](back-graceful.w) — Knuth's **BACK-GRACEFUL**, which finds
-  every *graceful labeling* of a graph read from a Stanford GraphBase file
-  (via [go-sgb](https://github.com/sjnam/go-sgb)'s `gbsave`): distinct vertex
-  labels in 0..m whose edge differences are exactly 1..m, optionally with some
-  labels prespecified as `VERTEX=label`. Walker's backtrack (Algorithm 7.2.2W)
-  aims each level at the largest missing edge label, keeps used and unused
-  labels in 64-bit maps, forces vertices whose domain has shrunk to one label,
-  and without prespecifications counts only "canonical" labelings, halving the
-  work by complementation. Porting it turned up three flaws, all fixed and
-  documented: `bad` is an `int`, so a duplicate edge label ≥ 32 goes unnoticed —
-  harmless to the answers (a popcount argument shows every printed labeling is
-  still valid) but costing up to 8.9× the nodes on dense graphs; a forced move
-  at level 2 skips the canonical restriction, so P₃ reports 4 canonical
-  labelings instead of 2; and two vertices may be prespecified with the same
-  label, yielding bogus output. Matches the corrected C byte-for-byte, nodes
-  included, on 382 runs, and a brute-force counter confirms the answers.
-  Korean.
-* [back-pdi.w](back-pdi.w) — Knuth's **back-pdi**: find every
-  *perfect digital invariant* of order m — an integer equal to the sum of the
-  m-th powers of its own digits, like 153 = 1³ + 5³ + 3³. A backtrack that picks
-  the digits in nonincreasing order and prunes hard with sharp lower/upper
-  bounds, over a binary-coded-decimal bignum that needs only addition (the
-  +6 / −6 carry trick, with a worked figure). A Go/GWEB port of Knuth's CWEB
-  program; its node counts match the original exactly. Korean, one MetaPost
-  figure.
-* [back-pi-day.w](back-pi-day.w) — Knuth's **BACK-PI-DAY**, on Johan de
-  Ruiter's puzzle for Pi Day 2018: a 10×10 grid whose cells each point north,
-  south, east or west, and each cell must hold the number of *distinct* labels
-  among the cells it points at; the 32 given labels spell the first 32 digits
-  of π. Candidate labels live in bitmaps, and a vertex is made "stable" by a
-  small backtrack over its successors' labels, pruned by `goal` masks computed
-  from ν, the population count — generalized arc consistency, in effect. An
-  active list picks the smallest unstable vertex round by round; after 301
-  tests in six rounds every bitmap is a singleton, so Knuth's optimism is
-  borne out and no case split is needed. The port matches the C byte-for-byte,
-  including all 197,802 lines of its debugging trace and its 6,865,501 mems,
-  and an independent solver confirms the answer is unique. A MetaPost figure
-  shows the grid with the given and derived labels. Korean.
-* [back-skeleton.w](back-skeleton.w) — Knuth's **BACK-SKELETON**, which
-  *composes* multiplication-skeleton puzzles of the kind Junya Take invented:
-  given a pattern of asterisks, find a multiplicand, multiplier and special
-  digit d so that d occurs in the partial products and the product exactly
-  where the pattern says, for every way zeros in the multiplier can offset the
-  rows. A backtrack over the multiplicand's digits from the right, with a
-  choice list per constraint that forces multiplier digits as it goes, and an
-  inner loop over the surviving m-tuples to test the bottom line. Porting it
-  turned up a bug: in `o,tt=(constr[k][0]<=l? 0: o,constr[k][l+1])` the comma
-  binds looser than `?:`, so the length test vanishes and stale digits left by
-  the previous offset turn "must not be d" into "must be d". The original
-  therefore misses Take's own puzzle from its introduction (2208068 × 357029),
-  finding 4707 solutions for the O pattern where there are 68151. The port
-  matches the fixed C byte-for-byte, nodes and mems included, and an
-  independent checker that shares none of the pruning machinery finds the same
-  68151. Korean.
-* [chain_bound.w](chain_bound.w) — the **football-chain challenge** from the
-  Stanford GraphBase page, settled exactly: how many points can Stanford run up
-  over Harvard through a simple chain of 1990 results? Longest path is NP-hard,
-  but dropping connectivity leaves an assignment problem, and the Hungarian
-  algorithm's O(n³) answer is an upper bound; branch on an edge of a cycle when
-  the assignment is not already a path. The bound is so tight that best-first
-  search proves 2473 (Stanford–Harvard) in 351 nodes, 2358 (Harvard–Stanford) in
-  51, and 2542 (Penn State–Columbia) — the maximum over all pairs — in one,
-  matching the three values the challenge page records. A chapter dissects the
-  root relaxation to show why. Uses
-  [go-sgb](https://github.com/sjnam/go-sgb); needs `games.dat`. English.
-* [commafree-eastman.w](commafree-eastman.w) — Knuth's **COMMAFREE-EASTMAN**:
-  Eastman's 1965 algorithm, iteratively. Given a sequence of odd length that
-  equals none of its cyclic shifts, it picks the one shift such that the chosen
-  shifts form a comma-free code — the construction that settled a conjecture of
-  Golomb, Gordon and Welch. The word is cut into subwords by boundary markers,
-  and each phase keeps just one marker in every odd-length *range* between
-  consecutive *basins* (the Nevada terminology is Knuth's), so ⌊log₃ n⌋ phases
-  suffice. Checked against the CWEB original on 26830 runs — every sequence of
-  length 3, 5, 7 or 9 over a two- or three-letter alphabet, plus 4000 random
-  ones up to length 105 — with one deliberate difference: `strconv.Atoi` refuses
-  the trailing garbage that `sscanf("%d")` quietly accepts. Korean, one MetaPost
-  figure.
-* [dlx-pre.w](dlx-pre.w) — Knuth's **DLX-PRE**, the *preprocessor* of his
-  exact-cover series: it reads a `.dlx` problem and writes an equivalent one with
-  the unnecessary options and items removed. Two rules do the work — if every
-  option containing a primary item *p* also contains an uncolored *c*, then *c*
-  and every option holding *c* without *p* can go; and if every option containing
-  *p* clashes with option *r*, then *r* can go — applied by hiding one item at a
-  time in the dancing-links structure, with no auxiliary tables, since nodes
-  pulled from a doubly linked list still remember their neighbours. The knot in
-  the port is a `goto` Knuth is proud of: on hitting a blocked item he jumps out
-  of the hiding loop straight into the *middle* of the undoing loop, the trick he
-  defended in "Structured programming with go to statements" (1974). Go cannot
-  jump into a block, so a `blocked` flag plus a labelled `break` reproduces the
-  flow exactly. Verified against the CWEB original — stdout byte-identical, mems
-  and verbose logs identical — on 2496 runs over 612 generated problems, the
-  pentomino and filomino boards from
-  [dancing-cells](https://github.com/sjnam/dancing-cells), and every panic path.
-  The document also notes two slips in the original's §3, where the sample output
-  shows `C` for `E` and a `|` that the program does not print. Korean.
-* [dragon-calc.w](dragon-calc.w) — Knuth's **dragon-calc**: an interactive
-  calculator for Dekking's generalized dragon curves and the calculus of tiles
-  from his *diamonds and dragons* notes. Fold sequences of `D`s and `U`s, the
-  folding product that doubles (or quintuples) a curve, tiles as Gaussian
-  integers with odd coordinate sum, congruence classes mod (2+2i)z via a
-  Hermite-normal-form basis found by Euclid on imaginary parts, factoring tiles
-  over plane-filling paths, and MetaPost output. A Go/GWEB port of Knuth's 2010
-  CWEB program whose answers match the original line for line; the `goto` web
-  became a labeled loop, the 134 MB static table became an exact allocation, and
-  a divide-by-zero on closed paths is now caught. Korean, two MetaPost figures.
-* [enigmatic-puzzle.w](enigmatic-puzzle.w) — Knuth's **enigmatic-puzzle**,
-  which breaks the 125-character Enigma message posed in TAOCP 7.2.2.8. Given
-  nothing but the ciphertext and one crib word (`ENIGMATICALLY`), it recovers the
-  rotor choice and order, the ring settings, the start position, the plugboard,
-  and the plaintext. Five of Knuth's programs are fused into one pipeline here, so
-  the document runs through all of them: the **machine** itself (three rotors from
-  five, reflector B, the double-stepping quirk, and the fatal flaw that no letter
-  ever enciphers to itself — which kills 50 of the 113 crib positions in a single
-  line); the **delta tree**, which sidesteps the unknown ring settings by tracking
-  only how far each rotor has turned, and has exactly 2k+1 nodes on level k; the
-  **bombe**, a union-find over the 351 unordered letter pairs, where taking the
-  pairs unordered *is* Welchman's diagonal board; the improved filter that merges
-  all forced classes into one giant class; a stripped-down watched-literal SAT
-  solver that enumerates every plugboard consistent with the surviving classes;
-  the arithmetic that turns a delta path back into start positions and ring
-  settings; and finally five-gram statistics to pick the one candidate out of
-  3,331,188 that is actually English. It is, and it comes from a 1653 book on
-  alchemy. Verified line-for-line against Knuth's C original over the full
-  million-configuration sweep. Three latent buffer problems in the original are
-  fixed and explained: `move[64]` is indexed up to the variable count, which Knuth
-  himself notes can exceed 64 — and the full run proves it does, reporting
-  `max vars 79`; `plugs[…][26]` has no room for the sentinel when a
-  plugboard has no plugs at all; and an at-least-one clause with no literals reads
-  an unwritten cell. Woven with the history — Scherbius, Rejewski and the Polish
-  bomba, Pyry, Turing, Welchman. The sweep is also split across goroutines:
-  profiling put 72% of the time inside the bombe's union step, where path
-  compression, narrower arrays and a struct-of-fields layout all turned out
-  slower, but the configurations share nothing, so ten workers cut a 2h04m26s run
-  to 16m10s on an M1 Max. Output stays byte-identical, and still streams: what to
-  print depends on everything before it, so a unit's lines are fixed only once
-  every earlier unit is done — each worker collects a superset of what could
-  print, then flushes the finished prefix in order. Slicing the sweep into 1560
-  units rather than 60 gets the first line out in 6.4 seconds, and turns out to
-  be *faster* overall (shorter tail) despite rebuilding the rotor table per unit.
-  Even the 13 stderr progress lines land unchanged. Korean, two MetaPost figures.
-  Needs Knuth's `VOL1TEXT` (a 900 KB file on his site) for the five-gram counts.
-* [floyd.w](floyd.w) — Floyd's partition problem, the classic
-  "toy problem" Knuth discusses in *Are Toy Problems Useful?*: partition
-  √1…√50 into two nearly-equal halves. A worked literate solution
-  (meet-in-the-middle search, Gray-code enumeration, compensated summation, and
-  a `math/big` verification).
-* [hopcroft-karp.w](hopcroft-karp.w) — Knuth's **hopcroft-karp**: maximum
-  bipartite matching in O((t+n)·sqrt(m)) by finding, in each round, a maximal set
-  of vertex-disjoint *shortest* augmenting paths at once instead of one path at a
-  time. Half the document is the proof: the symmetric difference of two matchings
-  splits into cycles and paths, which gives Berge's lemma; an augmentation
-  destroys a component without creating a shorter one, so path length strictly
-  grows; and after round r the matching is already r/(r+1) of optimal, which
-  bounds the rounds by 2·sqrt(s). Knuth's `goto enter_level` / `goto advance`
-  become one loop where `continue` *is* the advance. Two additions to the
-  original. Knuth defines rank k for a path of length 2k-1 but then prints (and
-  later argues with) `final_level`, which is one less; the port picks the
-  definition and says so. And since the last, failed breadth-first search has
-  already computed exactly the alternating-reachable set, the program can hand
-  back a minimum vertex cover of the same size as the matching — a Kőnig
-  certificate that the answer is optimal, checkable by eye. Verified against the C
-  original on 1200 random instances: identical matchings, rounds, and dag arcs,
-  cross-checked against an independent implementation, with every cover valid and
-  exactly the right size. The last chapter takes up the exercise Knuth leaves at
-  the end — that round 1 deserves a faster custom implementation. It does, and the
-  reason is that `final_level` is necessarily 0 in round 1, so the depth-first
-  search never descends and the whole round is a greedy maximal matching computed
-  the long way round, through a dag of t arcs written and immediately read back.
-  Replacing it with eight lines of greedy makes round 1 about 4x faster (69% of
-  the running time down to 41%) and the whole matching 1.6-2.3x faster, at the
-  cost of a different starting matching that changes the round count either way in
-  about one instance in five. Behind a flag, so the default still reproduces
-  Knuth's output exactly. Korean, three MetaPost figures.
-* [hyperbolic.w](hyperbolic.w) — Knuth's **hyperbolic**, which computes the
-  unique tiling of the hyperbolic plane by 36°-45°-90° triangles. Points live in
-  the upper half plane, "lines" are semicircles centred on the real axis, and the
-  whole tiling grows from one triangle by repeatedly reflecting a vertex in the
-  opposite edge — an inversion in a circle. Restricting the work to one
-  quarter-annulus makes 301 triangles enough for the entire plane, and the trick
-  that makes the restriction free is a vertical "circle" of centre 0 that the
-  algorithm then declines to cross. Ten of these triangles make a regular
-  pentagon, so this is Margenstern's pentagrid in disguise, and the golden ratio
-  duly appears in the starting coordinates. Where Knuth wrote the neighbour
-  computation out three times and copied 667 arcs into his `.mp` file by hand,
-  the Go port folds the three into one indexed loop and emits the MetaPost
-  itself — all 667 arcs agree with his to the last printed digit, even though the
-  underlying coordinates differ by up to 3.3e-13 because compilers fuse
-  multiply-add differently. That they still produce the identical tiling is
-  exactly what the fuzzy binary-search dictionary is for. Korean, four MetaPost
-  figures.
-* [koda-ruskey.w](koda-ruskey.w) — Knuth's **koda-ruskey**: generate every
-  *ideal of a forest poset* — all bitstrings in which a bit may be 1 only if
-  its parent's is — as a generalized reflected Gray code, one bit changing per
-  step. Two implementations of the same sequence, side by side: one coroutine
-  per node, and a loopless one whose every step is a bounded number of
-  operations on a four-link *fringe*. Where the CWEB original hand-simulates
-  coroutines with a ten-state `switch`, this port writes them out as goroutines
-  rendezvousing on unbuffered channels, so the six-line coroutine body survives
-  intact. Korean, three MetaPost figures.
-* [li-ruskey.w](li-ruskey.w) — Knuth's **li-ruskey**, the sequel to
-  `koda-ruskey`: the constraints now carry *directions*, so instead of a forest
-  poset the input is any totally acyclic digraph, and the job is to list every
-  0/1 labeling respecting `x → y ⟹ bit x ≤ bit y` as a Gray path whose root bit
-  flips exactly once. Near-positive and near-negative vertex sets, the
-  mixed-radix reflected code that splices two half-paths into one, entourages
-  and transition strings, and a fringe that stays loopless by leaving *stale*
-  links behind a travelling flag. Knuth left the coroutine version as an
-  exercise, noting that its parent pointers would have to be dynamic; this port
-  does that exercise with goroutines, where the difficulty evaporates (the call
-  stack *is* the parent pointer) and each coroutine picks its entry point by
-  reading its own bit as it first wakes. Both implementations run in one
-  program and agree line for line with the CWEB original, `-v` output included.
-  Korean, four MetaPost figures.
-* [matula.w](matula.w) — Knuth's **matula**: is the free tree *S* isomorphic to a
-  subtree of the free tree *T*? Subgraph isomorphism is NP-complete in general —
-  clique and Hamiltonian path are special cases — but for trees David W. Matula's
-  1978 algorithm settles it in O(mn·sqrt(max inner degree)). The reason to read it
-  right after [hopcroft-karp.w](hopcroft-karp.w) is that its inner loop *is*
-  bipartite matching: node p of S embeds at v of T exactly when p's children can be
-  matched to distinct neighbours of v, and Matula's insight is that all s+1 versions
-  of that subproblem (one per choice of which neighbour plays the parent) collapse
-  into one, saving a factor of n. Knuth said he stole the matching code from
-  HOPCROFT-KARP; we had just translated it. The climax is Matula's Theorem 3.4: the
-  girls who can be freed from a perfect matching are precisely those left in the
-  breadth-first queue when HK stops, so the answer is already lying in the dag.
-  Instrumented with Knuth's mems, and the port reproduces his count exactly —
-  1917+14760 on his own example, and on 1100 random tree pairs the answers, the
-  printed embeddings, and the mem counts all agree. Getting there needed care: C's
-  comma operator becomes either a prefixed `mems++` or a multiple assignment like
-  `mems, k = mems+1, next[k]`, and an `o` sitting inside a `&&` is charged to only
-  one of the two conditions — missing that cost 119 phantom mems. There was also a
-  real defect in the version this was translated from: `thresh` was declared with
-  maxn entries but read at index maxn when T's maximum degree is 61, and the loop
-  that filled it stopped short of the entry solve() needs whenever T's maximum
-  degree reached S's node count. It survives only because the neighbouring word
-  happens to hold zero — planting a chosen value there makes the old code answer 62
-  where 61 is right. Knuth revised the file on 2026-08-21, while this was being
-  written, and fixed exactly those two places: the array grows by one entry, as
-  here, and the missing slot is filled a different way at the same cost, so the mem
-  counts now agree with his on every input tested. Knuth keeps three change files
-  beside his own program, and all three are ported here.
-  [matula-big.ch](matula-big.ch) swaps the command-line parent-pointer strings
-  for *rectree* files, so maxn grows from 62 to 2000; since that format does
-  not promise S's root is a leaf, it also re-roots S and renumbers it
-  internally, reporting the user's own numbers back.
-  [matula-big-planted.ch](matula-big-planted.ch) takes only T and grows S by
-  deleting d random leaves from it — SGB's `gb_flip` through
-  [go-sgb](https://github.com/sjnam/go-sgb), so the same seed deletes the same
-  leaves as Knuth's C — which makes S certainly a subtree and turns the
-  question into how fast the algorithm finds it. Apply them the CWEB way:
-  `gtangle matula.w matula-big.ch`. Both match Knuth's C to the mem —
-  3221+14939 and 5750+36561 on his own examples, and over 660 random tree pairs
-  and 500 random trees the answers, exit codes and mem counts all agree. The
-  planted one's prose documents a defect it faithfully inherits: when the root
-  itself is deleted, the still-unrepaired `child` pointer can name an
-  already-deleted node, and both programs then stop with "I'm confused!" — 134
-  of 200 seeds when 124 of 127 nodes go.
-  [matula-exhaustive.ch](matula-exhaustive.ch) drops the command line's two trees
-  for two *counts* and runs every pair of free trees on *m* and *n* nodes, so maxn
-  falls from 62 to 16. Getting each free tree exactly once is the interesting
-  part: a trie of canonical level sequences for oriented forests (TAOCP exercise
-  7.2.1.6–90) yields the centroidal trees, and pairs of half-size forests yield
-  the bicentroidal ones. Knuth writes that machinery twice, once for S and once
-  for T; here it is one `family` type with `first`/`next`/`nth`, which also
-  merges his two `make_?string` routines into one. It reports Welford mean and
-  variance of the mems per pair, the hardest pair, and which trees embed into the
-  most and fewest others. Matched against the C on all 79 (m, n) pairs whose tree
-  counts multiply to at most 200000 — output, exit codes and mems identical, e.g.
-  2407+426125 at m = n = 8. Korean, three MetaPost figures.
-* [ntt.w](ntt.w) — a friendly guide to the **fast Fourier
-  transform** and its integer cousin, the **number theoretic transform**: the
-  evaluate–multiply–interpolate detour, why squaring folds the roots of unity
-  so the problem halves, bit reversal and the butterfly network, the inverse
-  transform, what NTT actually needs from a ring (and why
-  998244353 = 119·2²³+1), and the surprising history from Gauss (1805) to
-  Harvey–van der Hoeven (2021). Three MetaPost figures. The working program it
-  builds toward solves Library Checker's *Convolution (mod 998244353)* —
-  polynomial multiplication in O(n log n). Korean.
-* [pairsums.w](pairsums.w) — HackerRank's *Pair Sums*: the
-  largest pair-product sum over all subarrays. The identity value = (S²−Q)/2
-  and a prefix-sum twist turn it into the upper envelope of a family of lines,
-  solved with a **Li Chao tree** in O(n log n).
-* [perec.w](perec.w) — Georges Perec's *Life A User's Manual* rebuilt from its
-  two constraints. The novel's 99 chapters walk a knight's tour of a 10×10 grid
-  of rooms, all but the cellar at (1,10) — the *clinamen*, Perec's deliberate
-  flaw, which forces one illegal diagonal step between chapters 65 and 66. The
-  program builds the knight board with SGB's `Board`, then verifies Perec's
-  order **against the board's own arcs** rather than trusting the transcription;
-  it also runs Warnsdorff's rule to produce a genuinely flawless tour for
-  comparison, and reconstructs the order-10 Graeco-Latin square that decides
-  what each chapter contains (99 of its 100 pairs are used; the missing one is
-  the clinamen's share). Uses
-  [go-sgb](https://github.com/sjnam/go-sgb). English, three MetaPost figures
-  drawn inline by luamplib.
-* [perfect-partition-square.w](perfect-partition-square.w) — Knuth's
-  **PERFECT-PARTITION-SQUARE**, on a puzzle of Michael Keller's: place seven
-  7s, …, seven 1s in a 7×7 square so that its 14 rows and columns exhibit all
-  14 partitions of 7 into more than one part. Knuth doubted there was a
-  solution, wrote the brute force "as fast as I can", and reported 30885 of
-  them. Porting it turned up a bug that changes the answer: the inner loop's
-  bound `1<<(7*l-m)` shifts a 32-bit `int` by as much as 42, which is undefined
-  in C and on real machines shifts by 42 mod 32 = 10 instead, so nearly all
-  placements of the remaining digits are never tried. Go's `int` is 64 bits, so
-  the same line searches the whole space — and the square turns out to have
-  **16,492,083** solutions, of which Knuth's count is 0.19%. That search is 57
-  core-hours, so the port hands the 1716 subproblems to goroutines and buffers
-  each one's solutions, which keeps the printed output in Knuth's exact order
-  (6h26m wall). Verified three ways: with the shift truncated back to 32 bits it
-  reproduces the original C byte-for-byte (308 lines of output, 1716 progress
-  lines, 30885 solutions); 38 subproblems match a 64-bit-fixed C exactly; and
-  all 164,920 printed solutions pass an independent checker. Knuth's own
-  random-probe estimator sized the job beforehand, 21% low. Korean.
-* [perm.w](perm.w) — **Floyd's random-sampling algorithm**
-  (from Bentley's *More Programming Pearls*): draw M distinct integers from
-  1…N uniformly in O(M), every subset equally likely, without the collision
-  retries of the naive approach. A Korean literate essay building a small
-  `perm` library (plus a channel-based generator) with an extensive
-  `@(perm_test.go@>` suite — properties, reproducibility, distribution, and
-  benchmarks.
-* [pipeline.w](pipeline.w) — a tutorial that bridges Go's two
-  pipeline worlds: lazy `iter.Seq` transforms and a fan-out of channel workers,
-  joined by two boundary adapters, with first-error cancellation flowing across
-  both. Uses range-over-func and a pocket `errgroup`.
-* [pmap.w](pmap.w) — a generic concurrent `map` over a slice,
-  exercising generics, goroutines, channels, and `sync.WaitGroup`.
-* [prjeuler152.w](prjeuler152.w) — Project Euler Problem 152,
-  The key challenge—and the appeal—is that you cannot compare the sums using
-  floating-point arithmetic. When adding the $1/n^2$ terms, precise rational
-  number operations are required, and a brute-force approach that simply cycles
-  through all $2^{79}$ subsets is impossible.
-* [queenon-partition.w](queenon-partition.w) — Knuth's
-  **QUEENON-PARTITION**: Michael Simkin's curious mapping from an n×n grid onto a
-  2N×2N grid truncated to a diamond and turned 45°, the cell decomposition behind
-  his 2021 asymptotics for the n-queens count. The rule — take the smallest *I*
-  whose cell meets *(ij)* in positive area, and on a tie the *larger* *J* — falls
-  out of packing the pair as `I<<16 - J` and keeping the minimum; the areas
-  themselves are settled by brute force over an nN×nN pixel grid. The program
-  emits a MetaPost file drawing the assignment, so Go's raw strings replace two
-  dozen `fprintf` calls and let the MetaPost be read as MetaPost. Verified
-  byte-identical to the CWEB original — stdout, the emitted `.mp`, and exit codes
-  — on 649 (N, n) pairs. Korean, two luamplib figures in
-  [queenon-partition.mp](queenon-partition.mp).
-* [seq.w](seq.w) — a tiny lazy-sequence library (`Map`,
-  `Filter`, `Take` over infinite Fibonacci numbers), showing off the Go features
-  C has no answer to: first-class functions and closures, anonymous functions,
-  generics, and Go 1.23 range-over-func iterators.
-* [sham.w](sham.w) — a GWEB port of Knuth's Stanford GraphBase
-  demo `sham`: count the symmetric Hamiltonian cycles of the knight's graph on an
-  8×9 board, by folding the graph in half and backtracking with `goto` labels. It
-  builds on [go-sgb](https://github.com/sjnam/go-sgb), a Go port of the SGB, so
-  running it needs that module (`go get github.com/sjnam/go-sgb`); the commentary
-  is newly written. Shows GWEB handling an external dependency and a real Knuth
-  program.
-* [sliding.w](sliding.w) — Knuth's **SLIDING**, a general engine for
-  sliding-block puzzles: up to 15 kinds of pieces given as 0/1 patterns, a
-  board with dead cells, and six styles of move — one piece one step, one piece
-  straight any distance, one piece along any path, and the "superpiece"
-  versions of each, where any set of blocks may slide together. Breadth-first
-  search keeps only the last three distance layers, in a circular table of
-  variable-size packets threaded by relative hash-chain links, and recovers the
-  winning line — restarting with a nearer goal when the table has forgotten the
-  beginning. Superpieces are the ideals of a "bumps into" digraph, generated by
-  a neat backtrack. Porting it turned up a real bug: in style 5, Knuth stops
-  exploring past a configuration already reached from the same predecessor,
-  reasoning that only one piece moved — true for single pieces, false for
-  superpieces when some pieces are identical, since two different superpieces
-  can then reach the same configuration. The original misplaces
-  configurations by a layer (8 of 1800 random runs) and can report 5 moves
-  where 4 suffice; a per-superpiece visited stamp fixes it. Also fixed: a
-  sign-extension glitch in printing packed configurations and an unchecked
-  undefined piece name (reads `off[-1]`). The 64-bit hi/lo pointer pairs become
-  plain `uint64`, which Knuth predicted would make future readers chuckle.
-  Matches the fixed C byte-for-byte on 2178 runs (all six styles, all
-  verbosities), and an independent Python BFS confirms every layer. Korean.
-* [spiders.w](spiders.w) — Knuth's **spiders**, which closes the trilogy and
-  makes `koda-ruskey` and `li-ruskey` obsolete: the same problem — list every
-  0/1 labeling of a totally acyclic digraph respecting `x → y ⟹ bit x ≤ bit y`
-  as a Gray path whose root bit flips once — solved from a different direction.
-  The near-sets `U_k`/`V_k` carried implicitly on *progenitor* chains so the
-  whole O(n²) worth of sets fits in linear time and space; the parity of the
-  reflected code read off a single `ueven`/`veven` table instead of n-bit
-  arithmetic; and an *active list* of alternately awake and asleep nodes whose
-  blocks enter and leave behind delayed flags, giving a genuinely loopless
-  generator. Knuth's original recurrence for the insertion point was wrong for
-  twenty-five years — a five-vertex spider breaks it — and this document walks
-  through the failure and the fix (which Knuth adopted in June 2026 and
-  credited to this repository's author) with a figure. Verified against the
-  CWEB original on all 10,067 connected spiders of ≤ 7 vertices, `-v` output
-  included. Korean, four MetaPost figures.
-* [squint.w](squint.w) — lazy power series as demand-driven
-  channel networks (sum, product, composition, reciprocal, functional inverse,
-  and differential equations like `exp`), after McIlroy's *Squinting at Power
-  Series*.
-* [ssham.w](ssham.w) — Knuth's **SSHAM**: every Hamiltonian cycle of a
-  graph, found by an algorithm that picks the edges of subpaths without knowing
-  where in the final cycle they will land — Selby's idea (1970), which Knuth
-  rediscovered in 2001 in a more symmetric form where all subpaths have equal
-  status. Not to be confused with [sham.w](sham.w) beside it: same three letters,
-  a wholly different algorithm. The shrinking graph lives in **sparse sets**
-  (`nbr`/`adj`, with `adj` doubling as the adjacency matrix), vertices are *bare*,
-  *outer*, or *inner*, and a degree-2 bare vertex goes on a `trigger` list that
-  forces its two edges. Input is an SGB `.gb` file, read by
-  [go-sgb](https://github.com/sjnam/go-sgb)'s `gbsave.RestoreGraph`; go-sgb's own
-  `gbbasic.Board` + `gbsave.SaveGraph` writes files byte-identical to the C SGB's.
-  The `goto` web ports straight across, needing exactly one extra label (Go
-  cannot jump into a block). Verified against the CWEB original on 845
-  graph/option pairs — solutions, verbose logs, profiles, progress strings and
-  mem counts all identical, `gb_flip` randomization included; the 6×6 knight
-  graph gives 9862 cycles at 2265+4671495 mems on both. Korean.
-* [tarjan-strong-and-weak.w](tarjan-strong-and-weak.w) — Knuth's companion to
-  `tarjan-strong.w`: Algorithm 7.4.1.2T again, now carrying **Algorithm
-  7.4.1.2W** alongside it.
-  Knuth's *weak components* are not the usual weakly-connected ones — an
-  arc-less digraph has **one**, a path of *k* vertices has ***k***; he calls the
-  familiar notion *undirected components* instead. Weak equivalence is the
-  transitive closure of "mutually reachable **or** mutually unreachable"
-  (Graham, Knuth & Motzkin, 1972), which on the condensation is exactly
-  connectivity in the *incomparability* graph — a block of the finest ordinal
-  decomposition `P₁ ⊕ P₂ ⊕ ⋯ ⊕ Pₘ` of the reachability poset, what Knuth's index
-  calls a poset's series decomposition. (The definition was reverse-engineered
-  from the program and checked against brute force on 2500 digraphs with
-  weak-component counts from 1 to 20, then confirmed against prefascicle 12a.)
-  That view is what makes the algorithm legible: blocks are consecutive runs of
-  Tarjan's output order, so W only ever asks whether a cut fits above the newest
-  component — concretely, whether every *source* of the block above was hit,
-  walking a source list kept accurate by Tarjan's HIT/WHIT lazy deletion.
-  Where C must allocate n+1 shadow vertices to scrape
-  together five more utility fields, the Go record just names all nine.
-  Verified against the C
-  original — output and mems byte-identical — on the SGB Roget graph and 2230
-  random digraphs, including chains, transitive tournaments, and layered graphs
-  built to exercise W's merge loop and its path-compressed `src` walk. Uses
-  [go-sgb](https://github.com/sjnam/go-sgb). Korean, two MetaPost figures
-  sharing `tarjan-strong.mp`'s helpers.
-* [tarjan-strong.w](tarjan-strong.w) — **Tarjan's strong components**, after
-  Knuth's CWEB `tarjan-strong.w` (Algorithm 7.4.1.2T of the forthcoming
-  prefascicle 12a). One depth-first pass finds every strong component, and the
-  program also emits a certificate: the `tree` and `inner` arcs that keep each
-  component strongly connected, and one `link` per arc of the condensation.
-  Knuth's own note records a rule he first got wrong — dropping a parent's inner
-  arc when a tree child ties its LOW — and the document reproduces the failure by
-  building the mistaken variant and running it on his five-arc counterexample.
-  LOW here is the Eve–Kurki-Suonio variant the fascicle defines via *downpaths*
-  and arc *maturation*, not Tarjan's 1972 lowlink: a nontree arc `v→u` hands back
-  LOW(u), not PRE(u). Consequently "same LOW ⇒ same component" is false — it
-  failed on 168 of 500 random digraphs — which is why the pop test is `≥`.
-  The port replaces C's `low`/`rep` union with the encoding the *book* specifies
-  (`SENT + v′` in one field), which is what makes the mem counts match and which
-  deletes the original's `exit(-666)` check on pointer addresses. Verified
-  against the C original — output and mems byte-identical — on the SGB Roget
-  graph (1022 vertices, 77 components) and 1615 random digraphs, plus a separate
-  semantic check of the certificate on 1500 more. Uses
-  [go-sgb](https://github.com/sjnam/go-sgb). Korean, three MetaPost figures.
-* [topswops.w](topswops.w) — Conway's *topswops* game, solved
-  by A. Pepperdine's backward search (run the game in reverse from its ending
-  state). A Korean literate essay retelling of Knuth's CWEB `topswops.w`, with
-  MetaPost figures (a sample game, and the complete backward search tree for
-  n=3) and a proof of Conway's halting argument.
-* [topswops_fwd.w](topswops_fwd.w) — the same game solved
-  *forwards*: a branch-and-bound search with placeholder cards and an `f(m)`
-  pruning bound, written as a `goto` state machine. A Korean literate essay
-  retelling of Knuth's CWEB `topswops-fwd.w`, with MetaPost figures (the
-  five-label state machine, and the pruning bound).
-* [ulam-gibbs.w](ulam-gibbs.w) — Knuth's **ULAM-GIBBS**, which computes
-  billions of *Ulam numbers* (1, 2, 3, 4, 6, 8, 11, … — each the least number
-  that is a sum of two earlier ones in exactly one way) by Philip Gibbs's
-  method. Steinerberger noticed that U_n/λ mod 1, with λ ≈ 2.443443, almost
-  always falls in [1/3..2/3]; Gibbs turned that into an O(N) algorithm that
-  settles each candidate either by a short brute-force search over a window of
-  recent Ulams or by anchoring on a short sorted list of *outliers*, while an
-  18-bits-per-byte code packs the ulamness table into .778N bytes. Porting it
-  turned up a real bug in the CWEB original: `else @<outlier tests@>;` tangles
-  without braces, so the `else` governs only the first statement, and the
-  anchor loops also run, with stale bounds, after every brute-force search that
-  finds no representation. With the default λ that happens once (u = 25) and
-  is harmless, but with coarse approximations the C program prints wrong Ulam
-  numbers — `p22 q9` goes astray from U₇₀₀ on — while the Go port, whose braces
-  are mandatory, agrees with a direct count. Verified against the C original
-  with those braces restored on 47 option combinations: stdout, stderr, mems
-  and the METAPOST histogram all identical. The histogram the program draws
-  for N = 10⁶ is inlined as the document's figure. Korean.
-* [wc.w](wc.w) — a literate word-count program; its tangled
-  output matches the system `wc`. It also shows `@f` setting a user type in bold.
-* [word-cube-dlx.w](word-cube-dlx.w) — the same symmetric word cubes as
-  `wordcube.w`, but handed to somebody else: this one **translates the whole
-  problem into a single exact-cover (XCC) instance** and writes it out as a DLX
-  file, in the manner of Knuth's
+* [15puzzle-korf1.w](15puzzle-korf1.w) — 크누스의 **15PUZZLE-KORF1**. 15 퍼즐의
+  최소 수 풀이를 코르프의 반복 깊이 증가로 찾는다. 맨해튼 하한을 써서 먼저
+  "행복한" 수만으로 해 보고, 안 되면 "슬픈" 수를 하나씩 늘려 간다. 안쪽 반복문은
+  손으로 펼친 경우 152가지 `(r,c,d,p)`의 유한 상태 오토마톤이다. 빈칸이
+  `(r,c)`에 있고, 방향 `p`에서 들어왔으며, 이제 `d`로 가 본다는 뜻이고, 경우들은
+  `goto`로 이어지며 되짚어 갈 곳은 부호를 쌓는 스택이 기억한다. Go는 `case` 블록
+  안으로 뛰어들 수 없으므로, 이름표 152개를 한 블록에 나란히 두고 `switch`는
+  분기만 한다. 부호는 16진수 `0xrcdp`라서 분기표와 이름표를 눈으로 바로 맞대어
+  볼 수 있다. 전이 152가지를 모두 기계로 크누스의 원문과 맞춰 보았고, 틀린 것은
+  하나도 없었다. 결함은 하나, 처음 배치가 이미 목표일 때 1970년부터의 초를 찍는
+  것이다. 배치 1800개에서 C판과 출력이 바이트까지 같고, 풀이는 한 걸음씩
+  검사했다. 처음 옮긴 Go판은 C보다 25% 느렸다. 경우 152가지를 모두 품은 `main`을
+  Go의 인라이너가 '큰' 함수로 보아 비용 20 이하의 함수만 끼워 넣는데, 값 둘을
+  돌려주는 `east(r,c)`는 비용이 26이라 경우마다 진짜 호출이 일어나고 `s`와 `t`가
+  메모리로 밀려났다. 조각은 그 자리에서 읽고 값 하나짜리 `happy(x)`(비용 8)만
+  남기자 해결되었다. 코르프의 가장 어려운 예 `ca6098dfb73254e1`이 C의 24초에
+  맞서 Go에서 22초다.
+* [back-20q.w](back-20q.w) — 크누스의 **back-20q**. 돈 우즈의 *스무 문제*를
+  푼다. 스무 개의 객관식 문항이 모두 자기가 인쇄된 답안지를 두고 하는
+  말이다("답이 A인 첫 문항은…", "이 시험에서 얻을 수 있는 최고 점수는…"). 다섯
+  비트 후보 집합 위의 백트래킹인데, 문항마다 그 자리에서 판정할 수 있는 부분과
+  스무 글자가 다 정해져야 알 수 있는 부분으로 갈라 두고, 강제된 글자 하나가
+  이웃한 문항들로 줄줄이 번져 간다. 문서는 스무 문항을 모두 인용하고(더 읽기
+  전에 직접 풀어 보시라) 절 하나에 문항 하나씩 코드로 옮긴다. 그 과정에서 발표된
+  CWEB의 잘못 둘을 찾아 고쳤다. 닿을 수 없는 줄 때문에 18번을 틀릴 수가 없었던
+  것과, 뒤집힌 검사 때문에 15번이 사실은 맞는데도 틀린 것으로 매겨질 수 있었던
+  것이다. 그 탓에 원본은 옳은 답안지 14장을 잃고 그른 답안지 5장을 얻었다. 퍼즐
+  자체의 답은 그대로다. 최고 점수는 19점이고, 20번을 맞히면서 그 점수에 닿는
+  답안지는 정확히 하나다. 고친 원본과 거짓 패턴 211가지 모두에서 맞춰 보았고,
+  영문 문제에서 새로 쓴 독립 채점기와도, 탐색 순서를 열두 가지로 바꾼 것과도
+  맞춰 보았다. 크누스의 변경 파일 둘도 GWEB 변경 파일로 함께
+  옮겼다([back-20q-backmod9,15.ch](back-20q-backmod9,15.ch),
+  [back-20q-backmod9,15-indet.ch](back-20q-backmod9,15-indet.ch)). 저마다 문항
+  두엇을 고쳐 쓰고 제 답을 보고하는데, 그 가운데 첫째는 15번 결함이 어디서
+  왔는지 짐작하게 한다. 그 문구대로라면 다섯 선택지가 가지런히 늘어서서 문제의
+  경우가 사라지기 때문이다. 적용은 CWEB에서 하던 대로 `gtangle back-20q.w
+  back-20q-backmod9,15.ch`. MetaPost 그림 셋.
+* [back-graceful.w](back-graceful.w) — 크누스의 **BACK-GRACEFUL**. 스탠퍼드
+  그래프베이스 파일에서 읽은 그래프([go-sgb](https://github.com/sjnam/go-sgb)의
+  `gbsave`를 쓴다)의 *우아한 이름표*를 모두 찾는다. 꼭짓점 이름표는 0..m에서
+  서로 다르고, 변의 차이가 정확히 1..m이어야 하며, `VERTEX=label`로 이름표 몇
+  개를 미리 정해 둘 수도 있다. 워커의 백트래킹(알고리즘 7.2.2W)은 층마다 아직
+  없는 가장 큰 변 이름표를 겨냥하고, 쓴 이름표와 안 쓴 이름표를 64비트 맵에
+  담고, 고를 것이 하나로 줄어든 꼭짓점은 강제하고, 미리 정한 이름표가 없으면
+  "정규" 이름표만 세어 여집합으로 일을 절반으로 줄인다. 옮기다가 흠 셋을 만나
+  모두 고치고 적어 두었다. 변수 `bad`가 `int`라서 32 이상인 변 이름표의 중복을
+  놓친다. 답에는 해가 없지만(찍힌 이름표가 모두 옳다는 것은 popcount 논증으로
+  보인다) 빽빽한 그래프에서 마디를 최대 8.9배까지 더 훑는다. 2층에서 강제된 수가
+  정규 조건을 건너뛰어 P₃의 정규 이름표를 2개가 아니라 4개로 센다. 그리고 두
+  꼭짓점에 같은 이름표를 미리 정해 두어도 막지 않아 엉뚱한 답이 나온다. 고친
+  C판과 382번의 실행에서 마디 수까지 바이트 하나 다르지 않고, 답은 무차별
+  계수기로 확인했다.
+* [back-pdi.w](back-pdi.w) — 크누스의 **back-pdi**. 차수 m의 *완전 자릿수
+  불변수*를 모두 찾는다. 곧 제 자릿수의 m제곱 합과 같은 정수인데,
+  153 = 1³ + 5³ + 3³ 같은 것이다. 자릿수를 내림차순으로 고르는 백트래킹이고, 날카로운
+  상하한으로 가지를 세게 쳐 낸다. 큰 수는 덧셈만 있으면 되는 2진화 10진법으로
+  다룬다(+6 / −6 올림 요령을 그림으로 풀어 두었다). 크누스의 CWEB 프로그램을
+  Go/GWEB으로 옮긴 것이고, 마디 수가 원본과 정확히 같다. MetaPost 그림 하나.
+* [back-pi-day.w](back-pi-day.w) — 크누스의 **BACK-PI-DAY**. 요한 더라위터르가
+  2018년 파이 데이에 낸 퍼즐을 다룬다. 10×10 격자의 칸마다 동서남북 가운데 한
+  방향을 가리키고, 각 칸에는 그 칸이 가리키는 칸들의 이름표 가운데 *서로 다른*
+  것의 개수가 들어가야 한다. 주어진 이름표 32개는 π의 첫 32자리다. 후보 이름표는
+  비트맵에 담고, 꼭짓점을 "안정"하게 만드는 일은 뒤따르는 칸들의 이름표 위에서
+  작은 백트래킹을 하되 ν(popcount)로 셈한 `goal` 마스크로 쳐 낸다. 사실상
+  일반화된 호 일관성이다. 활성 목록이 회마다 가장 불안정한 꼭짓점을 고르고, 여섯
+  회에 걸친 301번의 검사 끝에 모든 비트맵이 홑원소가 된다. 크누스의 낙관이
+  들어맞아 경우를 가를 일이 없다. 옮긴 판은 C와 출력이 바이트까지 같다. 디버깅
+  흔적 197,802줄과 mems 6,865,501까지 같고, 답이 하나뿐이라는 것은 따로 만든
+  풀이기로 확인했다. MetaPost 그림 하나가 주어진 이름표와 이끌어 낸 이름표를
+  함께 보인다.
+* [back-skeleton.w](back-skeleton.w) — 크누스의 **BACK-SKELETON**. 타케 준야가
+  고안한 곱셈 뼈대 퍼즐을 *짓는다*. 별표 무늬가 주어지면, 곱해지는 수와 곱하는
+  수와 특별한 숫자 d를 찾되, 곱하는 수의 0들이 줄을 밀어 놓는 모든 경우에 대해
+  d가 부분 곱과 곱에서 무늬가 말하는 자리에 정확히 나타나야 한다. 곱해지는 수의
+  자릿수를 오른쪽부터 고르는 백트래킹이고, 제약마다 둔 선택 목록이 곱하는 수의
+  자릿수를 그때그때 강제하며, 살아남은 m짝들 위의 안쪽 반복문이 맨 아랫줄을
+  검사한다. 옮기다가 결함을 하나 만났다. 식 `o,tt=(constr[k][0]<=l? 0:
+  o,constr[k][l+1])`에서 쉼표가 `?:`보다 느슨하게 묶여 길이 검사가 사라지고,
+  앞선 밀림이 남긴 낡은 자릿수가 "d이면 안 된다"를 "d여야 한다"로 뒤집는다.
+  그래서 원본은 들어가며에 나오는 타케 자신의 퍼즐(2208068 × 357029)을 놓치고, O
+  무늬에서 68151개인 답을 4707개만 찾는다. 옮긴 판은 고친 C와 마디와 mems까지
+  바이트 하나 다르지 않고, 가지치기 장치를 전혀 함께 쓰지 않는 독립 검사기도
+  같은 68151개를 찾는다.
+* [chain_bound.w](chain_bound.w) — 스탠퍼드 그래프베이스 페이지에 실린
+  **미식축구 사슬 문제**를 정확히 매듭짓는다. 1990년 경기 결과의 단순 사슬을
+  타고 가면 스탠퍼드가 하버드를 몇 점 차로 이길 수 있는가? 최장 경로는 NP-어려운
+  문제지만, 연결성을 버리면 배정 문제가 남고, 헝가리 알고리즘의 O(n³) 답이
+  상계가 된다. 배정이 아직 경로가 아니면 순환의 변 하나를 골라 가지를 친다. 이
+  상계가 어찌나 촘촘한지, 최선 우선 탐색이 2473점(스탠퍼드–하버드)을 마디
+  351개로, 2358점(하버드–스탠퍼드)을 51개로, 그리고 모든 쌍을 통틀어 가장 큰
+  2542점(펜 스테이트–컬럼비아)을 단 하나로 증명한다. 문제 페이지에 적힌 세 값과
+  같다. 왜 그런지는 한 장을 들여 뿌리 완화를 해부해 보인다.
+  [go-sgb](https://github.com/sjnam/go-sgb)를 쓰고 `games.dat`가 필요하다. 영문.
+* [commafree-eastman.w](commafree-eastman.w) — 크누스의 **COMMAFREE-EASTMAN**.
+  이스트먼의 1965년 알고리즘을 반복문으로 쓴 것이다. 길이가 홀수이고 제 순환
+  이동 가운데 어느 것과도 같지 않은 수열이 주어지면, 고른 이동들이 쉼표 없는
+  부호를 이루도록 이동 하나를 고른다. 골롬과 고든과 웰치의 추측을 매듭지은
+  구성이다. 낱말은 경계 표시로 부분 낱말로 잘리고, 단계마다 이웃한
+  *분지*(네바다에서 온 용어는 크누스의 것이다) 사이의 길이가 홀수인 *구간*마다
+  표시를 딱 하나만 남긴다. 그래서 ⌊log₃ n⌋ 단계면 넉넉하다. CWEB 원본과
+  26830번의 실행에서 맞춰 보았다. 두세 글자 알파벳 위의 길이 3, 5, 7, 9인 수열
+  모두와 길이 105까지의 무작위 수열 4000개인데, 일부러 다르게 한 것이 하나 있다.
+  함수 `strconv.Atoi`는 `sscanf("%d")`가 조용히 받아들이던 뒤쪽 쓰레기를
+  거절한다. MetaPost 그림 하나.
+* [dlx-pre.w](dlx-pre.w) — 크누스의 **DLX-PRE**. 정확한 덮개 연작의
+  *전처리기*다. 입력 `.dlx` 문제를 읽어 쓸데없는 선택지와 항목을 덜어 낸 같은
+  값의 문제를 써 낸다. 규칙 둘이 일을 한다. 주 항목 *p*를 담은 선택지가 모두 색
+  없는 *c*도 담고 있으면 *c*와, *p* 없이 *c*를 담은 선택지를 모두 버릴 수 있다.
+  그리고 *p*를 담은 선택지가 모두 선택지 *r*과 부딪히면 *r*을 버릴 수 있다.
+  이것을 춤추는 링크 구조에서 항목을 하나씩 숨기며 적용하는데, 보조 표는 없어도
+  된다. 이중 연결 목록에서 빠져나온 마디는 제 이웃을 여전히 기억하기 때문이다.
+  옮길 때 매듭은 크누스가 자랑스러워한 `goto`다. 막힌 항목을 만나면 숨기는
+  반복문에서 빠져나와 되돌리는 반복문의 *한가운데*로 뛰어드는데, 그가 "goto 문을
+  쓰는 구조적 프로그래밍"(1974)에서 옹호한 바로 그 기법이다. Go는 블록 안으로
+  뛰어들 수 없으므로 `blocked` 플래그와 이름표 붙은 `break`로 흐름을 그대로
+  되살렸다. CWEB 원본과 맞춰 보았고(표준 출력이 바이트까지 같고 mems와 자세한
+  기록도 같다), 생성한 문제 612개에 대한 2496번의 실행과
+  [dancing-cells](https://github.com/sjnam/dancing-cells)의 펜토미노·필로미노
+  판, 그리고 패닉으로 끝나는 모든 길을 해 보았다. 문서는 원본 §3의 미끄러짐 둘도
+  적어 둔다. 보기 출력이 `E` 자리에 `C`를 보이고, 프로그램이 찍지 않는 `|`가
+  들어 있다.
+* [dragon-calc.w](dragon-calc.w) — 크누스의 **dragon-calc**. 데킹의 일반화된 용
+  곡선과, 그의 *다이아몬드와 용* 노트에 나오는 타일 계산을 위한 대화형 계산기다.
+  글자 `D`와 `U`로 된 접기 수열, 곡선을 두 배(또는 다섯 배)로 만드는 접기 곱,
+  좌표의 합이 홀수인 가우스 정수로서의 타일, 허수부에 유클리드를 돌려 얻은
+  에르미트 표준형 기저로 나눈 (2+2i)z에 대한 합동류, 평면을 채우는 경로 위에서의
+  타일 인수분해, 그리고 MetaPost 출력. 크누스의 2010년 CWEB 프로그램을
+  Go/GWEB으로 옮긴 것으로, 답이 원본과 줄 단위로 같다. 원본에서 `goto`의
+  거미줄은 이름표 붙은 반복문이 되었고, 134 MB짜리 정적 표는 필요한 만큼만 잡는
+  것이 되었고, 닫힌 경로에서 나던 0으로 나누기는 이제 걸러 낸다. MetaPost 그림
+  둘.
+* [enigmatic-puzzle.w](enigmatic-puzzle.w) — 크누스의 **enigmatic-puzzle**.
+  TAOCP 7.2.2.8에 나오는 125글자짜리 에니그마 암호문을 깬다. 암호문과 크립 낱말
+  하나(`ENIGMATICALLY`)만 가지고 회전자의 선택과 순서, 링 설정, 시작 위치,
+  플러그판, 그리고 평문을 되찾는다. 크누스의 프로그램 다섯 개를 여기서 하나의
+  파이프라인으로 엮었으므로 문서는 그것들을 모두 훑는다. **기계** 자체(다섯
+  가운데 회전자 셋, 반사기 B, 이중 전진의 버릇, 그리고 어떤 글자도 자기 자신으로
+  암호화되지 않는 치명적 흠 — 이 한 줄이 크립 위치 113개 가운데 50개를 죽인다),
+  회전자가 얼마나 돌았는지만 좇아 모르는 링 설정을 비껴가고 k층에 마디가 정확히
+  2k+1개인 **델타 나무**, 순서 없는 글자 쌍 351개 위의 유니온 파인드인
+  **봄베**(쌍을 순서 없이 다루는 것이 곧 웰치먼의 대각 판이다), 강제된 류를 모두
+  하나의 거대한 류로 합치는 개선된 거르개, 살아남은 류와 어긋나지 않는
+  플러그판을 모두 늘어놓는 간추린 감시 리터럴 SAT 풀이기, 델타 경로를 다시 시작
+  위치와 링 설정으로 바꾸는 산술, 그리고 마지막으로 후보 3,331,188개 가운데 진짜
+  영어인 하나를 고르는 5-그램 통계다. 영어가 맞고, 1653년의 연금술 책에서 왔다.
+  크누스의 C 원본과 백만 가지 설정을 모두 훑어 줄 단위로 맞춰 보았다. 원본에
+  숨어 있던 버퍼 문제 셋을 고치고 설명해 두었다. 배열 `move[64]`는 변수 개수만큼
+  첨자가 붙는데, 그것이 64를 넘을 수 있다고 크누스 자신이 적어 두었고, 전체
+  실행이 정말 그렇다는 것을 보인다(`max vars 79`). 배열 `plugs[…][26]`은
+  플러그가 하나도 없는 플러그판에서 보초를 둘 자리가 없다. 그리고 리터럴이 없는
+  "적어도 하나" 절이 쓰지 않은 칸을 읽는다. 역사도 함께 엮었다. 셰르비우스,
+  레예프스키와 폴란드의 봄바, 피리, 튜링, 웰치먼이다. 전체 훑기는 고루틴으로
+  나누었다. 프로파일을 떠 보니 시간의 72%가 봄베의 유니온 단계에 있었는데, 경로
+  압축도 더 좁은 배열도 필드 구조체 배치도 모두 오히려 느렸다. 그러나 설정들은
+  서로 아무것도 나누어 쓰지 않으므로, 일꾼 열이 M1 Max에서 2시간 4분 26초 걸리던
+  것을 16분 10초로 줄였다. 출력은 바이트까지 그대로이고, 여전히 흘러나온다.
+  무엇을 찍을지가 그 앞의 모든 것에 달려 있어서 한 단위의 줄은 앞선 단위가 모두
+  끝나야 정해지므로, 일꾼마다 찍힐 수 있는 것을 넉넉히 모아 두었다가 끝난
+  앞부분을 차례로 내보낸다. 훑기를 60단위가 아니라 1560단위로 잘랐더니 첫 줄이
+  6.4초 만에 나오고, 단위마다 회전자 표를 다시 짓는데도 전체가 오히려 *더
+  빠르다*(꼬리가 짧다). 표준 오류로 나가는 진행 표시 13줄까지 그대로다. MetaPost
+  그림 둘. 5-그램 계수에는 크누스의 `VOL1TEXT`(그의 사이트에 있는 900 KB 파일)가
+  필요하다.
+* [floyd.w](floyd.w) — 플로이드의 분할 문제. 크누스가 *장난감 문제는 쓸모
+  있는가?*에서 다룬 고전적인 "장난감 문제"다. √1…√50을 거의 같은 두 몫으로
+  가른다. 문학적으로 푼 풀이(중간에서 만나기 탐색, 그레이 부호 열거, 보정 덧셈,
+  그리고 `math/big` 검증)다.
+* [hopcroft-karp.w](hopcroft-karp.w) — 크누스의 **hopcroft-karp**. 이분 그래프의
+  최대 매칭을 O((t+n)·sqrt(m))에 찾는다. 회마다 경로를 하나씩 늘리는 대신,
+  꼭짓점이 겹치지 않는 *최단* 증가 경로의 극대 집합을 한꺼번에 찾는다. 문서의
+  절반은 증명이다. 두 매칭의 대칭차가 순환과 경로로 갈라진다는 데서 베르주의
+  보조정리가 나오고, 증가는 성분 하나를 없애면서 더 짧은 것을 만들지 않으므로
+  경로 길이가 엄격히 늘고, r회가 지나면 매칭이 이미 최적의 r/(r+1)이므로 회수는
+  2·sqrt(s)로 묶인다. 크누스의 `goto enter_level`과 `goto advance`는
+  `continue`가 곧 전진인 반복문 하나가 되었다. 원본에 둘을 덧붙였다. 크누스는
+  길이 2k-1인 경로의 등급을 k로 정의해 놓고는 그보다 하나 작은 `final_level`을
+  찍고 (나중에 그것을 두고 논하는데), 옮긴 판은 정의를 하나 골라 그렇다고
+  밝힌다. 그리고 마지막으로 실패한 너비 우선 탐색이 교대로 닿을 수 있는 집합을
+  이미 셈해 두었으므로, 프로그램은 매칭과 크기가 같은 최소 꼭짓점 덮개를 함께
+  내놓을 수 있다. 답이 최적임을 눈으로 확인할 수 있는 쾨니그 증서다. C 원본과
+  무작위 1200개에서 맞춰 보았다. 매칭과 회수와 dag의 호가 모두 같고, 따로 구현한
+  것과도 교차 확인했으며, 덮개는 모두 옳고 크기도 정확하다. 마지막 장은 크누스가
+  끝에 남긴 연습 문제, 곧 1회는 따로 빠르게 구현할 만하다는 이야기를 다룬다.
+  정말 그렇고, 까닭은 1회에서 `final_level`이 반드시 0이라 깊이 우선 탐색이
+  내려가지 않고, 그래서 그 회 전체가 호 t개짜리 dag를 썼다가 곧바로 되읽는 먼
+  길을 돌아 욕심쟁이 극대 매칭을 짓는 것이기 때문이다. 이것을 욕심쟁이 여덟 줄로
+  바꾸면 1회가 4배쯤 빨라지고(실행 시간의 69%를 차지하던 것이 41%로) 매칭 전체가
+  1.6~2.3배 빨라진다. 대신 시작 매칭이 달라져 다섯에 하나쯤은 회수가 이리저리
+  바뀐다. 플래그 뒤에 두었으니 기본값은 크누스의 출력을 그대로 되살린다.
+  MetaPost 그림 셋.
+* [hyperbolic.w](hyperbolic.w) — 크누스의 **hyperbolic**. 36°-45°-90° 삼각형으로
+  쌍곡 평면을 덮는 유일한 타일링을 셈한다. 점은 상반 평면에 있고, "직선"은
+  실축에 중심을 둔 반원이며, 타일링 전체는 삼각형 하나에서 꼭짓점을 맞은편 변에
+  거듭 비추어(원에 대한 반전) 자라난다. 일을 사분 고리 하나로 줄이면 평면 전체에
+  삼각형 301개면 넉넉한데, 그 제한을 공짜로 만드는 요령은 중심이 0인 수직 "원"을
+  두고 알고리즘이 그것을 넘지 않도록 하는 것이다. 이 삼각형 열 개가 정오각형을
+  이루니 마르겐슈테른의 오각 격자가 모습을 바꾼 것이고, 시작 좌표에 황금비가
+  마땅히 나타난다. 크누스가 이웃 셈을 세 번 따로 쓰고 호 667개를 손으로 `.mp`
+  파일에 옮겨 적은 자리에서, 옮긴 Go판은 셋을 첨자 붙은 반복문 하나로 접고
+  MetaPost를 스스로 뽑아낸다. 호 667개가 모두 그의 것과 찍힌 마지막 자리까지
+  같다. 바탕 좌표는 컴파일러가 곱셈과 덧셈을 다르게 융합하는 탓에 3.3e-13까지
+  다른데도 그렇다. 그런데도 똑같은 타일링이 나오는 것이야말로 어름한 이진 탐색
+  사전을 둔 까닭이다. MetaPost 그림 넷.
+* [koda-ruskey.w](koda-ruskey.w) — 크누스의 **koda-ruskey**. *숲 포셋의 이상*을
+  모두 만들어 낸다. 곧 부모가 1일 때만 자식이 1일 수 있는 비트열 모두를, 한
+  걸음에 비트 하나만 바뀌는 일반화된 반사 그레이 부호로 늘어놓는다. 같은 수열을
+  두 가지로 구현해 나란히 둔다. 하나는 마디마다 코루틴 하나를 두는 것이고, 다른
+  하나는 한 걸음이 언제나 네 고리짜리 *변두리*에 대한 정해진 수의 연산인 무반복
+  구현이다. CWEB 원본이 열 가지 상태의 `switch`로 코루틴을 손수 흉내 내는
+  자리에서, 옮긴 판은 그것을 버퍼 없는 채널에서 만나는 고루틴으로 적는다. 그래서
+  여섯 줄짜리 코루틴 몸통이 그대로 살아남는다. MetaPost 그림 셋.
+* [li-ruskey.w](li-ruskey.w) — 크누스의 **li-ruskey**. 앞의 `koda-ruskey`의
+  속편이다. 이제 제약에 *방향*이 있으므로 입력은 숲 포셋이 아니라 완전 비순환인
+  방향 그래프 아무것이나 되고, 할 일은 `x → y ⟹ 비트 x ≤ 비트 y`를 지키는 0/1
+  라벨링을 모두, 뿌리 비트가 딱 한 번 뒤집히는 그레이 경로로 늘어놓는 것이다.
+  준양·준음 꼭짓점 집합, 반쪽 경로 둘을 하나로 잇는 혼합 기수 반사 부호,
+  딸림들과 전이 문자열, 그리고 돌아다니는 플래그 뒤에 *낡은* 고리를 남겨 두는
+  것으로 무반복을 지키는 변두리가 나온다. 크누스는 코루틴 판을 연습 문제로
+  남기며 부모 포인터가 동적이어야 할 것이라고 했는데, 옮긴 판은 그 연습 문제를
+  고루틴으로 푼다. 거기서는 어려움이 증발한다(호출 스택이 곧 부모 포인터다).
+  코루틴마다 처음 깨어날 때 제 비트를 읽어 들어갈 자리를 고른다. 두 구현이 한
+  프로그램 안에서 돌고, `-v` 출력까지 CWEB 원본과 줄 단위로 같다. MetaPost 그림
+  넷.
+* [matula.w](matula.w) — 크누스의 **matula**. 자유 나무 *S*가 자유 나무 *T*의
+  부분 나무와 동형인가? 부분 그래프 동형은 일반적으로 NP-완전이지만(클릭과
+  해밀턴 경로가 특수한 경우다), 나무에 대해서는 데이비드 마툴라의 1978년
+  알고리즘이 O(mn·sqrt(최대 내부 차수))에 매듭짓는다. 이것을
+  [hopcroft-karp.w](hopcroft-karp.w) 바로 다음에 읽을 까닭은, 안쪽 반복문이 곧
+  이분 매칭이기 때문이다. S의 마디 p가 T의 v에 박히는 것은 정확히 p의 자식들을
+  v의 서로 다른 이웃에 짝지을 수 있을 때이고, 마툴라의 통찰은 그 부분 문제의
+  s+1가지 판(어느 이웃이 부모 노릇을 하는가에 따라)이 하나로 무너져 n배를
+  아낀다는 것이다. 크누스는 매칭 코드를 HOPCROFT-KARP에서 훔쳐 왔다고 적었는데,
+  우리는 그것을 막 옮긴 참이었다. 절정은 마툴라의 정리 3.4다. 완전 매칭에서
+  풀려날 수 있는 처녀들은 정확히 HK가 멈출 때 너비 우선 큐에 남아 있는
+  것들이므로, 답은 이미 dag 안에 놓여 있다. 크누스의 mems를 달아 두었고, 옮긴
+  판은 그 수를 정확히 되살린다. 그 자신의 예에서 1917+14760, 그리고 무작위 나무
+  쌍 1100개에서 답과 찍힌 박음과 mem 수가 모두 같다. 거기 닿기까지 조심할 것이
+  있었다. C의 쉼표 연산자는 앞에 붙인 `mems++`가 되거나 `mems, k = mems+1,
+  next[k]` 같은 다중 대입이 되고, `&&` 안에 놓인 `o`는 두 조건 가운데 하나에만
+  매겨진다. 그것을 놓쳐 유령 mems 119를 얻은 적이 있다. 옮겨 온 판에는 진짜
+  결함도 있었다. 배열 `thresh`는 maxn개로 선언되었는데 T의 최대 차수가 61일 때
+  첨자 maxn으로 읽히고, 그것을 채우는 반복문은 T의 최대 차수가 S의 마디 수에
+  이를 때마다 solve()가 필요로 하는 칸에 미치지 못한 채 멈춘다. 이것이 탈 없이
+  지나간 것은 이웃한 낱말이 마침 0을 담고 있기 때문이다. 거기에 값을 심어 두면
+  옛 코드는 61이 옳은 자리에서 62라고 답한다. 크누스는 이 글을 쓰는 동안인
+  2026-08-21에 파일을 고쳤고, 바로 그 두 곳을 손보았다. 배열은 여기서처럼 한 칸
+  늘었고, 빠진 자리는 같은 비용의 다른 방법으로 채워져, 이제 시험한 모든
+  입력에서 mem 수가 그의 것과 같다. 크누스는 제 프로그램 곁에 변경 파일 셋을
+  두는데, 셋 모두 여기에 옮겨 두었다. [matula-big.ch](matula-big.ch)는 명령줄의
+  부모 포인터 문자열을 *rectree* 파일로 바꾸어 maxn을 62에서 2000으로 키운다. 그
+  형식은 S의 뿌리가 잎이라고 약속하지 않으므로 S를 다시 뿌리내리고 안에서 번호를
+  새로 매긴 뒤, 사용자에게는 그의 번호로 돌려준다.
+  [matula-big-planted.ch](matula-big-planted.ch)는 T만 받아 거기서 무작위로 잎
+  d개를 지워 S를 기른다. SGB의 `gb_flip`을
+  [go-sgb](https://github.com/sjnam/go-sgb)로 쓰므로 같은 씨앗이면 크누스의 C와
+  같은 잎을 지운다. 그러면 S는 반드시 부분 나무이고, 물음은 알고리즘이 그것을
+  얼마나 빨리 찾느냐가 된다. 적용은 CWEB에서 하던 대로 `gtangle matula.w
+  matula-big.ch`. 둘 다 크누스의 C와 mem까지 같다. 그의 예에서 3221+14939와
+  5750+36561이고, 무작위 나무 쌍 660개와 무작위 나무 500개에서 답과 종료 코드와
+  mem 수가 모두 같다. 심은 판의 산문은 그것이 고스란히 물려받은 결함도 적어
+  둔다. 뿌리 자신이 지워지면 아직 고치지 않은 `child` 포인터가 이미 지워진
+  마디를 가리킬 수 있고, 그러면 두 프로그램 모두 "I'm confused!"로 멈춘다. 마디
+  127개 가운데 124개를 지울 때 씨앗 200개 가운데 134개가 그렇다.
+  [matula-exhaustive.ch](matula-exhaustive.ch)는 명령줄의 나무 둘을 *개수* 둘로
+  바꾸어, 마디가 *m*개인 자유 나무와 *n*개인 자유 나무의 모든 쌍을 돌린다.
+  그래서 maxn이 62에서 16으로 내려간다. 자유 나무를 정확히 한 번씩 얻는 것이
+  재미있는 대목이다. 방향 있는 숲의 정규 층 수열로 만든 트라이(TAOCP 연습 문제
+  7.2.1.6–90)가 중심 나무를 주고, 절반 크기 숲의 쌍이 이중 중심 나무를 준다.
+  크누스는 그 장치를 S용과 T용으로 두 번 쓰는데, 여기서는 `first`/`next`/`nth`를
+  갖춘 `family` 타입 하나이고, 그 덕에 그의 `make_?string` 둘도 하나로 합쳐진다.
+  쌍마다 mems의 웰퍼드 평균과 분산, 가장 어려운 쌍, 그리고 가장 많이 또 가장
+  적게 박히는 나무를 보고한다. 나무 개수의 곱이 200000 이하인 (m, n) 쌍 79가지
+  모두에서 C와 맞춰 보았고, 출력과 종료 코드와 mems가 같다. 이를테면 m = n =
+  8에서 2407+426125다. MetaPost 그림 셋.
+* [ntt.w](ntt.w) — **고속 푸리에 변환**과 그 정수 사촌인 **수론 변환**으로 가는
+  친절한 길잡이. 값매김–곱셈–보간이라는 우회로, 제곱이 1의 거듭제곱근을 접어
+  문제를 절반으로 만드는 까닭, 비트 뒤집기와 나비 회로, 역변환, NTT가 환에
+  정말로 요구하는 것(그리고 998244353 = 119·2²³+1인 까닭), 그리고
+  가우스(1805)에서 하비와 판데르후번(2021)에 이르는 뜻밖의 역사를 다룬다.
+  MetaPost 그림 셋. 이 글이 향해 가는 프로그램은 Library Checker의 *Convolution
+  (mod 998244353)*, 곧 O(n log n)의 다항식 곱셈을 푼다.
+* [pairsums.w](pairsums.w) — HackerRank의 *Pair Sums*. 모든 부분 배열에 대한 쌍
+  곱의 합 가운데 가장 큰 것을 찾는다. 항등식 value = (S²−Q)/2와 누적합 비틀기가
+  이것을 직선 가족의 위 포락선 문제로 바꾸고, **리 차오 트리**로 O(n log n)에
+  푼다.
+* [perec.w](perec.w) — 조르주 페렉의 *인생 사용법*을 그 두 제약에서 다시 짓는다.
+  소설의 99개 장은 방 10×10 격자의 나이트 투어를 따라가는데, (1,10)의 지하실만
+  빠진다. 페렉이 일부러 낸 흠인 *클리나멘*이고, 그 때문에 65장과 66장 사이에
+  규칙에 어긋나는 대각 걸음이 하나 생긴다. 프로그램은 SGB의 `Board`로 나이트
+  판을 짓고, 옮겨 적은 것을 믿는 대신 **판 자신의 호에 견주어** 페렉의 순서를
+  확인한다. 견주어 볼 흠 없는 투어를 얻으려고 바른스도르프 규칙도 돌리고, 장마다
+  무엇이 담기는지 정하는 10차 그레코라틴 방진도 되짚어 짓는다(그 100쌍 가운데
+  99쌍이 쓰이고, 빠진 하나가 클리나멘의 몫이다).
+  [go-sgb](https://github.com/sjnam/go-sgb)를 쓴다. 영문. 그 자리에서 luamplib이
+  그리는 MetaPost 그림 셋.
+* [perfect-partition-square.w](perfect-partition-square.w) — 크누스의
+  **PERFECT-PARTITION-SQUARE**. 마이클 켈러의 퍼즐을 다룬다. 7을 일곱 개, …, 1을
+  일곱 개를 7×7 정사각형에 놓아, 그 14개 행과 열이 7을 둘 이상으로 나눈 분할
+  14가지를 모두 보이게 하라. 크누스는 답이 있을지 의심하면서 무차별 탐색을 "할
+  수 있는 한 빠르게" 써서 30885개를 보고했다. 옮기다가 답을 바꾸는 결함을
+  만났다. 안쪽 반복문의 한계 `1<<(7*l-m)`이 32비트 `int`를 42까지 미는데, 이것은
+  C에서 정의되지 않은 동작이고 실제 기계에서는 42 mod 32 = 10만큼 민다. 그래서
+  남은 자릿수의 놓임새가 거의 다 시도 조차 되지 않는다. Go의 `int`는
+  64비트이므로 같은 줄이 공간을 다 훑고, 그 결과 이 정사각형에는 답이
+  **16,492,083**개 있다. 크누스가 센 것은 그 0.19%다. 그 탐색은 코어 기준
+  57시간이라, 옮긴 판은 부분 문제 1716개를 고루틴에 나눠 주고 저마다의 답을 모아
+  두어 찍히는 차례를 크누스의 것과 똑같이 지킨다(벽시계로 6시간 26분). 세 가지로
+  확인했다. 밀기를 다시 32비트로 자르면 원본 C와 바이트까지 같고(출력 308줄,
+  진행 1716줄, 답 30885개), 부분 문제 38개는 64비트로 고친 C와 정확히 같으며,
+  찍힌 답 164,920개가 모두 독립 검사기를 통과한다. 크누스 자신의 무작위 탐침
+  어림잡기는 일의 크기를 미리 재는데, 21% 낮게 잡았다.
+* [perm.w](perm.w) — **플로이드의 무작위 뽑기 알고리즘**(벤틀리의 *More
+  Programming Pearls*에서). 1…N에서 서로 다른 정수 M개를 균등하게 O(M)에 뽑는다.
+  모든 부분집합이 같은 확률이고, 순진한 방법이 겪는 충돌 재시도가 없다. 작은
+  `perm` 라이브러리(와 채널 기반 생성기)를 짓는 한글 문학적 에세이이고,
+  성질·재현성·분포·벤치마크를 다루는 넉넉한 `@(perm_test.go@>` 묶음이 딸려 있다.
+* [pipeline.w](pipeline.w) — Go의 두 파이프라인 세계를 잇는 길잡이. 게으른
+  `iter.Seq` 변환과 채널 일꾼의 팬아웃을 경계 어댑터 둘로 잇고, 첫 오류에 따른
+  취소가 양쪽을 가로질러 흐르게 한다. 여기서는 range-over-func과 주머니 속
+  `errgroup`을 쓴다.
+* [pmap.w](pmap.w) — 슬라이스 위의 제네릭 동시 `map`. 제네릭과 고루틴과 채널과
+  `sync.WaitGroup`을 함께 굴려 본다.
+* [prjeuler152.w](prjeuler152.w) — Project Euler 152번 문제. 핵심이자 재미는
+  합을 부동소수점으로 견줄 수 없다는 데 있다. $1/n^2$ 항을 더할 때는 정확한
+  유리수 연산이 필요하고, $2^{79}$개의 부분집합을 모두 도는 무차별 방법은
+  불가능하다.
+* [queenon-partition.w](queenon-partition.w) — 크누스의 **QUEENON-PARTITION**.
+  마이클 심킨이 n×n 격자를 다이아몬드로 자르고 45° 돌린 2N×2N 격자로 보내는 묘한
+  사상을 다루는데, 2021년에 그가 n-퀸 개수의 점근을 얻을 때 쓴 칸 나누기다.
+  규칙, 곧 *(ij)*와 넓이가 양수인 부분을 나누는 칸 가운데 가장 작은 *I*를 잡고
+  비기면 *더 큰* *J*를 잡는다는 규칙은, 쌍을 `I<<16 - J`로 담아 최소를 지키면
+  저절로 나온다. 넓이 자체는 nN×nN 픽셀 격자 위의 무차별 셈으로 정한다.
+  프로그램은 그 배정을 그리는 MetaPost 파일을 뽑아내는데, Go의 날문자열이
+  `fprintf` 스물 몇 개를 대신하니 MetaPost를 MetaPost로 읽을 수 있다. CWEB
+  원본과 (N, n) 쌍 649가지에서 표준 출력과 뽑아낸 `.mp`와 종료 코드가 바이트까지
+  같다. [queenon-partition.mp](queenon-partition.mp)에 담긴 luamplib 그림 둘.
+* [seq.w](seq.w) — 작은 게으른 수열 라이브러리(무한 피보나치 수 위의 `Map`,
+  `Filter`, `Take`). C에는 답이 없는 Go의 기능들, 곧 일급 함수와 클로저, 익명
+  함수, 제네릭, 그리고 Go 1.23의 range-over-func 이터레이터를 뽐낸다.
+* [sham.w](sham.w) — 크누스의 스탠퍼드 그래프베이스 예제 `sham`을 GWEB으로 옮긴
+  것. 8×9 판 위 나이트 그래프의 대칭 해밀턴 순환을 센다. 그래프를 반으로 접고
+  `goto` 이름표로 되짚어 간다. SGB를 Go로 옮긴
+  [go-sgb](https://github.com/sjnam/go-sgb) 위에서 도니, 돌리려면 그 모듈이
+  필요하다(`go get github.com/sjnam/go-sgb`). 해설은 새로 썼다. GWEB이 바깥
+  의존성과 진짜 크누스 프로그램을 어떻게 다루는지 보인다.
+* [sliding.w](sliding.w) — 크누스의 **SLIDING**. 미닫이 블록 퍼즐을 두루 푸는
+  엔진이다. 0/1 무늬로 주는 조각이 15종류까지, 죽은 칸이 있는 판, 그리고 이동
+  방식이 여섯이다. 조각 하나를 한 칸, 조각 하나를 곧게 아무 거리나, 조각 하나를
+  아무 길로나, 그리고 저마다의 "초조각" 판으로 블록 몇 개가 함께 미끄러지는
+  것이다. 너비 우선 탐색은 거리 층을 마지막 셋만 들고 있는데, 크기가 제각각인
+  꾸러미를 상대 해시 사슬 고리로 엮은 순환 표에 담고, 이기는 수순도 되찾는다.
+  표가 처음을 잊었으면 더 가까운 목표로 다시 시작한다. 초조각은 "부딪힌다" 방향
+  그래프의 이상이고, 말끔한 백트래킹이 그것을 만들어 낸다. 옮기다가 진짜 결함을
+  만났다. 방식 5에서 크누스는 같은 앞 배치에서 이미 닿은 배치를 만나면 더
+  나아가지 않는데, 근거는 조각 하나만 움직였다는 것이다. 조각 하나에는 맞지만
+  초조각에는 틀리다. 모양이 같은 조각이 있으면 서로 다른 초조각이 같은 배치에
+  이를 수 있기 때문이다. 원본은 배치를 한 층 늦게 놓고(무작위 1800번 가운데
+  8번), 4수면 되는 것을 5수라고 답할 수 있다. 초조각마다 도장을 찍어 고친다.
+  함께 고친 것은 꾸린 배치를 찍을 때의 부호 확장 오류와, 정의하지 않은 조각
+  이름을 막지 않아 `off[-1]`을 읽는 것이다. 64비트 hi/lo 포인터 쌍은 그냥
+  `uint64`가 되었는데, 훗날의 독자가 이 대목에서 웃으리라고 크누스가 미리 적어
+  둔 바다. 고친 C와 2178번의 실행(여섯 방식, 모든 자세히 찍기 단계)에서
+  바이트까지 같고, 따로 짠 파이썬 너비 우선 탐색기가 층마다 확인해 준다.
+* [spiders.w](spiders.w) — 크누스의 **spiders**. 삼부작을 닫으며 `koda-ruskey`와
+  `li-ruskey`를 낡은 것으로 만든다. 같은 문제, 곧 완전 비순환 방향 그래프의 `x →
+  y ⟹ 비트 x ≤ 비트 y`를 지키는 0/1 라벨링을 뿌리 비트가 한 번 뒤집히는 그레이
+  경로로 늘어놓는 일을 다른 쪽에서 푼다. 준집합 `U_k`/`V_k`를 *조상* 사슬에
+  암묵적으로 실어 O(n²)어치 집합 전부를 선형 시간과 공간에 담고, 반사 부호의
+  홀짝을 n비트 산술 대신 `ueven`/`veven` 표 하나에서 읽어 내며, 깨어 있는 마디와
+  잠든 마디가 번갈아 있는 *활성 목록*의 블록이 미룬 플래그를 남기며 드나들어
+  참으로 무반복인 생성기가 된다. 삽입 자리에 대한 크누스의 원래 점화식은
+  스물다섯 해 동안 틀린 채였고 꼭짓점 다섯 개짜리 거미가 그것을 깨뜨리는데, 이
+  문서는 그 실패와 고침을 그림과 함께 짚어 간다 (크누스가 2026년 6월에
+  받아들이고 이 저장소 지은이의 공으로 적었다). CWEB 원본과 꼭짓점 7개 이하인
+  연결된 거미 10,067개 모두에서 `-v` 출력까지 맞춰 보았다. MetaPost 그림 넷.
+* [squint.w](squint.w) — 게으른 거듭제곱 급수를 요구에 따라 움직이는 채널 그물로
+  본다(합, 곱, 합성, 역수, 함수의 역, 그리고 `exp` 같은 미분 방정식). 매킬로이의
+  *Squinting at Power Series*를 따른다.
+* [ssham.w](ssham.w) — 크누스의 **SSHAM**. 그래프의 해밀턴 순환을 모두 찾는데,
+  부분 경로의 변을 그것이 마지막 순환의 어디에 놓일지 모른 채 고르는 알고리즘을
+  쓴다. 셀비의 1970년 착상이고, 크누스가 2001년에 모든 부분 경로의 지위가 같은
+  더 대칭적인 꼴로 다시 발견했다. 옆에 있는 [sham.w](sham.w)와 헷갈리지 마시라.
+  세 글자가 같을 뿐 전혀 다른 알고리즘이다. 줄어드는 그래프는 **성긴
+  집합**(`nbr`/`adj`, `adj`는 인접 행렬 노릇도 겸한다)에 담기고, 꼭짓점은 *맨*,
+  *바깥*, *안* 가운데 하나이며, 차수가 2인 맨 꼭짓점은 `trigger` 목록에 올라 제
+  변 둘을 강제한다. 입력은 SGB `.gb` 파일이고
+  [go-sgb](https://github.com/sjnam/go-sgb)의 `gbsave.RestoreGraph`로 읽는다. 또
+  go-sgb의 `gbbasic.Board`와 `gbsave.SaveGraph`는 C SGB와 바이트까지 같은 파일을
+  쓴다. 원본에서 `goto`의 거미줄은 그대로 옮겨 오고, 이름표 하나만 더 있으면
+  된다(Go는 블록 안으로 뛰어들 수 없다). CWEB 원본과 그래프·선택지 쌍
+  845가지에서 맞춰 보았다. 답과 자세한 기록과 프로파일과 진행 문자열과 mem 수가
+  모두 같고 `gb_flip` 무작위화까지 같다. 6×6 나이트 그래프는 양쪽 모두
+  2265+4671495 mems에 순환 9862개를 준다.
+* [tarjan-strong-and-weak.w](tarjan-strong-and-weak.w) — 크누스가
+  `tarjan-strong.w`에 짝지어 쓴 프로그램. 알고리즘 7.4.1.2T를 다시 다루되
+  이번에는 **알고리즘 7.4.1.2W**를 나란히 싣는다. 크누스의 *약한 성분*은 흔히
+  말하는 약연결 성분이 아니다. 호가 없는 방향 그래프에는 **하나**뿐이고, 꼭짓점
+  *k*개짜리 경로에는 ***k***개다. 흔한 쪽은 그가 *무향 성분*이라 부른다. 약한
+  동치는 "서로 닿을 수 있거나 **서로 닿을 수 없다**"의 추이 폐포이고(그레이엄,
+  크누스, 모츠킨, 1972), 응축 그래프 위에서는 정확히 *비교 불가능* 그래프의
+  연결성이다. 곧 닿음 포셋의 가장 잘게 나눈 서수 분해 `P₁ ⊕ P₂ ⊕ ⋯ ⊕ Pₘ`의 한
+  블록이고, 크누스의 색인은 이것을 포셋의 직렬 분해라 부른다. (정의는
+  프로그램에서 거꾸로 알아낸 뒤 약한 성분이 1개에서 20개인 방향 그래프 2500개에
+  무차별 셈으로 맞춰 보고, 프리패시클 12a로 확인했다.) 그 관점이 알고리즘을 읽을
+  수 있게 만든다. 블록은 타잔이 내놓는 차례에서 잇닿은 구간이므로, W는 잘린
+  자리가 가장 새 성분 위에 맞는지만 물으면 된다. 구체적으로는 위 블록의 *원천*이
+  모두 맞았는지 묻는데, 타잔의 HIT/WHIT 게으른 삭제가 정확하게 지켜 주는 원천
+  목록을 따라 걷는다. C가 쓸모 필드 다섯 개를 더 긁어모으려고 그림자 꼭짓점
+  n+1개를 잡아야 하는 자리에서, Go의 레코드는 아홉 개에 그냥 이름을 붙인다. C
+  원본과 출력과 mems가 바이트까지 같다. SGB의 로제 그래프와 무작위 방향 그래프
+  2230개에서 맞춰 보았는데, W의 병합 반복문과 경로 압축된 `src` 걷기를 굴리려고
+  지은 사슬과 추이 토너먼트와 층진 그래프도 함께 넣었다.
+  [go-sgb](https://github.com/sjnam/go-sgb)를 쓴다. MetaPost 그림 둘은
+  `tarjan-strong.mp`의 도우미를 함께 쓴다.
+* [tarjan-strong.w](tarjan-strong.w) — **타잔의 강한 성분**. 크누스의 CWEB
+  `tarjan-strong.w`(곧 나올 프리패시클 12a의 알고리즘 7.4.1.2T)를 따른다. 깊이
+  우선 한 번으로 강한 성분을 모두 찾고, 증서도 함께 내놓는다. 성분마다 강한
+  연결을 지켜 주는 `tree`와 `inner` 호, 그리고 응축 그래프의 호마다 `link`
+  하나다. 크누스 자신의 노트에는 그가 처음에 잘못 잡았던 규칙, 곧 나무 자식이
+  LOW를 비길 때 부모의 안쪽 호를 버리는 규칙이 적혀 있는데, 이 문서는 그 틀린
+  판을 지어 그의 다섯 호짜리 반례에 돌려 실패를 되살린다. 여기서 LOW는 패시클이
+  *내리막 경로*와 호의 *성숙*으로 정의하는 이브–쿠르키수오니오 판이지 타잔의
+  1972년 lowlink가 아니다. 나무가 아닌 호 `v→u`는 PRE(u)가 아니라 LOW(u)를
+  돌려준다. 그래서 "LOW가 같으면 성분도 같다"는 거짓이고(무작위 방향 그래프
+  500개 가운데 168개에서 깨졌다), 그 때문에 꺼내기 검사가 `≥`다. 옮긴 판은 C의
+  `low`/`rep` 합집합을 *책*이 정한 부호화(한 필드 안의 `SENT + v′`)로 바꾸는데,
+  그래야 mem 수가 맞고 원본의 포인터 주소 검사 `exit(-666)`도 지울 수 있다. C
+  원본과 출력과 mems가 바이트까지 같다. SGB의 로제 그래프(꼭짓점 1022개, 성분
+  77개)와 무작위 방향 그래프 1615개에서 맞춰 보았고, 증서는 다시 1500개에서 뜻이
+  맞는지 따로 검사했다. [go-sgb](https://github.com/sjnam/go-sgb)를 쓴다.
+  MetaPost 그림 셋.
+* [topswops.w](topswops.w) — 콘웨이의 *톱스왑스* 놀이를 페퍼다인의 거꾸로
+  탐색(끝난 자리에서 놀이를 거꾸로 돌린다)으로 푼다. 크누스의 CWEB
+  `topswops.w`를 다시 풀어 쓴 한글 문학적 에세이이고, MetaPost 그림(놀이 한 판과
+  n=3의 거꾸로 탐색 나무 전체)과 콘웨이의 멈춤 논증에 대한 증명이 딸려 있다.
+* [topswops_fwd.w](topswops_fwd.w) — 같은 놀이를 *앞으로* 푼다. 자리 표시 카드와
+  `f(m)` 가지치기 한계를 쓰는 분기 한정 탐색이고, `goto` 상태 기계로 썼다.
+  크누스의 CWEB `topswops-fwd.w`를 다시 풀어 쓴 한글 문학적 에세이이고, MetaPost
+  그림(이름표 다섯 개짜리 상태 기계와 가지치기 한계)이 딸려 있다.
+* [ulam-gibbs.w](ulam-gibbs.w) — 크누스의 **ULAM-GIBBS**. *울람 수*(1, 2, 3, 4,
+  6, 8, 11, … — 저마다 앞선 두 수의 합으로 나타나는 방법이 꼭 하나인 가장 작은
+  수)를 필립 깁스의 방법으로 수십억 개 셈한다. 슈타이너베르거는 λ ≈ 2.443443에
+  대해 U_n/λ mod 1이 거의 언제나 [1/3..2/3]에 떨어지는 것을 알아챘고, 깁스는
+  그것을 O(N) 알고리즘으로 바꾸었다. 후보마다 최근 울람 수의 창 위에서 짧은
+  무차별 탐색을 하거나 짧게 정렬된 *이상값* 목록에 기대어 판정하고, 바이트당
+  18비트 부호화가 울람 여부 표를 .778N 바이트에 꾸린다. 옮기다가 CWEB 원본의
+  진짜 결함을 만났다. 줄 `else @<outlier tests@>;`가 중괄호 없이 짜이는 탓에
+  `else`가 첫 문장만 다스리고, 표현을 찾지 못한 무차별 탐색 뒤에는 언제나 낡은
+  한계를 단 채 닻 반복문까지 돌아간다. 기본 λ에서는 그런 일이 한 번(u = 25)
+  일어나고 탈이 없지만, 성긴 근삿값에서는 C 프로그램이 틀린 울람 수를 찍는다.
+  선택지 `p22 q9`는 U₇₀₀부터 어긋난다. 중괄호가 반드시 있어야 하는 Go판은
+  곧이곧대로 센 것과 맞는다. 중괄호를 되살린 C 원본과 선택지 조합 47가지에서
+  맞춰 보았고, 표준 출력과 표준 오류와 mems와 METAPOST 히스토그램이 모두 같다. N
+  = 10⁶에 대해 프로그램이 그리는 히스토그램을 문서의 그림으로 실었다.
+* [wc.w](wc.w) — 문학적으로 쓴 낱말 세기 프로그램. 짜 낸 결과가 시스템 `wc`와
+  맞는다. 지시자 `@f`가 사용자 타입을 굵게 세우는 것도 보인다.
+* [word-cube-dlx.w](word-cube-dlx.w) — 앞의 `wordcube.w`와 똑같은 대칭 낱말
+  정육면체를 남에게 맡긴다. 이쪽은 **문제 전체를 정확한 덮개(XCC) 사례 하나로
+  옮겨** DLX 파일로 써 낸다. 크누스의
   [word-rect-dlx.w](https://www-cs-faculty.stanford.edu/~knuth/programs/word-rect-dlx.w)
-  ("supposed to compete with BACK-MXN-WORDS-NEW"). The translation is startlingly
-  small — 15 primary items (the lines `i <= j`), 35 secondary items (the cells,
-  named by their sorted index triple), and one option per line-and-word, its five
-  colored items saying which letter goes where. Sorting the name is the whole
-  symmetry mechanism; not one line of code checks it. A bonus falls out for free:
-  an uncolored secondary item per word turns "all fifteen words distinct" into an
-  extra flag (`-d`) rather than extra code. Verified against `wordcube` on
-  truncated dictionaries (3 = 3 at 3000 words, 83 = 83 at 3500, 60 = 60 with `-d`),
-  each emitted solution rebuilt into a 5×5×5 array and re-checked along all three
-  axes, and the full list run to the end for the same 83,576. The closing chapter
-  runs the match: dancing cells prunes the *better* tree — 57.1M nodes against
-  98.0M — yet loses on the clock, because a cell item sits in 3·|W| options, so one
-  coloring walks thousands of them where the backtrack does one binary search. The
-  gap does narrow with scale, as covered items shorten the lists (92× at 2000 words,
-  39× at 3500, 16× on the full list: 26m36s against 1m41s). Korean, with one
-  inline MetaPost figure and one borrowed from `wordcube.mp`.
-* [wordcube.w](wordcube.w) — how many **symmetric 5×5×5 word
-  cubes** can be built from the Stanford GraphBase's 5757 five-letter words? A
-  fully symmetric cube reads the same word along any of its three axes; a clean
-  backtrack fills the fifteen lines in row-major order, where each new word's
-  already-placed letters form a prefix and dictionary lookup does the rest. The
-  answer is 83,576 (75,130 if all fifteen words must differ). The base program adds
-  *preclusion* (forward-checking): after each word is placed it verifies every
-  not-yet-filled line can still be completed from the dictionary, pruning the tree
-  from 4.6B search nodes to 98M (~1½ min sequentially). A Korean literate
-  essay, with a MetaPost figure. A companion change file `wordcube-par.ch`
-  (`gtangle wordcube.w wordcube-par.ch`) forks a goroutine-parallel build — the
-  independent first-word choices fan out across workers, giving the same counts
-  in ~13 s on 10 cores.
-* [ziptree.w](ziptree.w) — the **zip tree** of Tarjan, Levy,
-  and Timmel: a randomized BST that is max-heap-ordered by a geometric random
-  *rank* (ties favoring the smaller key), updated by *unzipping* and *zipping*
-  search paths instead of rotations. Implements the paper's recursive insert,
-  zip, and delete as a library, then derives two memory-savers: an *arena*
-  (index-based, byte rank, free list) that halves node size and cuts a
-  million-node build from ~1M allocations to ~40, and a *pseudo-random rank*
-  variant that drops the rank field entirely (computing it from the key). The
-  `@(zip_test.go@>` test file (run with `go test`) reproduces the paper's
-  Figure 1 exactly, cross-checks all three representations, fuzz-checks the
-  BST/heap invariants, and benchmarks allocations. Korean.
-* [cdq-dc/](cdq-dc/) — **CDQ divide and conquer**, the offline technique that
-  splits not the problem but the *set of pairs*, letting an earlier half pay its
-  contribution forward to a later one. One axis per weapon: sorting, divide and
-  conquer, Fenwick tree.
-  * `flower/` — Luogu P3810, 3-D partial order. The technique in general: what
-    it is, when it applies, O(n log n log k), and what it costs you.
-  * `inv/` — Luogu P3157, dynamic inversions. Promoting *time* to an axis.
-  * `stars/` — POJ 2352, star levels. Two axes only, so the input does the
-    sorting and even the Fenwick tree disappears — the technique at its barest.
-  * `robin/` — LightOJ 1112. An aside giving the Fenwick tree, silent third
-    axis of the other three, the stage to itself.
-* [cht/](cht/) — the **convex hull trick**: quadratic DP transitions reread as
-  lines, and the lower envelope of those lines. A companion to `cdq-dc/`, walking
-  down the same ladder as monotonicity is taken away one rung at a time.
-  * `frog/` — AtCoder EDPC Z, *Frog 3*. The technique in general; both slopes
-    and queries monotone, so a deque holds the hull and the whole thing is O(n).
-  * `bridge/` — CEOI 2017 *Building Bridges*. Both monotonicities broken, so a
-    **Li Chao tree** replaces the deque — and comparing values instead of
-    intersections retires the 128-bit arithmetic.
-  * `cash/` — NOI 2007 *Cash*, the problem CDQ divide and conquer was
-    introduced with. The two collections meet here: recursion over time, merging
-    upward in x, slopes distributed downward.
-  * `segment/` — HEOI 2013 *Segment*. Forced online (coordinates arrive
-    encrypted by the previous answer), which seals off CDQ and coordinate
-    compression and leaves the Li Chao tree standing alone, in its home problem
-    of segment insertion.
-* [guitar-tuner/](guitar-tuner/) — a guitar tuner that reads the Mac's
-  microphone and shows the pitch on a needle gauge in real time. Pitch detection
-  is a **from-scratch implementation of the YIN algorithm** with no DSP library:
-  difference function, cumulative mean normalization, absolute threshold, and
-  parabolic interpolation, wrapped in high-pass pre-filtering, attack-transient
-  suppression, median smoothing and octave-error correction. Audio capture uses
-  [malgo](https://github.com/gen2brain/malgo) (miniaudio). Its own
-  [README](guitar-tuner/README.md) has the details; unlike the two collections
-  above, this one is a single program cut into three documents.
-  * `pitch/` — the pure core, knowing nothing of microphones or screens: the
-    detection pipeline behind `pitch.Stream`, plus open-string music theory.
-  * `tuner.w` — the console frontend, a chromatic gauge drawn in the terminal.
-  * `gui/` — a second frontend in a [Gio](https://gioui.org) native window,
-    sharing that same core.
-* [life-game/](life-game/) — Conway's **Game of Life** in the terminal, with no
-  graphics library whatsoever: if a Go board was enough for Conway, ANSI escape
-  codes are enough for us. The universe is a torus, so a glider walking off one
-  edge returns from the other — and Gosper's gun is eventually shot down by its
-  own stream. A single `.w` that is equally a program and an essay, titled after
-  Laozi's *heaven and earth are not benevolent*: Conway tuning the rules with
-  stones on a tea table, the $50 bet the glider gun settled, and Conway's
-  late-life "I hate the Game of Life". `demos/` holds recordings made with
-  [vhs](https://github.com/charmbracelet/vhs).
-* [skew-ternary/](skew-ternary/) — Knuth's **skew-ternary-calc**, plus the
-  interactive toy he wished someone would build. A ternary tree gets buds in
-  its empty slots; every node and bud has a rank (left child −1, middle same,
-  right +1); the tree is *skew* when no rank goes negative. The pretty theorem
-  is that each cyclic family of 2n+2 such trees holds exactly four skew ones,
-  proved by letting an ant crawl the perimeter counting buds up and arcs down.
-  The program computes the three conjugates of a tree, then builds the
-  corresponding planar map twice over — by Jacquard and Schaeffer's
-  correspondence and by Del Lungo, Del Ristoro and Penaud's — in a
-  Guibas–Stolfi quad-edge structure, which is where Knuth's own surprise
-  lives: the four conjugates give four *dual* maps, a conjecture Gilles
-  Schaeffer then explained from his 1998 thesis. Verified against the CWEB
-  original on 6333 cases per seed with no difference, and all 68 of Knuth's
-  MetaPost figures come along, converted from `mpost`'s one-pass model (where
-  figures inherit state from earlier ones) to luamplib's per-figure one.
-  Korean.
-  * `app/` — a single HTML page for the wish in Knuth's own introduction, that
-    someone build something to handle these trees interactively and bring out
-    their patterns in color. Step the ant around the perimeter and watch the
-    buds pile up and pair off, until the four that never pair are all that is
-    left; then rotate through the four conjugates they name. Its arithmetic is
-    the `.w`'s own parsing and state-table chapters ported to JavaScript,
-    checked against the Go program on 3510 random skew trees.
+  ("BACK-MXN-WORDS-NEW와 겨루라고 만든 것")가 하던 방식이다. 옮겨 놓고 보면 놀랄
+  만큼 작다. 주 항목 15개(`i <= j`인 줄들), 부 항목 35개(칸들, 정렬한 첨자
+  세짝으로 이름을 짓는다), 그리고 줄과 낱말의 쌍마다 선택지 하나인데, 그 다섯 색
+  항목이 어느 글자가 어디에 놓이는지 말한다. 이름을 정렬하는 것이 대칭 장치의
+  전부이고, 그것을 검사하는 코드는 한 줄도 없다. 덤이 공짜로 따라온다. 낱말마다
+  색 없는 부 항목을 하나 두면 "열다섯 낱말이 모두 다르다"가 코드가 아니라
+  플래그(`-d`) 하나가 된다. 잘라 낸 사전 위에서 `wordcube`와 맞춰 보았고(낱말
+  3000개에서 3 대 3, 3500개에서 83 대 83, `-d`로 60 대 60), 뽑아낸 답마다 5×5×5
+  배열로 되짚어 지어 세 축을 따라 다시 검사했으며, 전체 목록도 끝까지 돌려 같은
+  83,576개를 얻었다. 마지막 장은 둘을 겨루게 한다. 춤추는 칸이 *더 나은* 나무를
+  쳐 내는데(마디 5710만 개 대 9800만 개) 시계로는 진다. 칸 항목 하나가 3·|W|개의
+  선택지에 들어 있어서, 색칠 한 번이 수천 개를 걷는 자리에서 백트래킹은 이진
+  탐색 한 번을 하기 때문이다. 규모가 커지면 덮인 항목이 목록을 줄여 차이가
+  좁아지기는 한다(낱말 2000개에서 92배, 3500개에서 39배, 전체 목록에서 16배로
+  26분 36초 대 1분 41초). 그 자리에서 그리는 MetaPost 그림 하나와
+  `wordcube.mp`에서 빌려 온 그림 하나.
+* [wordcube.w](wordcube.w) — 스탠퍼드 그래프베이스의 다섯 글자 낱말 5757개로
+  **대칭 5×5×5 낱말 정육면체**를 몇 개나 지을 수 있는가? 완전히 대칭인
+  정육면체는 세 축 어느 쪽으로 읽어도 같은 낱말이 나온다. 말끔한 백트래킹이
+  열다섯 줄을 행 우선으로 채우는데, 새 낱말마다 이미 놓인 글자가 접두사를 이루니
+  나머지는 사전 찾기가 해 준다. 답은 83,576개다(열다섯 낱말이 모두 달라야 하면
+  75,130개). 기본 프로그램은 *배제*(전방 검사)를 더한다. 낱말을 놓을 때마다 아직
+  채우지 않은 줄이 사전으로 채워질 수 있는지 확인해, 탐색 마디를 46억 개에서
+  9800만 개로 쳐 낸다(차례로 돌려 1분 30초쯤). 한글 문학적 에세이이고 MetaPost
+  그림이 딸려 있다. 짝이 되는 변경 파일 `wordcube-par.ch`(`gtangle wordcube.w
+  wordcube-par.ch`)는 고루틴으로 병렬 빌드를 갈라 낸다. 첫 낱말의 서로 독립인
+  선택이 일꾼들로 퍼져 나가, 코어 10개에서 13초쯤에 같은 답을 준다.
+* [ziptree.w](ziptree.w) — 타잔과 레비와 팀멜의 **짚트리**. 기하 분포 난수
+  *등급*으로 최대 힙 순서를 지키는 무작위 이진 탐색 트리이고(비기면 키가 작은
+  쪽을 민다), 회전 대신 탐색 경로를 *지퍼처럼 열고 닫아* 갱신한다. 논문의 재귀적
+  insert, zip, delete를 라이브러리로 구현한 뒤 메모리를 아끼는 두 가지를 이끌어
+  낸다. *아레나*(첨자 기반, 등급 1바이트, 빈칸 목록)는 마디 크기를 절반으로
+  줄이고 백만 마디 빌드의 할당을 100만 번쯤에서 40번쯤으로 줄인다. *의사 난수
+  등급* 판은 등급 필드를 아예 없앤다(키에서 셈한다). 명령 `go test`로 돌리는
+  `@(zip_test.go@>` 시험 파일은 논문의 그림 1을 정확히 되살리고, 세 표현을 교차
+  확인하고, BST와 힙 불변식을 퍼징으로 검사하고, 할당을 벤치마크한다.
+* [cdq-dc/](cdq-dc/) — **CDQ 분할 정복**. 문제가 아니라 *쌍의 집합*을 가르는
+  오프라인 기법으로, 앞쪽 절반이 뒤쪽 절반에 제 몫을 미리 치르게 한다. 무기
+  하나에 축 하나다. 정렬, 분할 정복, 펜윅 트리.
+  * `flower/` — 뤄구 P3810, 3차원 부분 순서. 기법 일반을 다룬다. 무엇이고, 언제
+    쓰이고, O(n log n log k)이고, 무엇을 내주어야 하는지.
+  * `inv/` — 뤄구 P3157, 동적 역위. *시간*을 축으로 올린다.
+  * `stars/` — POJ 2352, 별의 등급. 축이 둘뿐이라 입력이 정렬을 대신하고 펜윅
+    트리마저 사라진다. 기법의 가장 헐벗은 모습이다.
+  * `robin/` — LightOJ 1112. 다른 셋의 말 없는 셋째 축인 펜윅 트리에게 무대를
+    내주는 곁가지다.
+* [cht/](cht/) — **볼록 껍질 요령**. 이차 DP 전이를 직선으로 다시 읽고, 그
+  직선들의 아래 포락선을 본다. 디렉터리 `cdq-dc/`의 짝으로, 단조성을 한 칸씩
+  빼앗기며 같은 사다리를 내려간다.
+  * `frog/` — 앳코더 EDPC Z, *Frog 3*. 기법 일반을 다룬다. 기울기와 질의가 모두
+    단조라 덱이 껍질을 들고 전체가 O(n)이다.
+  * `bridge/` — CEOI 2017 *Building Bridges*. 단조성이 둘 다 깨져 덱 대신 **리
+    차오 트리**가 들어서고, 교점 대신 값을 견주니 128비트 산술이 물러난다.
+  * `cash/` — NOI 2007 *Cash*. CDQ 분할 정복이 세상에 나올 때 함께 온 문제다. 두
+    갈래가 여기서 만난다. 시간에 대한 재귀, 위로 올라가며 x에 대해 병합, 아래로
+    내려가는 기울기.
+  * `segment/` — HEOI 2013 *Segment*. 온라인이 강제되어(좌표가 앞선 답으로
+    암호화되어 온다) CDQ도 좌표 압축도 막히고, 리 차오 트리만 제 집인 선분 삽입
+    문제에 홀로 선다.
+* [guitar-tuner/](guitar-tuner/) — 맥의 마이크를 읽어 음높이를 바늘 계기로
+  실시간에 보이는 기타 튜너. 음높이 검출은 DSP 라이브러리 없이 **YIN 알고리즘을
+  맨손으로 구현한 것**이다. 차이 함수, 누적 평균 정규화, 절대 문턱값, 포물선
+  보간을 하고, 그 둘레에 고역 통과 전처리와 어택 과도 억제와 중앙값 평활화와
+  옥타브 오류 보정을 두른다. 소리 잡기는
+  [malgo](https://github.com/gen2brain/malgo)(miniaudio)로 한다. 자세한 것은 제
+  [README](guitar-tuner/README.md)에 있다. 위의 두 모음과 달리 이것은 프로그램
+  하나를 문서 셋으로 자른 것이다.
+  * `pitch/` — 마이크도 화면도 모르는 순수한 핵심. 곧 `pitch.Stream` 뒤의 검출
+    파이프라인과 개방현 음악 이론이다.
+  * `tuner.w` — 콘솔 프런트엔드. 터미널에 그리는 반음계 계기다.
+  * `gui/` — [Gio](https://gioui.org) 네이티브 창으로 만든 둘째 프런트엔드. 같은
+    핵심을 함께 쓴다.
+* [life-game/](life-game/) — 터미널에서 도는 콘웨이의 **생명 게임**. 그래픽
+  라이브러리는 전혀 쓰지 않는다. 콘웨이에게 바둑판으로 넉넉했다면 우리에게는
+  ANSI 이스케이프 부호로 넉넉하다. 우주는 원환면이라 한쪽 끝으로 걸어 나간
+  글라이더가 다른 쪽에서 돌아오고, 고스퍼의 글라이더 총도 끝내 제가 쏜 줄기에
+  맞아 떨어진다. 파일 `.w` 하나가 프로그램이자 에세이이고, 제목은 노자의
+  *천지불인*에서 왔다. 찻상 위에 돌을 놓아 가며 규칙을 다듬던 콘웨이, 글라이더
+  총이 매듭지은 50달러 내기, 그리고 말년의 "나는 생명 게임이 싫다"는 말을
+  담았다. 디렉터리 `demos/`에는 [vhs](https://github.com/charmbracelet/vhs)로
+  찍은 기록이 있다.
+* [skew-ternary/](skew-ternary/) — 크누스의 **skew-ternary-calc**와, 누군가
+  만들어 주기를 그가 바랐던 대화형 장난감. 삼진 나무의 빈자리마다 싹이 돋고,
+  마디와 싹 저마다 등급이 있다(왼쪽 자식 −1, 가운데는 그대로, 오른쪽 +1). 등급이
+  한 번도 음수가 되지 않으면 그 나무는 *비스듬하다*. 어여쁜 정리는 그런 나무
+  2n+2개로 된 순환 가족마다 비스듬한 것이 정확히 넷이라는 것인데, 개미를 둘레로
+  기어가게 해 싹은 올리고 호는 내리며 세면 증명된다. 프로그램은 나무의 세 켤레를
+  셈한 뒤 대응하는 평면 지도를 두 가지로 짓는다. 자카르와 셰페르의 대응으로 한
+  번, 델룽고와 델리스토로와 페노의 대응으로 한 번인데, 기바스–스톨피 쿼드에지
+  구조 위에서 하며, 크누스 자신의 놀라움이 사는 곳도 거기다. 네 켤레가 네 개의
+  *쌍대* 지도를 준다는 추측인데, 질 셰페르가 자기 1998년 학위 논문에서 설명해
+  주었다. CWEB 원본과 씨앗마다 6333가지에서 차이 없이 맞춰 보았고, 크누스의
+  MetaPost 그림 68개도 모두 함께 옮겼다. 그러면서 `mpost`의 한 번 훑기
+  모형(그림이 앞선 그림의 상태를 물려받는다)에서 luamplib의 그림별 모형으로
+  바꾸었다.
+  * `app/` — 크누스가 들어가며에서 손수 밝힌 바람, 곧 누군가 이 나무들을
+    대화형으로 다루고 그 무늬를 색으로 드러내 주기를 바란 것에 답하는 HTML 한
+    쪽. 개미를 둘레로 한 걸음씩 옮기며 싹이 쌓이고 짝지어 사라지는 것을 보다가,
+    끝내 짝을 찾지 못한 넷만 남으면 그것들이 가리키는 네 켤레를 돌려 본다. 셈은
+    `.w` 자신의 파싱과 상태표 장을 자바스크립트로 옮긴 것이고, 무작위 비스듬
+    나무 3510개에서 Go 프로그램과 맞춰 보았다.
 
-### Korean (and other non-English) documentation
+### 한글(과 그 밖의 비영어) 문서
 
-The woven output can be written in Korean by putting one line in the `.w`
-file's limbo:
+짜여 나오는 문서는 `.w` 파일의 림보에 한 줄을 두어 한글로 쓸 수 있다.
 
 ```tex
 \input kotexgweb
 ```
 
-`kotexgweb.tex` ships with [GWEB](https://github.com/sjnam/gweb) itself, not with
-these examples; installing GWEB puts it on your `TEXINPUTS`. It loads
-[luatexko](https://ctan.org/pkg/luatexko) and selects the Noto Serif/Sans CJK KR
-fonts (edit the `\sethangulfont` lines to change typefaces), translates gweave's
-fixed wording into Korean, and supplies a LuaTeX PDF back end so that blue
-cross-reference links and the PDF outline (bookmark) pane work, with Korean
-bookmark titles. Then:
+파일 `kotexgweb.tex`는 이 예제들이 아니라 [GWEB](https://github.com/sjnam/gweb)
+자체에 딸려 오고, GWEB을 설치하면 `TEXINPUTS`에 놓인다. 이것이
+[luatexko](https://ctan.org/pkg/luatexko)를 읽어 들이고 Noto Serif/Sans CJK KR
+글꼴을 고르며(글꼴을 바꾸려면 `\sethangulfont` 줄을 손보면 된다), gweave가 찍는
+고정 문구를 한글로 옮기고, LuaTeX PDF 백엔드를 마련해 파란 상호 참조 링크와 PDF
+북마크 창이 한글 제목으로 제대로 돌아가게 한다. 그런 다음에는 이렇게 한다.
 
 ```sh
 gweave foo.w           # -> foo.tex
-luatex foo.tex         # -> foo.pdf   (kotexgweb.tex on TEXINPUTS)
+luatex foo.tex         # -> foo.pdf   (kotexgweb.tex가 TEXINPUTS에 있어야 한다)
 ```
 
-gweave needs no flag; all the human-readable text it emits goes through macros
-(`\GU`, `\GNused`, `\Gsectionword`, …) that `kotexgweb.tex` overrides, so the same
-mechanism localizes to any language — write your own `\input` file modelled on it.
+도구 gweave에는 따로 줄 플래그가 없다. 그것이 내놓는 사람이 읽을 문구는 모두
+`kotexgweb.tex`가 덮어쓰는 매크로(`\GU`, `\GNused`, `\Gsectionword`, …)를
+거치므로, 같은 장치로 어떤 언어로든 지역화할 수 있다. 이 파일을 본떠 제 `\input`
+파일을 쓰면 된다.
