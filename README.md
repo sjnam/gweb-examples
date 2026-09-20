@@ -589,28 +589,3 @@ MetaPost를 그 자리에서 돌린다. 따로 도는 `mpost` 단계도, 중간 
     끝내 짝을 찾지 못한 넷만 남으면 그것들이 가리키는 네 켤레를 돌려 본다. 셈은
     `.w` 자신의 파싱과 상태표 장을 자바스크립트로 옮긴 것이고, 무작위 비스듬
     나무 3510개에서 Go 프로그램과 맞춰 보았다.
-
-### 한글(과 그 밖의 비영어) 문서
-
-짜여 나오는 문서는 `.w` 파일의 림보에 한 줄을 두어 한글로 쓸 수 있다.
-
-```tex
-\input kotexgweb
-```
-
-파일 `kotexgweb.tex`는 이 예제들이 아니라 [GWEB](https://github.com/sjnam/gweb)
-자체에 딸려 오고, GWEB을 설치하면 `TEXINPUTS`에 놓인다. 이것이
-[luatexko](https://ctan.org/pkg/luatexko)를 읽어 들이고 Noto Serif/Sans CJK KR
-글꼴을 고르며(글꼴을 바꾸려면 `\sethangulfont` 줄을 손보면 된다), gweave가 찍는
-고정 문구를 한글로 옮기고, LuaTeX PDF 백엔드를 마련해 파란 상호 참조 링크와 PDF
-북마크 창이 한글 제목으로 제대로 돌아가게 한다. 그런 다음에는 이렇게 한다.
-
-```sh
-gweave foo.w           # -> foo.tex
-luatex foo.tex         # -> foo.pdf   (kotexgweb.tex가 TEXINPUTS에 있어야 한다)
-```
-
-도구 gweave에는 따로 줄 플래그가 없다. 그것이 내놓는 사람이 읽을 문구는 모두
-`kotexgweb.tex`가 덮어쓰는 매크로(`\GU`, `\GNused`, `\Gsectionword`, …)를
-거치므로, 같은 장치로 어떤 언어로든 지역화할 수 있다. 이 파일을 본떠 제 `\input`
-파일을 쓰면 된다.
