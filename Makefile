@@ -7,9 +7,9 @@
 # 예제마다 한 번에 하나씩 빌드한다(`make all`은 없다). 거의 모든 .go 가 package main
 # 의 main() 을 가져, 한 디렉토리에 동시에 풀면 Go 가 main 중복으로 컴파일을 거부한다.
 #
-# 조판은 문서를 가리지 않고 luatex 하나로 한다. 한글 문서(\input kotexgweb.tex)와
-# 그림 있는 문서(\input luamplib.sty)는 luatex라야 하고---luamplib 은 \directlua 를
-# 쓰므로 pdftex 로는 돌지 않는다---나머지 영문 문서도 목차까지 그대로 나온다.
+# 조판은 luatex 하나로 한다. 한글 문서(\input kotexgweb.tex)와 그림 있는
+# 문서(\input luamplib.sty)가 luatex 를 요구하고---luamplib 은 \directlua 를 쓰므로
+# pdftex 로는 돌지 않는다---여기 있는 문서는 모두 그 둘 가운데 하나다.
 # 매크로(gwebmac.tex, kotexgweb.tex)는 설치된 texmf 트리에서 자동으로 찾는다.
 # 변경 파일 .ch 를 적용하려면 수작업으로 부른다(예: gtangle matula.w matula-big.ch).
 
@@ -49,8 +49,8 @@ $(NAMES): %: %.go %.pdf
 # `*.tex`로 싹 지우면 손으로 쓴 .tex 가 있을 때 함께 날아가므로, .w 에 대응하는
 # <name>.tex 만 지운다.
 #
-# `*.[0-9]*` 는 mpost 가 그림마다 뱉는 <name>.1, <name>.2, ... 를 쓸어 담는다.
-# `*.[0-9]` 로는 한 자리밖에 못 잡아 <name>.12 같은 것이 남는다. 소스 이름에는
+# `*.[0-9]*` 는 예전에 mpost 를 쓰던 시절의 찌꺼기(<name>.1, <name>.2, ...)를 쓸어
+# 담는다. 지금은 luamplib 이 조판 중에 그리므로 새로 생기지는 않는다. 소스 이름에는
 # 점 뒤에 숫자가 오는 것이 없으니 이 글로브에 걸릴 것도 없다.
 clean:
 	rm -f *.go $(WFILES:.w=.tex) *.log *.toc *.pdf *.idx *.scn *.dvi *.out
