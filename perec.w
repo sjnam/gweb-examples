@@ -1,8 +1,11 @@
-% perec: Georges Perec's Life A User's Manual reconstructed with the
-% Stanford GraphBase, as a GWEB literate program in Go.
+% perec: 조르주 페렉의 인생 사용법을 스탠퍼드 그래프베이스로 다시 지은,
+% Go로 쓴 GWEB 문학적 프로그램.
+\input kotexgweb
 @i types.w
 
 \input luamplib.sty
+
+\def\title{인생 사용법}
 \def\verbatim{\begingroup
   \def\do##1{\catcode`##1=12 } \dospecials
   \parskip 0pt \parindent 2em \let\!=!
@@ -11,39 +14,33 @@
 {\catcode`\^^M=13{\catcode`\ =13\gdef\verbatimdefs{\def^^M{\ \par}\let =\ }} %
   \gdef\verbatimgobble#1^^M{}}
 
-@** The knight's tour. Georges Perec's novel ``{\sl Life A User's Manual\/}
-({\it La Vie mode d'emploi\/}, 1978)'' is set in an apartment building at 11 rue
-Simon-Crubellier in Paris. Perec cut the building's facade away like a doll's
-house, imagining a $10\times10=100$-cell grid from the cellars to the attic.
-Each chapter of the novel dwells in one of those 100 cells and tells the story
-unfolding in that room.
+@** 나이트 투어. 조르주 페렉의 소설 ``{\sl 인생 사용법\/}({\it La Vie mode
+d'emploi\/}, 1978)''은 파리 시몽크뤼벨리에가 11번지의 한 아파트 건물을 무대로
+한다. 페렉은 인형의 집처럼 건물의 정면을 떼어 내고, 지하실부터 다락까지
+$10\times10=100$칸의 격자를 떠올렸다. 소설의 각 장은 그 100칸 가운데 하나에 머물며
+그 방에서 펼쳐지는 이야기를 들려준다.
 
-The question is the order in which the narrative moves from room to room. Perec
-fixed it by the {\it knight's move\/} of chess: he chose a knight's tour of the
-$10\times10$ board---a path that steps by knight's moves through all 100 cells,
-never landing on one twice---and let the chapters travel in that order. The
-first chapter begins at the central landing |(6,6)|.
+문제는 이야기가 방에서 방으로 옮겨 가는 차례다. 페렉은 그것을 체스의 {\it 나이트
+이동\/}으로 정했다. $10\times10$ 판의 나이트 투어, 곧 나이트 걸음으로 100칸을 모두
+지나되 한 칸도 두 번 밟지 않는 길을 골라, 장들이 그 차례로 돌아다니게 했다. 첫 장은
+한가운데 층계참 |(6,6)|에서 시작한다.
 
-Yet the novel has 99 chapters, not 100. Partway through the tour Perec
-deliberately skipped a cell: the cellar at the bottom-left corner |(1,10)|.
-Borrowing a word from Lucretius, he called this deliberate flaw the {\it
-clinamen\/} (the slight swerve of an atom from its ordained path). Because of
-it, the move from the 65th chapter to the 66th is not a knight's move but an
-illegal diagonal step of one cell---the single blemish on an otherwise perfect
-tour.
+그런데 소설은 100장이 아니라 99장이다. 투어 도중에 페렉은 일부러 한 칸을 건너뛰었다.
+왼쪽 아래 구석 |(1,10)|의 지하실이다. 루크레티우스에게서 말을 빌려, 그는 이 일부러
+낸 흠을 {\it 클리나멘\/}(정해진 길에서 원자가 살짝 빗나감)이라 불렀다. 그 때문에
+65장에서 66장으로 가는 수는 나이트 걸음이 아니라 한 칸 대각선으로 가는, 규칙에
+어긋나는 걸음이다. 그것만 빼면 흠 없는 투어인데 거기 한 군데 티가 난다.
 
-Here is a picture. The facade is cut away like a doll's house so that all 100
-rooms lie open at once; each cell is stamped with its chapter number, and
-consecutive chapters are joined by a line. The first chapter is the ringed |1|
-at the center, and the bottom-left corner---the unvisited clinamen---is left
-empty with a cross. The dashed line from $65$ to $66$ is that one illegal,
-non-knight move.
+그림으로 보자. 인형의 집처럼 정면을 떼어 내 100개의 방이 한눈에 열려 있다. 칸마다
+장 번호가 찍혀 있고, 이어지는 두 장은 선으로 이었다. 첫 장은 한가운데 동그라미 친
+|1|이고, 왼쪽 아래 구석---들르지 않은 클리나멘---은 비운 채 가위표를 쳤다. $65$에서
+$66$으로 가는 점선이 나이트 걸음이 아닌 그 한 수다.
 \bigskip
 $$
 \mplibcode
 beginfig(1);
-  numeric u; u := 28;              % cell size in bp
-  pair p[];                        % p[k] is the cell the (k)th chapter sits in (x=col, y=floor)
+  numeric u; u := 28;              % 칸 크기, bp 단위
+  pair p[];                        % p[k]는 k번째 장이 머무는 칸 (x=열, y=층)
   p[1]:=(6,6); p[2]:=(8,7); p[3]:=(10,6); p[4]:=(8,5); p[5]:=(10,4); p[6]:=(9,2); p[7]:=(7,1);
   p[8]:=(8,3); p[9]:=(6,2); p[10]:=(4,1); p[11]:=(2,2); p[12]:=(1,4); p[13]:=(3,5); p[14]:=(4,3);
   p[15]:=(3,1); p[16]:=(5,2); p[17]:=(6,4); p[18]:=(4,5); p[19]:=(5,7); p[20]:=(3,8); p[21]:=(4,10);
@@ -60,14 +57,14 @@ beginfig(1);
   p[92]:=(10,8); p[93]:=(9,6); p[94]:=(7,5); p[95]:=(5,4); p[96]:=(3,3); p[97]:=(1,2); p[98]:=(2,4);
   p[99]:=(1,6);
 
-  % map cell (x,y) to a screen point; y grows downward (top row is the attic).
+  % 칸 (x,y)를 화면 점으로 보낸다. y는 아래로 자란다(맨 윗줄이 다락).
   def C(expr c) = ((xpart c)*u, -(ypart c)*u) enddef;
 
-  % clinamen: shade the unvisited bottom-left corner (1,10) lightly.
+  % 클리나멘: 들르지 않은 왼쪽 아래 구석 (1,10)을 옅게 칠한다.
   fill C((0.5,9.5))--C((1.5,9.5))--C((1.5,10.5))--C((0.5,10.5))--cycle
     withcolor 0.86white;
 
-  % room partitions (thin) and the facade border (thick).
+  % 방 사이 칸막이(가늘게)와 정면의 테두리(굵게).
   pickup pencircle scaled 0.3bp;
   for i=0 upto 10:
     draw C((0.5,0.5+i))--C((10.5,0.5+i));
@@ -76,11 +73,11 @@ beginfig(1);
   pickup pencircle scaled 1.1bp;
   draw C((0.5,0.5))--C((10.5,0.5))--C((10.5,10.5))--C((0.5,10.5))--cycle;
 
-  % a doll's-house roof, set atop the cut-away facade.
+  % 떼어 낸 정면 위에 얹은 인형의 집 지붕.
   pickup pencircle scaled 1.1bp;
   draw C((0.5,0.5))--(5.5u,0.2u)--C((10.5,0.5));
 
-  % the knight's tour: join consecutive chapters; only 65->66 is a non-knight move.
+  % 나이트 투어: 이어지는 장을 잇는다. 65->66만 나이트가 아닌 수다.
   pickup pencircle scaled 0.7bp;
   for k=1 upto 98:
     if k=65:
@@ -90,13 +87,13 @@ beginfig(1);
     fi
   endfor;
 
-  % stamp each cell with its chapter number.
+  % 칸마다 장 번호를 찍는다.
   defaultscale := 0.62;
   for k=1 upto 99:
     label(decimal k, C(p[k]));
   endfor;
 
-  % ring the first chapter (6,6); mark the clinamen cell with an x.
+  % 첫 장 (6,6)에 동그라미를 치고, 클리나멘 칸에 가위표를 친다.
   pickup pencircle scaled 0.6bp;
   draw fullcircle scaled 0.78u shifted C(p[1]);
   draw C((0.68,9.68))--C((1.32,10.32));
@@ -105,23 +102,19 @@ endfig;
 \endmplibcode
 $$
 \bigskip\noindent
-Perec had a second constraint. He gathered 42 lists of ten items into
-twenty-one pairs and, by an order-10 Graeco-Latin square, assigned to each
-chapter a combination of items. If the knight's tour decides {\it where to
-write}, this square decides {\it what to write}. This starred section builds and
-verifies the {\it knight's tour}; the square that distributes the material is
-treated in a later starred section.
+페렉에게는 제약이 하나 더 있었다. 그는 열 개짜리 목록 42개를 스물한 쌍으로 모으고,
+10차 그레코라틴 방진으로 장마다 소재의 조합을 배정했다. 나이트 투어가 {\it 어디에
+쓸지}를 정한다면, 이 방진은 {\it 무엇을 쓸지}를 정한다. 이 별표 절은 {\it 나이트
+투어}를 짓고 확인한다. 소재를 나누는 방진은 뒤의 별표 절에서 다룬다.
 
-@ Here is what the program does. Using {\sc GB\_\,BASIC}'s |Board| it builds the
-$10\times10$ knight board, lays Perec's actual chapter order on it, and
-verifies---by asking the board's own arcs---that the order really is a walk of
-knight's moves, with the clinamen as its one exception. Finally it prints a grid
-of chapter numbers and a diagnosis.
+@ 프로그램이 하는 일은 이렇다. {\sc GB\_\,BASIC}의 |Board|로 $10\times10$ 나이트
+판을 짓고, 거기에 페렉의 실제 장 차례를 얹은 다음, 판 자신의 호에 물어 그 차례가
+정말 나이트 걸음의 걷기인지, 그리고 클리나멘이 그 하나뿐인 예외인지 확인한다. 끝으로
+장 번호 격자와 진단을 찍는다.
 
-The chapter-order data is transcribed from the |sqs| array in
-\.{scripts/knights-tour.js}, published by Thomas Guest at
-\.{wordaligned.org/knights-tour}. Whether the transcription is faithful the
-program checks for itself, on the board.
+장 차례 자료는 토머스 게스트가 \.{wordaligned.org/knights-tour}에 낸
+\.{scripts/knights-tour.js}의 |sqs| 배열에서 옮겨 적었다. 옮겨 적은 것이 맞는지는
+프로그램이 판 위에서 스스로 검사한다.
 
 @c
 package main
@@ -135,22 +128,21 @@ import (
 	"github.com/sjnam/go-sgb/gbbasic"
 )
 
-@<Types and data@>
+@<타입과 자료@>
 
 func main() {
-	@<Build the knight board@>
-	@<Extract the board's adjacency@>
+	@<나이트 판을 짓는다@>
+	@<판의 인접 관계를 뽑는다@>
 	out := bufio.NewWriter(os.Stdout)
 	defer out.Flush()
-	@<Verify and print the tour@>
-	@<Generate and print a complete tour@>
-	@<Verify the square and print the assignment@>
+	@<투어를 확인하고 찍는다@>
+	@<온전한 투어를 만들어 찍는다@>
+	@<방진을 확인하고 배정을 찍는다@>
 }
 
-@ A cell of the board is a |cell|. Here |x| is the column (1 at the left, 10 at
-the right) and |y| the floor (1 at the top, 10 at the bottom). |tour[k]| is the
-cell the $(k+1)$th chapter sits in.
-@<Types and data@>=
+@ 판의 한 칸은 |cell|이다. 여기서 |x|는 열(왼쪽이 1, 오른쪽이 10)이고 |y|는 층(맨
+위가 1, 맨 아래가 10)이다. 값 |tour[k]|는 $(k+1)$번째 장이 머무는 칸이다.
+@<타입과 자료@>=
 type cell struct{ x, y int }
 
 var tour = []cell{
@@ -166,24 +158,22 @@ var tour = []cell{
 	{9, 10}, {10, 8}, {9, 6}, {7, 5}, {5, 4}, {3, 3}, {1, 2}, {2, 4}, {1, 6},
 }
 
-@ |Board| builds a board graph from the moves of a generalized chess piece. Its
-first four arguments are the board's dimensions; a zero dimension is unused, so
-|10,10,0,0| is a two-dimensional $10\times10$ board. The fifth argument
-|piece=5| is the knight---a knight's move is exactly the one whose Euclidean
-distance between two cells is $\sqrt5$. The last two arguments are wrapping and
-directedness, both unused here.
-@<Build the knight board@>=
+@ 함수 |Board|는 일반화된 체스 말의 이동에서 판 그래프를 짓는다. 앞의 네 인수는 판의
+크기다. 0인 차원은 쓰지 않으므로 |10,10,0,0|은 2차원 $10\times10$ 판이다. 다섯째 인수
+|piece=5|가 나이트다. 나이트 걸음은 두 칸 사이의 유클리드 거리가 정확히 $\sqrt5$인
+것이기 때문이다. 마지막 두 인수는 감싸기와 방향성인데 여기서는 쓰지 않는다.
+@<나이트 판을 짓는다@>=
 g, err := gbbasic.Board(10, 10, 0, 0, 5, 0, false)
 if err != nil {
-	log.Fatalf("couldn't build the knight board: %v", err)
+	log.Fatalf("나이트 판을 짓지 못했다: %v", err)
 }
 
-@ The vertices |Board| makes are named by coordinate |"row.col"|, so the cell at
-floor |y| and column |x| is |"y-1.x-1"| (both counted from 0). Verification needs
-not the vertices themselves but only whether two cells are neighbors on the
-board, so we sweep all of the board's arcs into a single set of name pairs. Then
-one lookup tells whether two cells are joined by a knight's move.
-@<Extract the board's adjacency@>=
+@ 함수 |Board|가 만드는 꼭짓점은 좌표 |"row.col"|로 이름이 붙는다. 그래서 층 |y|,
+열 |x|의 칸은 |"y-1.x-1"|이다(둘 다 0부터 센다). 확인하는 데 필요한 것은 꼭짓점
+자체가 아니라 두 칸이 판에서 이웃인지뿐이므로, 판의 호를 모두 쓸어 이름 쌍의 집합
+하나에 담는다. 그러면 찾아보기 한 번으로 두 칸이 나이트 걸음으로 이어지는지 알 수
+있다.
+@<판의 인접 관계를 뽑는다@>=
 adj := make(map[[2]string]bool)
 for v := range g.AllVertices() {
 	for a := range v.AllArcs() {
@@ -191,32 +181,29 @@ for v := range g.AllVertices() {
 	}
 }
 
-@ This |name| is the bridge from a coordinate to a vertex name: floor |y| first,
-column |x| second, each decremented to count from 0.
-@<Types and data@>=
+@ 함수 |name|은 좌표에서 꼭짓점 이름으로 건너가는 다리다. 층 |y|가 먼저, 열 |x|가
+나중이고, 0부터 세도록 저마다 1을 뺀다.
+@<타입과 자료@>=
 func name(c cell) string { return fmt.Sprintf("%d.%d", c.y-1, c.x-1) }
 
-@ Now the heart of it. First we sweep Perec's chapter order as a walk on the
-board, collecting the links that are not neighbors and the cells stepped on
-twice. Then we pick out the cell, among the 100, that is never stepped on. If
-Perec's tour is right, the only non-adjacent link is the clinamen, and the only
-unvisited cell is the cellar corner.
-@<Verify and print the tour@>=
-fmt.Fprint(out, "PEREC: the knight's tour of Life A User's Manual\n\n")
-fmt.Fprintf(out, "  The board's official name is\n  %s\n", g.ID)
-fmt.Fprintf(out, "  with %d vertices and %d arcs.\n\n", g.N, g.M)
-@<Find non-adjacent links and repeated cells@>
-@<Find the unvisited cell@>
-@<Print the chapter-number grid@>
-@<Print the verification result@>
+@ 이제 핵심이다. 먼저 페렉의 장 차례를 판 위의 걷기로 쓸어 가며, 이웃이 아닌 이음과
+두 번 밟은 칸을 모은다. 그다음 100칸 가운데 한 번도 밟지 않은 칸을 골라낸다. 페렉의
+투어가 옳다면 이웃이 아닌 이음은 클리나멘뿐이고, 들르지 않은 칸은 지하실 구석뿐이다.
+@<투어를 확인하고 찍는다@>=
+fmt.Fprint(out, "PEREC: 인생 사용법의 나이트 투어\n\n")
+fmt.Fprintf(out, "  판의 공식 이름은\n  %s\n", g.ID)
+fmt.Fprintf(out, "  이고 꼭짓점 %d개와 호 %d개를 가진다.\n\n", g.N, g.M)
+@<이웃하지 않은 이음과 두 번 밟은 칸을 찾는다@>
+@<들르지 않은 칸을 찾는다@>
+@<장 번호 격자를 찍는다@>
+@<확인 결과를 찍는다@>
 
-@ For each consecutive pair of chapters we ask |adj| whether their cells are
-neighbors on the board. If not, we record the link in |breaks|. We also record
-in |chapterAt| the first chapter to step on each cell, so a cell stepped on
-twice shows up at once.
-@<Find non-adjacent links and repeated cells@>=
+@ 이어지는 두 장마다 그 칸이 판에서 이웃인지 |adj|에게 묻는다. 아니면 그 이음을
+|breaks|에 적어 둔다. 또 칸마다 그것을 처음 밟은 장을 |chapterAt|에 적어 두므로, 두
+번 밟은 칸은 그 자리에서 드러난다.
+@<이웃하지 않은 이음과 두 번 밟은 칸을 찾는다@>=
 chapterAt := make(map[string]int)
-var breaks [][2]int // (earlier chapter, later chapter) of a non-adjacent link
+var breaks [][2]int // 이웃이 아닌 이음의 (앞 장, 뒤 장)
 var repeats int
 for k, c := range tour {
 	if _, seen := chapterAt[name(c)]; seen {
@@ -228,9 +215,9 @@ for k, c := range tour {
 	}
 }
 
-@ We walk all 100 cells of the board and gather those not in |chapterAt|,
-forming the coordinates by |Board|'s naming rule from floor |y| and column |x|.
-@<Find the unvisited cell@>=
+@ 판의 100칸을 모두 훑어 |chapterAt|에 없는 것을 모은다. 좌표는 층 |y|와 열 |x|에서
+|Board|의 이름 규칙대로 만든다.
+@<들르지 않은 칸을 찾는다@>=
 var missing []cell
 for y := 1; y <= 10; y++ {
 	for x := 1; x <= 10; x++ {
@@ -240,11 +227,11 @@ for y := 1; y <= 10; y++ {
 	}
 }
 
-@ The chapter-number grid is a copy of the novel's facade. From the top-left
-|(1,1)| to the bottom-right |(10,10)|, each cell is stamped with the chapter
-that treats that room. The unvisited cellar corner is left blank with three dots.
-@<Print the chapter-number grid@>=
-fmt.Fprint(out, "  Chapter-number grid (top-left is (1,1), top row is the attic):\n\n")
+@ 장 번호 격자는 소설의 정면을 옮겨 놓은 것이다. 왼쪽 위 |(1,1)|에서 오른쪽 아래
+|(10,10)|까지, 칸마다 그 방을 다루는 장이 찍힌다. 들르지 않은 지하실 구석은 점 셋으로
+비워 둔다.
+@<장 번호 격자를 찍는다@>=
+fmt.Fprint(out, "  장 번호 격자 (왼쪽 위가 (1,1), 맨 윗줄이 다락):\n\n")
 for y := 1; y <= 10; y++ {
 	fmt.Fprint(out, "   ")
 	for x := 1; x <= 10; x++ {
@@ -258,25 +245,24 @@ for y := 1; y <= 10; y++ {
 }
 fmt.Fprint(out, "\n")
 
-@ Finally we put the verification into words a reader can follow. For each
-non-adjacent link we tell between which chapters, and to which cell, it strayed,
-and whether the stray is a single diagonal step. Perec's clinamen is exactly
-that one move from the 65th chapter to the 66th.
-@<Print the verification result@>=
-fmt.Fprintf(out, "  chapters: %d, repeated cells: %d\n", len(tour), repeats)
+@ 끝으로 확인 결과를 독자가 따라갈 수 있는 말로 적는다. 이웃이 아닌 이음마다 어느
+장과 어느 장 사이에서 어느 칸으로 벗어났는지, 그 벗어남이 대각선 한 걸음인지 알린다.
+페렉의 클리나멘이 바로 65장에서 66장으로 가는 그 한 수다.
+@<확인 결과를 찍는다@>=
+fmt.Fprintf(out, "  장: %d, 두 번 밟은 칸: %d\n", len(tour), repeats)
 for _, m := range missing {
-	fmt.Fprintf(out, "  unvisited cell: (%d,%d)  <- clinamen\n", m.x, m.y)
+	fmt.Fprintf(out, "  들르지 않은 칸: (%d,%d)  <- 클리나멘\n", m.x, m.y)
 }
 for _, b := range breaks {
 	p, q := tour[b[0]-1], tour[b[1]-1]
 	dx, dy := abs(p.x-q.x), abs(p.y-q.y)
 	fmt.Fprintf(out,
-		"  non-knight move: ch.%d (%d,%d) -> ch.%d (%d,%d), offset (%d,%d)\n",
+		"  나이트가 아닌 수: %d장 (%d,%d) -> %d장 (%d,%d), 차이 (%d,%d)\n",
 		b[0], p.x, p.y, b[1], q.x, q.y, dx, dy)
 }
 
-@ A small hand for the absolute value of a coordinate difference.
-@<Types and data@>=
+@ 좌표 차의 절댓값을 구하는 자그마한 도움이다.
+@<타입과 자료@>=
 func abs(n int) int {
 	if n < 0 {
 		return -n
@@ -284,19 +270,18 @@ func abs(n int) int {
 	return n
 }
 
-@ Run the program and it prints this for the tour: the board's official name and
-its vertex and arc counts, the chapter-number grid modeled on the novel's
-facade, and then the verification result.
+@ 프로그램을 돌리면 투어에 대해 이렇게 찍는다. 판의 공식 이름과 꼭짓점·호의 개수,
+소설의 정면을 본뜬 장 번호 격자, 그리고 확인 결과다.
 \medskip
 \begingroup
 \verbatim
-PEREC: the knight's tour of Life A User's Manual
+PEREC: 인생 사용법의 나이트 투어
 
-  The board's official name is
+  판의 공식 이름은
   board(10,10,0,0,5,0,0)
-  with 100 vertices and 576 arcs.
+  이고 꼭짓점 100개와 호 576개를 가진다.
 
-  Chapter-number grid (top-left is (1,1), top row is the attic):
+  장 번호 격자 (왼쪽 위가 (1,1), 맨 윗줄이 다락):
 
      59  83  15  10  57  48   7  52  45  54
      97  11  58  82  16   9  46  55   6  51
@@ -309,38 +294,35 @@ PEREC: the knight's tour of Life A User's Manual
      63  24  66  73  35  22  90  75  39  32
     ...  72  64  21  67  74  38  33  91  76
 
-  chapters: 99, repeated cells: 0
-  unvisited cell: (1,10)  <- clinamen
-  non-knight move: ch.65 (2,8) -> ch.66 (3,9), offset (1,1)
+  장: 99, 두 번 밟은 칸: 0
+  들르지 않은 칸: (1,10)  <- 클리나멘
+  나이트가 아닌 수: 65장 (2,8) -> 66장 (3,9), 차이 (1,1)
 !endgroup
 \endgroup
 
-@* A genuine complete tour. Perec's path is a knight's tour with a deliberate
-scar: ninety-nine cells, one illegal diagonal step, one room left forever empty.
-It is fair to ask whether the board forced his hand---whether a $10\times10$
-board admits any flawless tour of all one hundred cells at all. It does, and to
-see it we now set the novel aside and let the program find such a tour on its
-own, on the very same board.
+@* 참으로 온전한 투어. 페렉의 길은 일부러 낸 흉터가 있는 나이트 투어다. 아흔아홉
+칸에, 규칙에 어긋나는 대각선 한 걸음에, 영영 비워 둔 방 하나다. 판이 그의 손을 묶은
+것인지, 곧 $10\times10$ 판에 100칸을 모두 도는 흠 없는 투어가 아예 있기는 한지 물어볼
+만하다. 있다. 그것을 보려고 이제 소설을 내려놓고, 바로 그 판 위에서 프로그램이 스스로
+그런 투어를 찾게 한다.
 
-The oldest and simplest rule for the purpose is {\it Warnsdorff's\/} (1823):
-from the cell you stand on, always step to the unvisited cell that has the fewest
-unvisited neighbors of its own. The idea is to visit the awkward, hard-to-reach
-cells early, while reaching them is still easy, and to save the roomy ones for
-last. On the $10\times10$ board the rule walks clean through all hundred cells
-without ever having to turn back; so, fittingly, we start it at Perec's own
-central landing |(6,6)| and let it finish what he chose to leave undone.
+이 일에 가장 오래되고 가장 단순한 규칙은 {\it 바른스도르프의 것\/}(1823)이다. 지금
+선 칸에서, 아직 들르지 않은 이웃 가운데 제 안 들른 이웃이 가장 적은 칸으로 언제나
+옮겨 간다. 가기 어려운 까다로운 칸을 아직 가기 쉬울 때 일찍 들르고, 넉넉한 칸은
+나중으로 미루자는 생각이다. $10\times10$ 판에서 이 규칙은 한 번도 되돌아설 것 없이
+100칸을 곧장 걸어 나간다. 그러니 어울리게도 페렉이 쓰던 한가운데 층계참 |(6,6)|에서
+시작해, 그가 남겨 둔 일을 마치게 한다.
 
-@ The rule needs, for each cell, the list of its knight-neighbors, which we read
-straight off the board's arcs. Vertex names are coordinates |"row.col"|, so a
-small reverse map |rev| turns a name back into a |cell|, and |nbr[c]| collects
-the cells a knight can reach from~|c|.
-@<Generate and print a complete tour@>=
-fmt.Fprint(out, "\nPEREC: a genuine complete knight's tour (Warnsdorff)\n\n")
-@<Build the neighbor lists from the board@>
-@<Grow a tour by Warnsdorff's rule@>
-@<Verify and print the complete tour@>
+@ 규칙에는 칸마다 그 나이트 이웃의 목록이 필요한데, 판의 호에서 그대로 읽어 온다.
+꼭짓점 이름은 좌표 |"row.col"|이므로, 작은 역 맵 |rev|가 이름을 |cell|로 되돌리고,
+|nbr[c]|는 나이트가~|c|에서 갈 수 있는 칸을 모은다.
+@<온전한 투어를 만들어 찍는다@>=
+fmt.Fprint(out, "\nPEREC: 참으로 온전한 나이트 투어 (바른스도르프)\n\n")
+@<판에서 이웃 목록을 짓는다@>
+@<바른스도르프 규칙으로 투어를 기른다@>
+@<온전한 투어를 확인하고 찍는다@>
 
-@ @<Build the neighbor lists from the board@>=
+@ @<판에서 이웃 목록을 짓는다@>=
 rev := make(map[string]cell)
 for y := 1; y <= 10; y++ {
 	for x := 1; x <= 10; x++ {
@@ -354,11 +336,11 @@ for v := range g.AllVertices() {
 	}
 }
 
-@ We start at |(6,6)|, mark it walked, and grow the path one cell at a time. At
-each step we scan the unvisited neighbors of the current cell and keep the one
-with the |fewest| onward moves. Should the scan ever find nothing, Warnsdorff has
-run into a dead end and we stop; but on this board it never does.
-@<Grow a tour by Warnsdorff's rule@>=
+@ 칸 |(6,6)|에서 시작해 그것을 밟은 것으로 적고, 길을 한 칸씩 기른다. 걸음마다 지금
+칸의 안 들른 이웃을 훑어, 앞으로 갈 곳이 가장 적은 것(|fewest|)을 잡는다. 훑어서
+아무것도 찾지 못하면 바른스도르프가 막다른 곳에 이른 것이니 멈춘다. 그러나 이
+판에서는 그런 일이 없다.
+@<바른스도르프 규칙으로 투어를 기른다@>=
 start := cell{6, 6}
 walked := map[cell]bool{start: true}
 full := []cell{start}
@@ -369,7 +351,7 @@ for len(full) < 100 {
 		if walked[n] {
 			continue
 		}
-		@<Let |onward| count |n|'s unvisited neighbors@>
+		@<|onward|에 |n|의 안 들른 이웃을 센다@>
 		if onward < fewest {
 			fewest, next, found = onward, n, true
 		}
@@ -381,9 +363,9 @@ for len(full) < 100 {
 	full = append(full, next)
 }
 
-@ This is the crux of the rule: how crowded the cell~|n| still is, measured as
-the number of its neighbors not yet walked.
-@<Let |onward| count |n|'s unvisited neighbors@>=
+@ 여기가 규칙의 핵심이다. 칸~|n|이 아직 얼마나 붐비는지를, 아직 밟지 않은 이웃의
+수로 잰다.
+@<|onward|에 |n|의 안 들른 이웃을 센다@>=
 onward := 0
 for _, m := range nbr[n] {
 	if !walked[m] {
@@ -391,11 +373,10 @@ for _, m := range nbr[n] {
 	}
 }
 
-@ We verify the finished tour on the board's own arcs, exactly as we did Perec's,
-and this time expect no flaw at all: a hundred cells, every step a knight's move,
-and---unlike the novel---no clinamen. The step-number grid is laid out like the
-facade, so it can be read against the chapter grid above.
-@<Verify and print the complete tour@>=
+@ 끝난 투어를 페렉의 것과 똑같이 판 자신의 호로 확인하는데, 이번에는 흠이 하나도
+없기를 바란다. 100칸에, 걸음마다 나이트 이동이고, 소설과 달리 클리나멘도 없다. 걸음
+번호 격자는 정면처럼 놓았으니 위의 장 격자와 견주어 읽을 수 있다.
+@<온전한 투어를 확인하고 찍는다@>=
 grid := make(map[cell]int)
 var flaws int
 for k, c := range full {
@@ -404,14 +385,14 @@ for k, c := range full {
 		flaws++
 	}
 }
-@<Print the complete-tour grid@>
-fmt.Fprintf(out, "  cells visited: %d, non-knight moves: %d\n", len(full), flaws)
+@<온전한 투어의 격자를 찍는다@>
+fmt.Fprintf(out, "  들른 칸: %d, 나이트가 아닌 수: %d\n", len(full), flaws)
 if len(full) == 100 && flaws == 0 {
-	fmt.Fprint(out, "  => a flawless knight's tour of all 100 cells (no clinamen).\n")
+	fmt.Fprint(out, "  => 100칸을 모두 도는 흠 없는 나이트 투어다 (클리나멘 없음).\n")
 }
 
-@ @<Print the complete-tour grid@>=
-fmt.Fprint(out, "  Step-number grid (top-left is (1,1), top row is the attic):\n\n")
+@ @<온전한 투어의 격자를 찍는다@>=
+fmt.Fprint(out, "  걸음 번호 격자 (왼쪽 위가 (1,1), 맨 윗줄이 다락):\n\n")
 for y := 1; y <= 10; y++ {
 	fmt.Fprint(out, "   ")
 	for x := 1; x <= 10; x++ {
@@ -421,16 +402,16 @@ for y := 1; y <= 10; y++ {
 }
 fmt.Fprint(out, "\n")
 
-@ Run it and the program prints this for the complete tour: the step-number grid,
-then a line confirming that all hundred cells were visited with not one
-non-knight move. The |1| sits at the central landing |(6,6)|, right where Perec
-began; from there the rule reaches every room, the bottom-left cellar included.
+@ 돌리면 온전한 투어에 대해 이렇게 찍는다. 걸음 번호 격자, 그리고 100칸을 모두
+들렀고 나이트가 아닌 수가 하나도 없음을 알리는 줄이다. 번호 |1|은 페렉이 시작한 바로
+그 한가운데 층계참 |(6,6)|에 있다. 거기서 규칙은 왼쪽 아래 지하실까지 모든 방에
+닿는다.
 \medskip
 \begingroup
 \verbatim
-PEREC: a genuine complete knight's tour (Warnsdorff)
+PEREC: 참으로 온전한 나이트 투어 (바른스도르프)
 
-  Step-number grid (top-left is (1,1), top row is the attic):
+  걸음 번호 격자 (왼쪽 위가 (1,1), 맨 윗줄이 다락):
 
      27   8  41  96  25  10  23  64  57  12
      40  93  26   9  42  75  58  11  22  63
@@ -443,23 +424,22 @@ PEREC: a genuine complete knight's tour (Warnsdorff)
      31   4  35  86  47  18  81  70  49  16
      36  87  32   3  34  71  48  17  52  69
 
-  cells visited: 100, non-knight moves: 0
-  => a flawless knight's tour of all 100 cells (no clinamen).
+  들른 칸: 100, 나이트가 아닌 수: 0
+  => 100칸을 모두 도는 흠 없는 나이트 투어다 (클리나멘 없음).
 !endgroup
 \endgroup
 
-@ And here is that tour drawn out. This time the grid is plain, not a doll's
-house cut away for a novel: this tour belongs to no story, only to the board. The
-hundred cells are joined in the order Warnsdorff's rule visited them; the start
-|(6,6)|, Perec's central landing, is ringed with a solid circle, and the finish
-|(6,5)| with a dashed one. Every link is a true knight's move, and no cell is
-left out---the flawless tour of which Perec's is the deliberate scarring.
+@ 그리고 여기 그 투어를 그려 두었다. 이번 격자는 소설을 위해 떼어 낸 인형의 집이
+아니라 맨 격자다. 이 투어는 어느 이야기에도 매이지 않고 판에만 매인다. 100칸이
+바른스도르프 규칙이 들른 차례로 이어져 있고, 시작 |(6,6)|, 곧 페렉의 한가운데
+층계참은 실선 동그라미로, 끝 |(6,5)|는 점선 동그라미로 표시했다. 이음은 모두 참된
+나이트 걸음이고 빠진 칸도 없다. 페렉의 것이 일부러 흉터를 낸, 그 흠 없는 투어다.
 \bigskip
 $$
 \mplibcode
 beginfig(3);
   numeric u; u := 28;
-  pair q[];                        % q[k] is the cell visited at step k (x=col, y=floor)
+  pair q[];                        % q[k]는 걸음 k에서 들른 칸 (x=열, y=층)
   q[1]:=(6,6); q[2]:=(5,8); q[3]:=(4,10); q[4]:=(2,9); q[5]:=(1,7); q[6]:=(2,5); q[7]:=(1,3);
   q[8]:=(2,1); q[9]:=(4,2); q[10]:=(6,1); q[11]:=(8,2); q[12]:=(10,1); q[13]:=(9,3); q[14]:=(10,5);
   q[15]:=(9,7); q[16]:=(10,9); q[17]:=(8,10); q[18]:=(6,9); q[19]:=(7,7); q[20]:=(8,5); q[21]:=(10,4);
@@ -478,7 +458,7 @@ beginfig(3);
 
   def C(expr c) = ((xpart c)*u, -(ypart c)*u) enddef;
 
-  % room partitions (thin) and the border (thick).
+  % 방 사이 칸막이(가늘게)와 테두리(굵게).
   pickup pencircle scaled 0.3bp;
   for i=0 upto 10:
     draw C((0.5,0.5+i))--C((10.5,0.5+i));
@@ -487,19 +467,19 @@ beginfig(3);
   pickup pencircle scaled 1.1bp;
   draw C((0.5,0.5))--C((10.5,0.5))--C((10.5,10.5))--C((0.5,10.5))--cycle;
 
-  % the tour: join consecutive cells; every link is a knight's move.
+  % 투어: 이어지는 칸을 잇는다. 모든 이음이 나이트 걸음이다.
   pickup pencircle scaled 0.7bp;
   for k=1 upto 99:
     draw C(q[k])--C(q[k+1]) withcolor 0.55white;
   endfor;
 
-  % stamp each cell with its step number.
+  % 칸마다 걸음 번호를 찍는다.
   defaultscale := 0.62;
   for k=1 upto 100:
     label(decimal k, C(q[k]));
   endfor;
 
-  % ring the start (6,6) solid, the finish (6,5) dashed.
+  % 시작 (6,6)은 실선 동그라미, 끝 (6,5)은 점선 동그라미.
   pickup pencircle scaled 0.6bp;
   draw fullcircle scaled 0.78u shifted C(q[1]);
   draw fullcircle scaled 0.78u shifted C(q[100]) dashed evenly scaled 0.5;
@@ -507,50 +487,40 @@ endfig;
 \endmplibcode
 $$
 
-@** A Graeco-Latin square. If the knight's tour decides {\it where to write},
-{\it what to write} is decided by Perec's second constraint. As we said, he
-gathered 42 lists of material into twenty-one pairs and, by a $10\times10$
-Graeco-Latin square, assigned to each chapter its combination of material. But
-why order 10? Behind that number lies two centuries of mathematical drama, and
-Perec chose this square knowing the story.
+@** 그레코라틴 방진. 나이트 투어가 {\it 어디에 쓸지}를 정한다면, {\it 무엇을
+쓸지}는 페렉의 두 번째 제약이 정한다. 앞서 말했듯 그는 소재 목록 42개를 스물한 쌍으로
+모으고, $10\times10$ 그레코라틴 방진으로 장마다 소재의 조합을 배정했다. 그런데 왜
+10차인가? 그 수 뒤에는 두 세기에 걸친 수학의 드라마가 있고, 페렉은 그 이야기를 알고
+이 방진을 골랐다.
 
-A Graeco-Latin square is two Latin squares laid one over the other, each cell
-holding a pair of symbols, so that all the pairs are distinct. The story begins
-in 1782 with Euler's {\it problem of the 36 officers\/}. Can thirty-six
-officers, one of each of six ranks and six regiments, be drawn up in a
-$6\times6$ array so that every row and every column shows each rank once and
-each regiment once? That is precisely an order-6 Graeco-Latin square. Euler
-could not build one however he tried, and finally conjectured that no such
-square exists whenever the order is of the form $4k+2$ (that is,
-$2,6,10,14,\dots$).
+그레코라틴 방진은 라틴 방진 둘을 포개 놓은 것인데, 칸마다 기호 한 쌍이 들어가되 그
+쌍이 모두 서로 다른 것이다. 이야기는 1782년 오일러의 {\it 36명의 장교 문제\/}에서
+시작한다. 계급 여섯과 연대 여섯에서 하나씩 뽑은 장교 서른여섯을 $6\times6$ 배열로
+세워, 모든 행과 모든 열에 계급이 한 번씩, 연대가 한 번씩 나오게 할 수 있는가? 그것이
+바로 6차 그레코라틴 방진이다. 오일러는 아무리 해도 짓지 못했고, 마침내 차수가
+$4k+2$ 꼴이면(곧 $2,6,10,14,\dots$) 그런 방진이 없다고 추측했다.
 
-Euler's conjecture was half right and half wrong. In 1900 Gaston Tarry proved,
-by counting every case by hand, that the order-6 square really is
-impossible---so for 6 Euler was right. But not beyond it. At the April 1959
-meeting of the American Mathematical Society in New York, Bose, Shrikhande and
-Parker announced that for every order of the form $4k+2$ except $2$ and
-$6$---that is, $10,14,18,\dots$---a Graeco-Latin square exists. Parker found an
-order-10 square in about an hour's search on a UNIVAC 1206 military computer, one
-of the earliest combinatorial problems solved on a digital computer. The three
-were nicknamed {\it Euler's spoilers\/}, and that November the cover of {\it
-Scientific American\/} carried their order-10 square in full colour.
+오일러의 추측은 반은 맞고 반은 틀렸다. 1900년에 가스통 타리가 모든 경우를 손으로
+세어 6차 방진이 정말 불가능함을 증명했다. 그러니 6에 대해서는 오일러가 옳았다. 그러나
+그 너머는 아니었다. 1959년 4월 뉴욕에서 열린 미국 수학회 모임에서 보스와 슈리칸데와
+파커는 $4k+2$ 꼴의 모든 차수에 대해, $2$와 $6$만 빼고---곧 $10,14,18,\dots$---그레코라틴
+방진이 있다고 알렸다. 파커는 군용 컴퓨터 UNIVAC 1206으로 한 시간쯤 찾아 10차 방진을
+얻었는데, 디지털 컴퓨터로 푼 가장 이른 조합론 문제 가운데 하나다. 세 사람은 {\it
+오일러를 망친 사람들\/}이라는 별명을 얻었고, 그해 11월 {\it Scientific American\/}의
+표지에 그들의 10차 방진이 원색으로 실렸다.
 
-So order 10 is no ordinary number. The very order Euler declared impossible,
-overturned only two centuries later---the square whose existence had just been
-proved---is the one Perec took for the skeleton of his novel. It is a choice
-worthy of a member of Oulipo, who prized the beauty of constraint above all.
-Now it is time to build the square in earnest and, as Perec did, assign the
-material to each chapter.
+그러니 10차는 예사로운 수가 아니다. 오일러가 불가능하다고 못 박았다가 두 세기 만에
+뒤집힌 차수, 곧 존재가 막 증명된 그 방진을 페렉은 제 소설의 뼈대로 삼았다. 무엇보다
+제약의 아름다움을 아낀 울리포 회원다운 선택이다. 이제 방진을 제대로 짓고, 페렉이 한
+대로 장마다 소재를 배정할 차례다.
 
-@ For an order that is odd or a prime power, a square is built by a simple
-formula. For a prime $p$, say, |L1(i,j) = (i+j) mod p| and |L2(i,j) = (i+2j) mod
-p| are already two orthogonal Latin squares. But 10 is even and the formula
-breaks---which is just what fooled Euler and set Parker to his computer. So we
-do exactly as Parker did: we run a search that builds a random Latin square and
-hunts for its orthogonal mate, obtain one square (a matter of seconds on today's
-machines), and set the result down here as |square|. Each cell is a
-two-component |[2]int{a, b}|.
-@<Types and data@>=
+@ 차수가 홀수이거나 소수의 거듭제곱이면 방진은 간단한 식으로 짓는다. 이를테면 소수
+$p$에 대해 |L1(i,j) = (i+j) mod p|와 |L2(i,j) = (i+2j) mod p|가 이미 직교하는 라틴
+방진 둘이다. 그러나 10은 짝수라 이 식이 무너진다. 바로 그것이 오일러를 속이고 파커를
+컴퓨터 앞에 앉힌 대목이다. 그래서 우리도 파커가 한 그대로 한다. 무작위 라틴 방진을
+짓고 그것과 직교하는 짝을 찾는 탐색을 돌려 방진 하나를 얻고(요즘 기계로는 몇 초다),
+그 결과를 여기 |square|로 적어 둔다. 각 칸은 두 성분 |[2]int{a, b}|다.
+@<타입과 자료@>=
 var square = [10][10][2]int{
 	{{4, 0}, {2, 1}, {5, 2}, {1, 3}, {3, 4}, {6, 5}, {9, 6}, {0, 7}, {7, 8}, {8, 9}},
 	{{3, 3}, {7, 9}, {8, 8}, {0, 4}, {6, 6}, {9, 1}, {2, 5}, {1, 2}, {4, 7}, {5, 0}},
@@ -564,12 +534,11 @@ var square = [10][10][2]int{
 	{{6, 9}, {5, 6}, {1, 7}, {9, 8}, {2, 2}, {4, 3}, {0, 0}, {8, 1}, {3, 5}, {7, 4}},
 }
 
-@ Here it is in colour. Like that famous {\it Scientific American\/} cover, each
-cell is split on its diagonal, the upper triangle coloured by the first
-component and the lower by the second. Because each component is Latin, the ten
-colours each appear once in every row and column; because the two are
-orthogonal, no upper-lower pair of colours repeats across the hundred cells.
-That is the visible proof that this picture is a genuine Graeco-Latin square.
+@ 여기 색으로 보인다. 그 유명한 {\it Scientific American\/} 표지처럼, 칸마다
+대각선으로 갈라 위 삼각형은 첫째 성분의 색, 아래 삼각형은 둘째 성분의 색으로 칠했다.
+성분이 저마다 라틴이므로 열 가지 색이 행마다 열마다 한 번씩 나오고, 둘이 직교하므로
+위아래 색의 쌍은 100칸에서 되풀이되지 않는다. 이 그림이 참된 그레코라틴 방진이라는,
+눈에 보이는 증거다.
 \bigskip
 $$
 \mplibcode
@@ -626,22 +595,20 @@ endfig;
 \endmplibcode
 $$
 
-@ We do not take on trust that the square we set down is really Graeco-Latin; we
-check, in the same spirit as for the knight's tour. Three things: is the first
-component Latin, is the second Latin, and are all 100 pairs distinct (which is
-exactly the orthogonality of the two components). If all three hold, we hold in
-our hands the very thing Euler said could not exist.
-@<Verify the square and print the assignment@>=
-fmt.Fprint(out, "\nPEREC: an order-10 Graeco-Latin square\n\n")
-@<Check that the square is Graeco-Latin@>
-@<Print the square as a grid@>
-@<Assign one couple of lists to chapters@>
+@ 적어 둔 방진이 정말 그레코라틴인지는 믿고 넘어가지 않는다. 나이트 투어에서와 같은
+마음으로 검사한다. 세 가지다. 첫째 성분이 라틴인가, 둘째 성분이 라틴인가, 그리고
+100쌍이 모두 서로 다른가(이것이 바로 두 성분의 직교성이다). 셋이 다 참이면 오일러가
+있을 수 없다고 한 바로 그것을 우리 손에 쥔 것이다.
+@<방진을 확인하고 배정을 찍는다@>=
+fmt.Fprint(out, "\nPEREC: 10차 그레코라틴 방진\n\n")
+@<그레코라틴 방진인지 검사한다@>
+@<방진을 격자로 찍는다@>
+@<목록 한 쌍을 장에 배정한다@>
 
-@ For a component to be Latin means that in each of the ten rows and columns the
-symbols $0$ through $9$ each appear once, so it is enough to OR ten bits and see
-whether they make |1023|. Orthogonality we check by putting the 100 pairs into a
-set and seeing that its size is 100.
-@<Check that the square is Graeco-Latin@>=
+@ 성분이 라틴이라는 것은 열 개의 행과 열마다 기호 $0$부터 $9$가 한 번씩 나온다는
+뜻이다. 그러니 비트 열 개를 OR로 모아 |1023|이 되는지 보면 넉넉하다. 직교성은 100쌍을
+집합에 넣고 그 크기가 100인지 보아 검사한다.
+@<그레코라틴 방진인지 검사한다@>=
 latinA, latinB := true, true
 for i := 0; i < 10; i++ {
 	var rA, cA, rB, cB int
@@ -664,18 +631,17 @@ for i := 0; i < 10; i++ {
 		seen[square[i][j]] = true
 	}
 }
-fmt.Fprintf(out, "  Are both components Latin squares?  A: %v, B: %v\n", latinA, latinB)
-fmt.Fprintf(out, "  Are all 100 pairs distinct (orthogonal)?  %v (%d distinct pairs)\n",
+fmt.Fprintf(out, "  두 성분이 모두 라틴 방진인가?  A: %v, B: %v\n", latinA, latinB)
+fmt.Fprintf(out, "  100쌍이 모두 다른가(직교하는가)?  %v (서로 다른 쌍 %d개)\n",
 	len(seen) == 100, len(seen))
 if latinA && latinB && len(seen) == 100 {
-	fmt.Fprint(out, "  => here is the order-10 square Euler said could not exist.\n\n")
+	fmt.Fprint(out, "  => 오일러가 있을 수 없다고 한 10차 방진이 여기 있다.\n\n")
 }
 
-@ To show the square itself, we print each cell as two digits |ab|. That these
-hundred pairs run over $00$ through $99$ exactly once each is guaranteed by the
-check above.
-@<Print the square as a grid@>=
-fmt.Fprint(out, "  The square (each cell is two components ab):\n\n")
+@ 방진 자체를 보이려고 칸마다 두 자리 |ab|로 찍는다. 이 100쌍이 $00$부터 $99$까지
+정확히 한 번씩 훑는다는 것은 위의 검사가 보장한다.
+@<방진을 격자로 찍는다@>=
+fmt.Fprint(out, "  방진 (칸마다 두 성분 ab):\n\n")
 for i := 0; i < 10; i++ {
 	fmt.Fprint(out, "   ")
 	for j := 0; j < 10; j++ {
@@ -685,56 +651,51 @@ for i := 0; i < 10; i++ {
 }
 fmt.Fprint(out, "\n")
 
-@ Now the two constraints meet. Each cell $(x,y)$ of the building is given a pair
-$(a,b)$ by the square. Perec bundled his lists of material ten at a time into a
-couple, and put the $a$th item of the one list and the $b$th of the other into
-the chapter of that room. Because the square is orthogonal, the hundred cells
-show a hundred combinations exactly once each---any pairing of the two lists
-meets in the novel exactly once.
+@ 이제 두 제약이 만난다. 건물의 칸 $(x,y)$마다 방진이 쌍 $(a,b)$를 준다. 페렉은
+소재 목록을 열 개씩 묶어 한 쌍으로 만들고, 한 목록의 $a$번째 것과 다른 목록의
+$b$번째 것을 그 방의 장에 넣었다. 방진이 직교하므로 100칸이 100가지 조합을 정확히 한
+번씩 보인다. 두 목록의 어떤 짝이든 소설에서 꼭 한 번 만난다.
 
-Perec kept twenty-one such couples, but his lists in full and their cell-by-cell
-assignment fill the vast material of his working notebook (the {\it cahier des
-charges\/}). Here, only to show the structure, we use one illustrative couple:
-ten animals and ten colours.
-@<Assign one couple of lists to chapters@>=
-animals := [10]string{"cat", "dog", "horse", "fox", "bear", "deer", "rabbit", "wolf", "hawk", "mouse"}
-colours := [10]string{"red", "orange", "yellow", "green", "blue", "indigo", "violet", "black", "white", "gray"}
-fmt.Fprint(out, "  One couple (animal, colour) assigned to chapters (first eight):\n\n")
+페렉은 그런 쌍을 스물한 개 두었지만, 그의 목록 전부와 칸마다의 배정은 작업 노트({\it
+cahier des charges\/})의 방대한 자료를 채운다. 여기서는 구조만 보이려고 본보기로 한
+쌍만 쓴다. 동물 열과 색 열이다.
+@<목록 한 쌍을 장에 배정한다@>=
+animals := [10]string{"고양이", "개", "말", "여우", "곰", "사슴", "토끼", "늑대", "매", "쥐"}
+colours := [10]string{"빨강", "주황", "노랑", "초록", "파랑", "남색", "보라", "검정", "하양", "회색"}
+fmt.Fprint(out, "  한 쌍(동물, 색)을 장에 배정한 것 (앞의 여덟 장):\n\n")
 used := make(map[[2]int]bool)
 for k, c := range tour {
 	p := square[c.y-1][c.x-1]
 	used[p] = true
 	if k < 8 {
-		fmt.Fprintf(out, "  ch.%2d (%d,%d): %s, %s\n",
+		fmt.Fprintf(out, "  %2d장 (%d,%d): %s, %s\n",
 			k+1, c.x, c.y, animals[p[0]], colours[p[1]])
 	}
 }
-@<Show the missing combination is the clinamen's@>
+@<빠진 조합이 클리나멘의 몫임을 보인다@>
 
-@ The ninety-nine chapters use ninety-nine distinct combinations. Exactly one of
-the hundred is missing---the combination the unvisited clinamen cell $(1,10)$
-would have held. The blemish in the tour that fixes the order has taken away one
-of the things to write as well.
-@<Show the missing combination is the clinamen's@>=
-fmt.Fprintf(out, "\n  combinations used: %d (of 100)\n", len(used))
-q := square[9][0] // |square[10-1][1-1]|, clinamen cell $(1,10)$
-fmt.Fprintf(out, "  missing combination: %s, %s  <- the share of clinamen cell (1,10)\n",
+@ 아흔아홉 장이 아흔아홉 가지 조합을 쓴다. 100가지 가운데 정확히 하나가 빠지는데,
+들르지 않은 클리나멘 칸 $(1,10)$이 가졌을 조합이다. 차례를 정하는 투어에 낸 티가 쓸
+거리 하나도 함께 앗아 갔다.
+@<빠진 조합이 클리나멘의 몫임을 보인다@>=
+fmt.Fprintf(out, "\n  쓰인 조합: %d가지 (100가지 가운데)\n", len(used))
+q := square[9][0] // |square[10-1][1-1]|, 클리나멘 칸 $(1,10)$
+fmt.Fprintf(out, "  빠진 조합: %s, %s  <- 클리나멘 칸 (1,10)의 몫\n",
 	animals[q[0]], colours[q[1]])
 
-@ The output for the square continues like this: the verification result, the
-square itself, and one illustrative couple assigned to chapters. Ninety-nine
-combinations are used, and the last two lines confirm that the one share of the
-clinamen cell is missing.
+@ 방진 쪽 출력은 이렇게 이어진다. 확인 결과, 방진 자체, 그리고 본보기 한 쌍을 장에
+배정한 것이다. 조합 아흔아홉 가지가 쓰이고, 마지막 두 줄이 클리나멘 칸의 몫 하나가
+빠졌음을 알린다.
 \medskip
 \begingroup
 \verbatim
-PEREC: an order-10 Graeco-Latin square
+PEREC: 10차 그레코라틴 방진
 
-  Are both components Latin squares?  A: true, B: true
-  Are all 100 pairs distinct (orthogonal)?  true (100 distinct pairs)
-  => here is the order-10 square Euler said could not exist.
+  두 성분이 모두 라틴 방진인가?  A: true, B: true
+  100쌍이 모두 다른가(직교하는가)?  true (서로 다른 쌍 100개)
+  => 오일러가 있을 수 없다고 한 10차 방진이 여기 있다.
 
-  The square (each cell is two components ab):
+  방진 (칸마다 두 성분 ab):
 
     40 21 52 13 34 65 96 07 78 89
     33 79 88 04 66 91 25 12 47 50
@@ -747,19 +708,19 @@ PEREC: an order-10 Graeco-Latin square
     92 64 36 41 10 57 83 75 29 08
     69 56 17 98 22 43 00 81 35 74
 
-  One couple (animal, colour) assigned to chapters (first eight):
+  한 쌍(동물, 색)을 장에 배정한 것 (앞의 여덟 장):
 
-  ch. 1 (6,6): wolf, yellow
-  ch. 2 (8,7): mouse, gray
-  ch. 3 (10,6): dog, violet
-  ch. 4 (8,5): bear, violet
-  ch. 5 (10,4): bear, indigo
-  ch. 6 (9,2): bear, black
-  ch. 7 (7,1): mouse, violet
-  ch. 8 (8,3): deer, blue
+   1장 (6,6): 늑대, 노랑
+   2장 (8,7): 쥐, 회색
+   3장 (10,6): 개, 보라
+   4장 (8,5): 곰, 보라
+   5장 (10,4): 곰, 남색
+   6장 (9,2): 곰, 검정
+   7장 (7,1): 쥐, 보라
+   8장 (8,3): 사슴, 파랑
 
-  combinations used: 99 (of 100)
-  missing combination: rabbit, gray  <- the share of clinamen cell (1,10)
+  쓰인 조합: 99가지 (100가지 가운데)
+  빠진 조합: 토끼, 회색  <- 클리나멘 칸 (1,10)의 몫
 !endgroup
 \endgroup
 
