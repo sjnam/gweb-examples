@@ -3,9 +3,31 @@
 
 \font\logo=logo10
 
-% 그림들은 hyperbolic.mp 안에 fig_... 라는 이름으로 있다. 그 가운데 셋은
-% 이 프로그램 자신이 hyperbolic-arcs.mp 에 적어 넣은 것이다.
-\everymplib{input hyperbolic;}
+% 그림들이 함께 쓰는 정의. 뒤따르는 \mplibcode 토막이 물려받도록
+% \mplibcodeinherit 을 켜 둔다.
+\mplibcodeinherit{enable}
+\mplibcode
+numeric u; u := 4.3in;          % 사분원의 반지름
+
+% x축 위 (c,0)에 중심을 둔 반지름 r 의 반원 --- 곧 쌍곡 평면의 '직선' 하나.
+def arc(expr c,r) =
+ draw (((r,0){up}..(r*cosd30,r*sind30)..(r*cosd60,r*sind60)..(0,r)..
+              (-r*cosd60,r*sind60)..(-r*cosd30,r*sind30)..(-r,0){down})
+   shifted (c,0)) scaled u;
+enddef;
+
+% 그린 것을 오른쪽 위 사분원으로 잘라 내고, 테두리를 두른다.
+def quarter =
+ clip currentpicture to ((0,0)--(1,0){up}..(cosd30,sind30)..
+         (cosd60,sind60)..(0,1){left}--cycle) scaled u;
+ draw((1,0){up}..(cosd30,sind30)..(cosd60,sind60)..(0,1){left}) scaled u;
+ draw (0,0)--(0,u);
+ setbounds currentpicture to ((0,0)--(u,0)--(u,u)--(0,u)--cycle);
+enddef;
+
+
+input hyperbolic-arcs;
+\endmplibcode
 
 \def\title{쌍곡 모눈종이}
 
@@ -134,7 +156,64 @@ func reflect(z point, l circle) point {
 @ 되비추기에 마음을 쓰는 까닭은 이렇다. 우리가 구하려는 덮기에서 삼각형 하나는
 이웃을 셋 가진다. 그리고 그 이웃들은 각각 꼭짓점 하나를 맞은편 변에 대해
 되비추어 얻어진다. 아래 삼각형 $ABC$를 보자.
-$$\mplibcode fig_triangle; \endmplibcode$$
+$$\mplibcode
+beginfig(1);                    % 삼각형과 그 세 이웃
+numeric s; (1685-72)*s=2.6in;
+
+z1=(0,1000) scaled s;
+z2=(-500,500) scaled s;
+z3=(500,500) scaled s;
+z12=(-222,797) scaled s;
+z23=(85,519) scaled s;
+z31=(245,735) scaled s;
+z123=(0,72) scaled s;
+z231=(491,1364) scaled s;
+z312=(-483,1685) scaled s;
+z1231=(220,1176) scaled s;
+z2312=(-518,1144) scaled s;
+z3123=(229,302) scaled s;
+z1223=(-204,246) scaled s;
+z2331=(448,888) scaled s;
+z3112=(-242,1309) scaled s;
+
+draw (z1..z12..z2);
+draw (z2..z23..z3);
+draw (z3..z31..z1);
+draw (z1..z1231..z231) dashed evenly scaled 1/2;
+draw (z231..z2331..z3) dashed evenly scaled 1/2;
+draw (z2..z2312..z312) dashed evenly scaled 1/2;
+draw (z312..z3112..z1) dashed evenly scaled 1/2;
+draw (z3..z3123..z123) dashed evenly scaled 1/2;
+draw (z123..z1223..z2) dashed evenly scaled 1/2;
+
+labeloffset:=5pt;
+pickup pencircle scaled 2pt;
+drawdot z1;
+label.top(btex $A$ etex,z1+(0,3pt));
+drawdot z2;
+label.lft(btex $B$ etex,z2);
+drawdot z3;
+label.rt(btex $C$ etex, z3);
+drawdot z123;
+label.bot(btex $A'$ etex,z123);
+drawdot z231;
+label.rt(btex $B'$ etex, z231);
+drawdot z312;
+label.lft(btex $C'$ etex, z312);
+label.lft(btex $\scriptstyle90$ etex,z1);
+label.bot(btex $\scriptstyle90$ etex,z1);
+label.rt (btex $\scriptstyle90$ etex,z1);
+label.urt(btex $\scriptstyle45$ etex,z2+(-2pt,8pt));
+label.urt(btex $\scriptstyle45$ etex,z2+(6pt,0));
+label.lrt(btex $\scriptstyle45$ etex,z2+(6pt,2pt));
+label.llft(btex $\scriptstyle36$ etex,z3-(6pt,-2pt));
+label.ulft(btex $\scriptstyle36$ etex,z3-(6pt,0));
+label.ulft(btex $\scriptstyle36$ etex,z3+(0,8pt));
+label.lrt(btex $\scriptstyle36$ etex,z312-(4pt,10pt));
+label.llft(btex $\scriptstyle45$ etex,z231-(1pt,6pt));
+label.top(btex $\scriptstyle90$ etex,z123+(0,1pt));
+endfig;
+\endmplibcode$$
 이웃 $A'BC$, $AB'C$, $ABC'$은 $A$를 $BC$에, $B$를 $C\!A$에, $C$를 $AB$에
 되비추어 나온다. 이 짓을 되풀이하면 무늬 전체가 자란다.
 
@@ -410,7 +489,7 @@ for i := 0; i < 3; i++ {
 fmt.Printf("\n")
 
 @* 그림 그리기. 여기서부터는 원본에 없는 부분이다. 크누스는 프로그램이 뱉은
-좌표를 손으로 골라 \.{hyperbolic.mp}에 옮겨 적었다. 그림 셋에 걸쳐 원이 육백
+좌표를 손으로 골라 {\logo METAPOST} 파일에 옮겨 적었다. 그림 셋에 걸쳐 원이 육백
 예순일곱 개다. 우리는 프로그램에게 그 일을 시킨다.
 
 @<그림 파일을 쓴다@>=
@@ -419,8 +498,8 @@ if len(os.Args) > 1 {
 }
 
 @ 파일에는 그림 셋이 |fig_annulus|, |fig_dual|, |fig_tiling|이라는 이름으로 들어간다.
-그림을 오른쪽 위 사분원으로 잘라 내고 테두리를 두르는 일은 \.{hyperbolic.mp}에
-|quarter|라는 매크로로 있으므로, 여기서는 반원 목록만 적으면 된다.
+그림을 오른쪽 위 사분원으로 잘라 내고 테두리를 두르는 일은 이 글 첫머리의
+정의 토막에 |quarter|라는 매크로로 있으므로, 여기서는 반원 목록만 적으면 된다.
 
 @<{\logo METAPOST} 파일을 만든다@>=
 f, err := os.Create(os.Args[1])
@@ -436,7 +515,7 @@ fmt.Fprint(f, mphead)
 
 @ @<상수@>=
 const mphead = `% hyperbolic.go 가 적은 파일이다. 손대지 말 것.
-% hyperbolic.mp 가 이것을 input 한다.
+% hyperbolic.w 가 이것을 input 한다.
 `
 
 @ 반원 하나를 적는 일은 세 그림 모두에서 하므로 함수로 둔다. 자릿수는 여섯이면
@@ -531,16 +610,22 @@ $3.3\times10^{-13}$이었다.
 
 @ 첫 그림, 고리 하나에 놓인 무늬다. 바깥 테두리가 $\vert z\vert=1$, 안쪽으로
 비어 보이는 곳의 경계가 $\vert z\vert=1/r\approx0.588$이다.
-$$\mplibcode fig_annulus; \endmplibcode$$
+$$\mplibcode
+fig_annulus;
+\endmplibcode$$
 
 @ 이것을 $\vert z\vert=1/r$에 대해 되비추면 안쪽 고리의 무늬가 된다. 바깥쪽이
 비고 안쪽이 찬 것이 앞 그림과 정확히 뒤바뀌었다.
-$$\mplibcode fig_dual; \endmplibcode$$
+$$\mplibcode
+fig_dual;
+\endmplibcode$$
 
 @ 그리고 둘을 모두 놓고 원점 쪽으로 거듭 줄여 이어 붙이면 오른쪽 반평면 전체의
 무늬가 된다. 경계인 $x$축에 다가갈수록 삼각형이 잘아 보이지만, 쌍곡 자로 재면
 모두 넓이가 꼭 같은 $\pi/20$이다. 작아 보이는 것은 종이의 사정일 뿐이다.
-$$\mplibcode fig_tiling; \endmplibcode$$
+$$\mplibcode
+fig_tiling;
+\endmplibcode$$
 
 @ 이런 그림을 처음 세상에 알린 사람은 수학자가 아니라 판화가였다. M. C. Escher는
 1957년에 Coxeter가 보낸 쌍곡 덮기 그림 한 장을 보고 {\it 원의 극한\/}(Circle

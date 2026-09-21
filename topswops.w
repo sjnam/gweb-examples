@@ -1,10 +1,6 @@
 \input kotexgweb
 \input luamplib.sty
 
-% 그림은 topswops.mp 안에 fig_... 라는 이름의 매크로로 있다. 여기서 한 번 읽어
-% 두고 그림 자리마다 이름만 부른다.
-\everymplib{input topswops;}
-
 @* 위에서 읽어 위로 뒤집어 얹는 놀이.
 {\it 톱스웝스\/}는 존 콘웨이(John H. Conway)가 고안한 혼자 하는 카드
 게임이다. 규칙은 딱 하나다. 수 $1$부터 $n$까지 적힌 카드를 아무렇게나 섞어 숫자가
@@ -16,7 +12,31 @@
 
 $$
 \mplibcode
-fig_forward;
+beginfig(1);
+  numeric w, h, gap, g; w := 16; h := 20; gap := 44;
+  def card(expr x, v, hot) =
+    if hot:
+      fill unitsquare xscaled w yscaled h shifted (x, 0)
+        withcolor (1, 0.92, 0.78);
+    fi
+    draw unitsquare xscaled w yscaled h shifted (x, 0);
+    label(v, (x + 0.5w, 0.5h));
+  enddef;
+  % a deck of three cards, left = top of the pile; nhot leftmost are shaded
+  def deck(expr gx, a, b, c, nhot) =
+    card(gx, a, nhot >= 1);
+    card(gx + w, b, nhot >= 2);
+    card(gx + 2w, c, nhot >= 3);
+  enddef;
+  g := 3w + gap;
+  deck(0,  "3", "1", "2", 3);
+  deck(g,  "2", "1", "3", 2);
+  deck(2g, "1", "2", "3", 0);
+  drawarrow (3w + 7, 0.5h) -- (3w + gap - 7, 0.5h);
+  label.top("3", (3w + 0.5gap, 0.5h + 2));
+  drawarrow (g + 3w + 7, 0.5h) -- (g + 3w + gap - 7, 0.5h);
+  label.top("2", (g + 3w + 0.5gap, 0.5h + 2));
+endfig;
 \endmplibcode
 $$
 \smallskip
@@ -75,7 +95,31 @@ Mathematical Gazette\/} {\bf 73} (1989), 131--133): 전진 게임의 골칫거�
 
 $$
 \mplibcode
-fig_backtree;
+beginfig(2);
+  numeric dy, bw, bh; dy := 40; bw := 36; bh := 15;
+  % a tree node: fixed-size box around three characters placed by hand,
+  % so that no label string ever contains a space
+  def node(expr c, a, b, d) =
+    unfill unitsquare xscaled bw yscaled bh shifted (c - (0.5bw, 0.5bh));
+    draw unitsquare xscaled bw yscaled bh shifted (c - (0.5bw, 0.5bh));
+    label(a, c + (-11, 0));
+    label(b, c);
+    label(d, c + (11, 0));
+  enddef;
+  pair R, A, B, AA, BB;
+  R  = (110, 2dy);
+  A  = (45, dy);   B  = (175, dy);
+  AA = (45, 0);    BB = (175, 0);
+  draw R -- A;  draw R -- B;
+  draw A -- AA; draw B -- BB;
+  label.ulft("2", 0.5[R,A]);
+  label.urt("3", 0.5[R,B]);
+  label.lft("3", 0.5[A,AA]);
+  label.rt("2", 0.5[B,BB]);
+  node(R,  "1", ".", ".");
+  node(A,  "2", "1", ".");  node(B,  "3", ".", "1");
+  node(AA, "3", "1", "2");  node(BB, "2", "3", "1");
+endfig;
 \endmplibcode
 $$
 \smallskip

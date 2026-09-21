@@ -36,12 +36,15 @@ kotexgweb.tex`, 아래 참조)와 그림 있는 문서(`\input luamplib.sty`)가
 
 그림에는 따로 빌드 단계가 필요 없다. **luamplib**이 문서를 조판하는 동안
 MetaPost를 그 자리에서 돌린다. 따로 도는 `mpost` 단계도, 중간 PDF도 없고, 그림의
-라벨은 문서 자신의 글꼴로 짜인다. 그림이 하나뿐인 문서는 MetaPost를 `.w` 안에
-바로 담고, 여럿인 문서는 `<이름>.mp`에 이름 붙인 매크로(`fig_...`)로 두었다가
-`\everymplib{input <이름>;}`으로 읽어들여 필요한 자리마다 이름으로 부른다.
+라벨은 문서 자신의 글꼴로 짜인다. MetaPost는 몇 장이든 `.w` 안에 그대로 담는다.
+남은 `.mp`는 넷뿐이고 저마다 까닭이 있다. `tarjan-strong.mp`와 `wordcube.mp`는
+문서 둘이 나눠 쓰는 도우미이고, `hyperbolic-arcs.mp`는 `hyperbolic.w`의 프로그램이
+뱉는 좌표이며, `skew-ternary/skew-ternary-calc.mp`는 크누스가 발표한 파일을 고친
+것이라 원본과 한 줄씩 견줄 수 있게 그대로 두었다. 모두
+`\everymplib{input <이름>;}`으로 읽어들인다.
 
-추적하는 것은 원본과 자료뿐이다. 원본은 `.w`/`.ch` 프로그램과 MetaPost 그림
-라이브러리(`*.mp`)이고, 자료는 `wordcube.w`와 `word-cube-dlx.w`가 읽는 낱말 목록
+추적하는 것은 원본과 자료뿐이다. 원본은 `.w`/`.ch` 프로그램과 남은 MetaPost
+파일(`*.mp`)이고, 자료는 `wordcube.w`와 `word-cube-dlx.w`가 읽는 낱말 목록
 `sgb-words.txt`, 그리고 `enigmatic-puzzle.w`가 5-그램 계수에 쓰는 크누스의 원문
 `VOL1TEXT.txt`다. 여기 있는 `.go`와 PDF는 모두 생성물이니, 빌드하기 전에는 없다.
 
@@ -372,7 +375,7 @@ MetaPost를 그 자리에서 돌린다. 따로 도는 `mpost` 단계도, 중간 
   프로그램은 그 배정을 그리는 MetaPost 파일을 뽑아내는데, Go의 날문자열이
   `fprintf` 스물 몇 개를 대신하니 MetaPost를 MetaPost로 읽을 수 있다. CWEB
   원본과 (N, n) 쌍 649가지에서 표준 출력과 뽑아낸 `.mp`와 종료 코드가 바이트까지
-  같다. [queenon-partition.mp](queenon-partition.mp)에 담긴 luamplib 그림 둘.
+  같다. 글 안에 담긴 luamplib 그림 둘.
 * [sliding.w](sliding.w) — 미닫이 블록 퍼즐을 두루 푸는
   엔진이다. 0/1 무늬로 주는 조각이 15종류까지, 죽은 칸이 있는 판, 그리고 이동
   방식이 여섯이다. 조각 하나를 한 칸, 조각 하나를 곧게 아무 거리나, 조각 하나를

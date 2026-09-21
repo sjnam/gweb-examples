@@ -1,8 +1,64 @@
 \input kotexgweb
 \input luamplib.sty
 
-% 그림 둘(fig_cells, fig_map)은 queenon-partition.mp 안에 있다.
-\everymplib{input queenon-partition;}
+% 그림들이 함께 쓰는 정의. 뒤따르는 \mplibcode 토막이 물려받도록
+% \mplibcodeinherit 을 켜 둔다.
+\mplibcodeinherit{enable}
+\mplibcode
+numeric N, n, u, h;
+N := 4;
+n := 17;
+u := 1.2cm;
+h := N*u/n;
+primarydef x!y = (x*u,y*u) enddef;
+
+% 잘라 돌린 눈금의 대각선들. 두 그림이 나눠 쓴다.
+def diagonals =
+  for i = 0 upto N-1:
+    draw 0!i--(N-i)!N;
+    draw i!0--N!(N-i);
+    draw 0!(N-i)--(N-i)!0;
+    draw i!N--N!i;
+  endfor
+enddef;
+
+% 칸 [IJ]의 이름표와 그 이름표가 놓일 자리(칸의 중심).
+string digs;
+digs := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+vardef lab(expr I, J) =
+  ((substring (I,I+1) of digs) & (substring (J,J+1) of digs)) infont "cmtt10"
+enddef;
+vardef labloc(expr I, J) =
+  save x, y;
+  x = (I-J+N)/2;
+  y = (I+J-N-1)/2;
+  x!y
+enddef;
+
+
+% 그림 둘에 쓸 색칠. 프로그램이 뱉는 것과 똑같은 얼개다.
+string ch;
+picture pic[];
+pic[ASCII "W"] := nullpicture;
+currentpicture := nullpicture;
+fill (0,0)--(h,0)--(h,h)--(0,h)--cycle withcolor red;
+pic[ASCII "R"] := currentpicture;
+fill (0,0)--(h,0)--(h,h)--(0,h)--cycle withcolor blue;
+pic[ASCII "B"] := currentpicture;
+fill (0,0)--(h,0)--(h,h)--(0,h)--cycle withcolor green;
+pic[ASCII "G"] := currentpicture;
+currentpicture := nullpicture;
+
+numeric ny;
+def row expr s =
+  ny := ny+1;
+  for j = 0 upto length s - 1:
+    ch := substring (j,j+1) of s;
+    draw pic[ASCII ch] shifted (j*h, ny*h);
+  endfor
+enddef;
+
+\endmplibcode
 
 \def\title{심킨의 쪼개기}
 \font\logo=logo10
@@ -37,7 +93,18 @@ $$[IJ]=\{(x,y)\mid 0\le x,y\le 1,\ I-1\le N(x+y)\le I,\
                                    J-1\le N(1+y-x)\le J\}$$
 이다. (Simkin의 식을 조금 옮겨 놓은 것인데, 프로그램으로 짜기에는 이편이 더
 편하다.) 이를테면 $N=4$일 때의 칸들은 이렇다.
-$$\mplibcode fig_cells; \endmplibcode$$
+$$\mplibcode
+beginfig(0);
+draw 0!0--N!0--N!N--0!N--cycle;
+diagonals;
+for i = 1 upto N:
+  for j = N+1-i upto N+i: label(lab(i,j), labloc(i,j)); endfor
+endfor
+for i = N+1 upto 2N:
+  for j = i-N upto 3N+1-i: label(lab(i,j), labloc(i,j)); endfor
+endfor
+endfig;
+\endmplibcode$$
 \figcap{$N=4$일 때의 칸 $[IJ]$. 이름표는 $I$와 $J$를 나란히 적은 것이다.}
 
 @ 눈여겨볼 것은 칸 $[IJ]$가 넓이 $1/(2N^2)$인 마름모이거나, 넓이 $1/(4N^2)$인
@@ -53,7 +120,30 @@ $4N$개다. $I$가 같거나 $J$가 같은 칸들은 한 대각선 위에 놓인
 가장 작은 $I$를 찾는다. 그런 $[IJ]$가 같은 $I$로 둘이라면 $J$가 {\it 큰\/}
 쪽을 고른다. 그쪽이 다른 쪽의 북서쪽에 놓인다. 이를테면 $N=4$, $n=17$일 때의
 대응은 이렇다.
-$$\mplibcode fig_map; \endmplibcode$$
+$$\mplibcode
+beginfig(1);
+ny := -1;
+row "WGGGGBRRRWGGGBRRR"
+row "WWGGBBBRWWWGBBBRW"
+row "WWWBBBBGWWWRBBBGW"
+row "WWRRBBGGGWRRRBGGG"
+row "BRRRRGGGGBRRRWGGG"
+row "BBRRWWGGBBBRWWWGG"
+row "BBBWWWWBBBBGWWWRB"
+row "BBGGWWRRBBGGGWWRR"
+row "WGGGGRRRRGGGGBRRR"
+row "WWGGBBRRWWGGGBBRR"
+row "WWWBBBBWWWWGBBBGW"
+row "WWRRBBGGWWWRBBBGG"
+row "BRRRRGGGGWRRRBGGG"
+row "BBRRWWGGGBRRRWGGG"
+row "BBBWWWWGBBBRWWWGB"
+row "BBGGWWWRBBBGWWWRB"
+row "BGGGGWRRRBGGGWRRR"
+for i = 0 upto n: draw (0,i*h)--(n*h,i*h); draw (i*h,0)--(i*h,n*h); endfor
+diagonals;
+endfig;
+\endmplibcode$$
 \figcap{$N=4$, $n=17$일 때의 대응 $(ij)\mapsto[IJ]$. 칸 $(ij)$의 색은 $I$와 $J$의
 홀짝으로 정한다. 둘 다 짝수면 흰색, $J$만 홀수면 빨강, $I$만 홀수면 초록,
 둘 다 홀수면 파랑이다. 같은 색 덩어리 하나가 칸 $[IJ]$ 하나로 간다.}
@@ -67,10 +157,9 @@ $[IJ]$, $[(I+1)J]$, $[I(J+1)]$, $[(I+1)(J+1)]$ 넷에 걸친다.
 @ 이 프로그램은 그 배정을 그림으로 그리는 \MP\ 파일을 뱉는다. 위의 둘째 그림이
 바로 그렇게 나온 것이다.
 
-이 저장소의 \.{queenon-partition.mp}에 그림 둘이 |fig_cells|와 |fig_map|이라는
-이름으로 들어 있다. \.{luamplib}이 조판하는 동안 직접 그리므로 \.{mpost}를 따로 부를
-까닭이 없다. 둘째 그림의 |row| 줄들은 이 프로그램에 $N=4$, $n=17$을 주어 뱉은 것을
-그대로 옮겨 놓은 것이다.
+그림 둘은 이 글 안에 \MP\ 코드로 그대로 들어 있다. \.{luamplib}이 조판하는 동안
+직접 그리므로 \.{mpost}를 따로 부를 까닭이 없다. 둘째 그림의 |row| 줄들은 이
+프로그램에 $N=4$, $n=17$을 주어 뱉은 것을 그대로 옮겨 놓은 것이다.
 
 @ 뼈대는 짧다. 명령줄을 읽고, 대응을 셈하고, 두 가지로 알리고, \MP\ 파일을 쓴다.
 

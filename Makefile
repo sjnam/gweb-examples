@@ -38,9 +38,9 @@ $(NAMES): %: %.go %.pdf
 
 # Weave + 조판: <name>.w -> <name>.tex -> <name>.pdf
 #
-# 그림은 따로 만들 것이 없다. MetaPost 는 luamplib 이 조판 중에 직접 돌린다. 그림이
-# 여러 장인 문서는 그림들을 <name>.mp 에 이름 붙은 매크로로 두고 문서가
-# `input <name>;` 으로 읽어들인다.
+# 그림은 따로 만들 것이 없다. MetaPost 는 luamplib 이 조판 중에 직접 돌린다. 그림은
+# .w 안에 그대로 들어 있고, 문서 둘이 나눠 쓰는 도우미와 프로그램이 뱉는 좌표만
+# <name>.mp 에 남아 `input <name>;` 으로 읽힌다.
 %.pdf: %.w
 	$(GWEAVE) $<
 	$(LUATEX) $*.tex </dev/null

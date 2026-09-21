@@ -1,5 +1,5 @@
 % hyperbolic.go 가 적은 파일이다. 손대지 말 것.
-% hyperbolic.mp 가 이것을 input 한다.
+% hyperbolic.w 가 이것을 input 한다.
 def fig_annulus =
 beginfig(2);
  arc(0.58823,0.831883)

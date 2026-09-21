@@ -3,9 +3,31 @@
 \input kotexgweb
 \input luamplib.sty
 
-% 그림은 dragon-calc.mp 안에 fig_... 라는 이름의 매크로로 있다. 여기서 한 번 읽어
-% 두고 그림 자리마다 이름만 부른다.
-\everymplib{input dragon-calc;}
+% 그림들이 함께 쓰는 정의. 뒤따르는 \mplibcode 토막이 물려받도록
+% \mplibcodeinherit 을 켜 둔다.
+\mplibcodeinherit{enable}
+\mplibcode
+picture nlbl[], slbl[];
+nlbl[1] := btex $n=1$ etex;  nlbl[2] := btex $n=2$ etex;
+nlbl[3] := btex $n=3$ etex;  nlbl[4] := btex $n=4$ etex;
+nlbl[5] := btex $n=5$ etex;
+slbl[1] := btex $s=5$ etex;  slbl[2] := btex $s=25$ etex;
+slbl[3] := btex $s=125$ etex;
+
+numeric dd; pair rr, ww, zz;
+def D = dd:=dd+90; ww:=zz; zz:=ww+rr rotated dd; draw ww--zz; enddef;
+def U = dd:=dd-90; ww:=zz; zz:=ww+rr rotated dd; draw ww--zz; enddef;
+def O = zz:=origin; dd:=-90; D; enddef;
+
+% 차수 n의 용은 단위 경로에 *D 를 n 번 곱한 것이다. 그 접기열 F(n) 은
+% F(n) = F(n-1) D G(n-1), G(n) = F(n-1) U G(n-1) 로 저절로 난다.
+def Dn(expr n) = if n>0: Dn(n-1); D; Un(n-1); fi enddef;
+def Un(expr n) = if n>0: Dn(n-1); U; Un(n-1); fi enddef;
+
+
+% 일반화된 용. 단위 경로에 경로 01012 를 거듭 곱한 것으로, 접기열은 프로그램의
+% m 명령이 뱉은 것을 그대로 옮겼다.
+\endmplibcode
 
 \def\title{용 곡선 계산기}
 \font\logo=logo10
@@ -25,7 +47,30 @@
 대화식 계산기다.
 $$
 \mplibcode
-fig_dragons;
+beginfig(1);
+  picture p[], q;
+  numeric wd, cw, x, top;
+  rr := (7bp,0);
+  for n=1 upto 5:
+    p[n] := image(O Dn(n));
+  endfor
+  x := 0;
+  for n=1 upto 5:
+    % 칸 너비는 그림과 라벨 가운데 넓은 쪽. 둘 다 칸 한가운데 놓는다.
+    wd := xpart urcorner p[n] - xpart llcorner p[n];
+    cw := max(wd, xpart urcorner nlbl[n] - xpart llcorner nlbl[n]);
+    draw p[n] shifted (x + .5(cw-wd) - xpart llcorner p[n],
+                       -ypart llcorner p[n]);
+    label.bot(nlbl[n], (x + .5cw, -4));
+    x := x + cw + 14;
+  endfor
+  top := -36;
+  rr := (2.6bp,0);
+  drawoptions(withpen pencircle scaled .3bp);
+  q := image(O Dn(12));
+  draw q shifted (.5x - .5(xpart urcorner q + xpart llcorner q),
+                  top - ypart urcorner q);
+endfig;
 \endmplibcode
 $$
 \figcap{{\sl 그림\/} 1: 접을수록 자라는 용. 위는 차수 $1$부터 $5$까지고, 아래는 차수
@@ -507,7 +552,33 @@ $$F\,g_0\,\tilde F\,g_1\,F\,g_2\,\tilde F\,\cdots$$
 쏟아지는데, Dekking이 일반화한 용이 바로 이것들이다.
 $$
 \mplibcode
-fig_general;
+beginfig(2);
+  picture g[];
+  numeric wd, cw, x;
+  rr := (9bp,0);
+  g[1] := image(O D U D D;);
+  g[2] := image(O D U D D D U U D U U D U D D D U U D U D D U D D;);
+  rr := (5bp,0);
+  g[3] := image(
+  O D U D D D U U D U U D U D D D U U D U D D U D D D U U D U U D
+  U D D U U U D U D D U D D U U U D U U D U D D D U U D U U D U D
+  D D U U D U D D U D D D U U D U U D U D D U U U D U D D U D D U
+  U U D U D D U D D D U U D U U D U D D D U U D U D D U D D;);
+  numeric bot;
+  bot := 0;
+  for n=1 upto 3:
+    bot := min(bot, -.5(ypart urcorner g[n] - ypart llcorner g[n]));
+  endfor
+  x := 0;
+  for n=1 upto 3:
+    wd := xpart urcorner g[n] - xpart llcorner g[n];
+    cw := max(wd, xpart urcorner slbl[n] - xpart llcorner slbl[n]);
+    draw g[n] shifted (x + .5(cw-wd) - xpart llcorner g[n],
+                       -.5(ypart urcorner g[n] + ypart llcorner g[n]));
+    label.bot(slbl[n], (x + .5cw, bot - 3));
+    x := x + cw + 22;
+  endfor
+endfig;
 \endmplibcode
 $$
 \figcap{{\sl 그림\/} 2: 단위 경로에 경로 \.{01012}(접기열 \.{DUDD})를 거듭 곱한 것. 곱할

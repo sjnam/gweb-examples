@@ -1,10 +1,6 @@
 \input kotexgweb
 \input luamplib.sty
 
-% 그림은 koda-ruskey.mp 안에 fig_... 라는 이름의 매크로로 있다. 여기서 한 번 읽어
-% 두고 그림 자리마다 이름만 부른다.
-\everymplib{input koda-ruskey;}
-
 \def\title{코다--러스키}
 \datethis
 
@@ -89,7 +85,36 @@ $[\,scope[j],\,j\,]$다. 그래서 수 하나가 부분나무 하나를 통째�
 $0$과 $2$와 $3$은 잎이라 제 자신뿐이다.
 $$
 \mplibcode
-fig_forest;
+beginfig(1);
+  numeric u, v, rad; u := 13bp; v := 27bp; rad := 7bp;
+  string s; s := "((())(()()))";
+  numeric px[], dep[], par[];
+  pair np[];
+  px0 := 3;  px1 := 4;  px2 := 7;  px3 := 9;  px4 := 10; px5 := 11;
+  dep0 := 2; dep1 := 1; dep2 := 2; dep3 := 2; dep4 := 1; dep5 := 0;
+  par0 := 1; par1 := 5; par2 := 4; par3 := 4; par4 := 5; par5 := -1;
+  for k=0 upto 11:
+    label(substring (k,k+1) of s, (k*u, 0));
+  endfor
+  for k=0 upto 5:
+    np[k] := (px[k]*u, -dep[k]*v - 30bp);
+    draw (px[k]*u, -9bp) -- (np[k] + (0,rad)) dashed withdots
+      withpen pencircle scaled .7bp;
+  endfor
+  for k=0 upto 5:
+    if par[k] >= 0:
+      drawarrow np[k] -- np[par[k]]
+        cutbefore fullcircle scaled 2.4rad shifted np[k]
+        cutafter fullcircle scaled 2.4rad shifted np[par[k]];
+    fi
+  endfor
+  for k=0 upto 5:
+    unfill fullcircle scaled 2rad shifted np[k];
+    draw fullcircle scaled 2rad shifted np[k];
+    label(decimal k, np[k]);
+  endfor
+  label.rt(btex \ \ 뿌리 etex, np[5] + (rad,0));
+endfig;
 \endmplibcode
 $$
 \figcap{{\it 그림\/} 1: 괄호열 \.{((())(()()))}과 거기서 나오는 숲. 각 노드는 제
@@ -184,7 +209,35 @@ $l$가지를 만든다면 |p|가 책임지는 전체는 $l(r+1)$가지가 된다
 그레이 코드라 부른다. 표준 이진 그레이 코드 $00,01,11,10$이 바로 이 모양이다.
 $$
 \mplibcode
-fig_gray;
+beginfig(2);
+  numeric U, V, ll, rr; U := 40bp; V := 26bp; ll := 4; rr := 3;
+  pair pt[][];
+  path snake;
+  for i=0 upto ll-1: for j=0 upto rr-1:
+    pt[i][j] := (i*U, j*V);
+  endfor endfor
+  snake := pt[0][0] -- pt[0][rr-1];
+  for i=1 upto ll-1:
+    if odd i:
+      snake := snake -- pt[i][rr-1] -- pt[i][0];
+    else:
+      snake := snake -- pt[i][0] -- pt[i][rr-1];
+    fi
+  endfor
+  draw snake withpen pencircle scaled 1.1bp;
+  for i=0 upto ll-1: for j=0 upto rr-1:
+    unfill fullcircle scaled 5bp shifted pt[i][j];
+    draw fullcircle scaled 5bp shifted pt[i][j];
+  endfor endfor
+  fill fullcircle scaled 5bp shifted point 0 of snake;
+  fill fullcircle scaled 9bp shifted point (length snake) of snake;
+  label.llft(btex 처음: 모두 $0$ etex, pt[0][0] + (-2bp,-2bp));
+  label.lrt(btex 끝 etex, pt[ll-1][0] + (3bp,-3bp));
+  label.bot(btex 왼쪽 형제들의 $l$가지 $\longrightarrow$ etex,
+    (.5(ll-1)*U, -22bp));
+  label.lft(btex \vbox{\halign{\hfil#\hfil\cr $p$의\cr 부분나무가\cr
+    내는\cr $r+1$가지\cr}} etex, (-16bp, .5(rr-1)*V));
+endfig;
 \endmplibcode
 $$
 \figcap{{\it 그림\/} 2: 코루틴 |p|가 만드는 $l(r+1)$가지. 세로 한 칸은 |p|의 부분나무가
@@ -407,7 +460,45 @@ for call(root) {
 자신이다.
 $$
 \mplibcode
-fig_fringe;
+beginfig(3);
+  numeric U, wd, ht; U := 40bp; wd := 24bp; ht := 18bp;
+  numeric xx[];
+  picture nm[];
+  path bx[];
+  nm0 := btex $A$ etex; nm1 := btex $B$ etex; nm2 := btex $C$ etex;
+  nm3 := btex $D$ etex; nm4 := btex $E$ etex; nm5 := btex $F$ etex;
+  nm6 := btex \it head etex;
+  boolean act[];
+  act0 := true;  act1 := false; act2 := false;
+  act3 := true;  act4 := false; act5 := false; act6 := true;
+  for k=0 upto 5: xx[k] := k*U; endfor
+  xx6 := -U;  % head 는 맨 왼쪽에 둔다
+  for k=0 upto 6:
+    bx[k] := unitsquare xscaled wd yscaled ht
+      shifted -(.5wd,.5ht) shifted (xx[k],0);
+  endfor
+  for k=0 upto 6:
+    if act[k]: fill bx[k] withcolor .85white; fi
+    draw bx[k];
+    label(nm[k], (xx[k],0));
+  endfor
+  for k=0 upto 4:
+    drawdblarrow (xx[k]+.5wd+2bp, 0) -- (xx[k+1]-.5wd-2bp, 0);
+  endfor
+  drawdblarrow (xx6+.5wd+2bp, 0) -- (xx0-.5wd-2bp, 0);
+  % focus 지름길: C 는 A 로, F 는 D 로.
+  drawarrow (xx2,.5ht+3bp) .. (.5[xx0,xx2], .5ht+22bp) .. (xx0,.5ht+3bp)
+    dashed evenly;
+  drawarrow (xx5,.5ht+3bp) .. (.5[xx3,xx5], .5ht+22bp) .. (xx3,.5ht+3bp)
+    dashed evenly;
+  label.top(btex \it focus etex, (.5[xx0,xx2], .5ht+24bp));
+  label.top(btex \it focus etex, (.5[xx3,xx5], .5ht+24bp));
+  % 순환 목록임을 알리는 되돌이 선.
+  draw (xx5,-.5ht-3bp) .. (.5[xx6,xx5], -.5ht-26bp) .. (xx6,-.5ht-3bp)
+    dashed withdots withpen pencircle scaled .5bp;
+  label.bot(btex 목록은 {\it head\/}를 거쳐 돈다 etex,
+    (.5[xx6,xx5], -.5ht-27bp));
+endfig;
 \endmplibcode
 $$
 \figcap{{\it 그림\/} 3: 프린지의 한 순간. 색을 채운 $A$와 $D$가 능동, 빈 것이 수동이다.
