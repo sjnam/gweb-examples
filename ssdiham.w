@@ -36,6 +36,8 @@
 
 프로그램이 찍는 말과 종료 부호는 원본 그대로 두었다. 그래야 두 프로그램의 출력을
 바이트 단위로 견줄 수 있다. 이 점은 말을 한글로 옮긴 \.{ssham.w}와 다르다.
+다만 원본이 마디 없는 그래프에서 죽는 것은 고쳤다. 그 이야기는 그래프를 읽어 들이는
+자리에서 한다.
 
 @ 다른 프로그램들({\mc SSXCC} 따위)과 마찬가지로 이 프로그램도 실행 시간을
 ``mem'' 단위로 알린다. 여덟 바이트짜리 메모리 낱말을 읽거나 쓸 때마다 하나씩
@@ -240,7 +242,15 @@ func scanUint(s string, p *uint64) int {
 	return 0
 }
 
-@ @<그래프 파일을 읽어 들인다@>=
+@ 원본은 마디가 하나도 없는 그래프를 받으면 죽는다. 그때는 가장 작은 차수 |mind|가
+처음 값 |infty|로 남아 차수 $0$인 마디를 알리는 자리를 지나치고, 판을 벌이는
+자리에서 보이는 마디가 없는데도 |makeinner|를 불러 |vis[-1]|을 짚는다. 원본은
+세그멘테이션 오류로 끝나고, \GO/라면 범위 밖이라며 멈춘다. 이 판은 마디가 너무 많을
+때처럼 거절하고 끝낸다. 크누스가 쓴 말이 없으니 말은 내가 지었다. 이 결함은
+{\mc SSDIHAM}을 옮긴 뒤 {\mc SSBIDIHAM}을 옮기다가 찾았다. 둘이 같은 모양이라
+\.{ssbidiham.w}와 똑같이 고쳤다.
+
+@<그래프 파일을 읽어 들인다@>=
 var err error
 if g, err = gbsave.RestoreGraph(os.Args[1]); err != nil {
 	fmt.Fprintf(os.Stderr, "I couldn't reconstruct graph %s!\n", os.Args[1])
@@ -250,6 +260,10 @@ if g, err = gbsave.RestoreGraph(os.Args[1]); err != nil {
 	if nn > maxn {
 		fmt.Fprintf(os.Stderr, "Sorry, graph %s has too many vertices (%d>%d)!\n",
 			os.Args[1], nn, maxn)
+		os.Exit(-2)
+	}
+	if nn == 0 {
+		fmt.Fprintf(os.Stderr, "Sorry, graph %s has no vertices!\n", os.Args[1])
 		os.Exit(-2)
 	}
 }
@@ -1583,7 +1597,10 @@ mem을 자르는 \.{T}, 같은 선택항을 두 번 준 것, \.{t-1}과 \.{m-3} 
 
 또 원본을 \.{AddressSanitizer}와 \.{UndefinedBehaviorSanitizer}를 붙여 컴파일하고
 $6\times6$ 나이트 그래프를 뺀 그래프 $74$개에 선택항 조합 다섯 가지씩, $370$번을
-돌려 보았다. 한 번도 경고가 나지 않았다. 이번에는 옮기며 고칠 결함을 찾지 못했다.
+돌려 보았다. 한 번도 경고가 나지 않았다. 처음 옮길 때는 그래서 고칠 결함이 없다고
+여겼다. 하지만 이 시험에는 마디 없는 그래프가 없었고, 원본은 바로 그 그래프에서
+죽는다. 앞에서 말한 대로 그것은 고쳤다. 그 그래프만은 원본이 죽으므로 견줄 수 없다.
+이 판은 \.{Sorry, graph ... has no vertices!}라고 말하고 종료 부호 $254$로 끝난다.
 
 @ 속도는 원본에 못 미친다. 호가 빽빽한 마디 $13$개짜리 무작위 그래프에서 해
 $300$만 개를 찾는 데(mem $7$억 남짓) 원본은 $0.18$초, 이 판은 $0.61$초가 걸린다.
