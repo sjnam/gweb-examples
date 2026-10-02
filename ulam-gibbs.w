@@ -263,7 +263,7 @@ if k != 0 || maxn == 0 || uncompressedBytes < 3 ||
 	os.Exit(1)
 }
 
-@ 중요한 고리가 몇 번 도는지에 대한 통계는 \&{stat} 구조에 모은다.
+@ 중요한 고리가 몇 번 도는지에 대한 통계는 \KW{stat} 구조에 모은다.
 
 @<자료형@>=
 type stat struct {

@@ -350,7 +350,7 @@ quit(-999)
 ``트라이''로 짓는다.
 
 트라이는 계산하는 동안 자란다. 마디는 거대한 포인터 배열 |mem|의 구간들에 담고,
-잎은 거대한 \&{bignum} 배열 |weight|의 원소에 담는다.
+잎은 거대한 \KW{bignum} 배열 |weight|의 원소에 담는다.
 
 잎 하나는 열쇠 $a_0a_1\ldots a_{q-1}$로 가려낸다. 여기서 $0\le l<q$마다
 $-1\le a_l<|deg|$이다. 트라이에는 열쇠의 앞머리 $a_0\ldots a_{l-1}$마다($0\le l<q$)
@@ -463,7 +463,7 @@ oldmem = make([]uint64, 1<<10)
 weight = make([]bignum, 1<<10)
 oldweight = make([]bignum, 1<<10)
 
-@ 원본의 \&{memtyp}는 |unsigned int|다. 여기서는 |uint32|로 둔다.
+@ 원본의 \KW{memtyp}는 |unsigned int|다. 여기서는 |uint32|로 둔다.
 
 @<전역 변수@>=
 var (
