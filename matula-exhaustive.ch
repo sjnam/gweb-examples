@@ -22,9 +22,21 @@ $S$의 문자열에는 \.0이 딱 한 번만 나온다.
 $$\eqalign{S&=\.{.0111444759a488cfch};\cr
 T&=\.{.011345676965cc5ffh5cklfn55qjstuuwxxwwuCCuFCpppqrtGOHJRLMNO};\cr}$$
 $T$ 안에서 $S$를 찾을 수 있겠는가?
-$$\mplibcode fig_S; \endmplibcode$$
+$$\mplibcode
+beginfig(0);
+  S_grid;
+  edges(pos)(Sdad, black);
+  marks(pos)(length Sdad);
+endfig;
+\endmplibcode$$
 \figcap{나무 $S$. 마디 $19$개다.}
-$$\mplibcode fig_T; \endmplibcode$$
+$$\mplibcode
+beginfig(0);
+  T_grid;
+  edges(pos)(Tdad, black);
+  marks(pos)(length Tdad);
+endfig;
+\endmplibcode$$
 \figcap{나무 $T$. 마디 $59$개다. 답은 마지막 장에 있다.}
 @y
 @ 이 판은 나무 둘을 받는 대신, 마디가 $m$개인 자유 나무 $S$와 마디가 $n$개인
@@ -925,7 +937,16 @@ D C E H u F v w x G O W t y z N V s j\cr}}$$
 가는지를 적은 것이다.
 
 @ 그러니 퍼즐을 풀었는가?
-$$\mplibcode fig_ST; \endmplibcode$$
+$$\mplibcode
+beginfig(0);
+  T_grid;
+  edges(pos)(Tdad, pale);
+  disks(pos)(length Tdad, pale);
+  embed("DCEHuFvwxGOWtyzNVsj");
+  edges(img)(Sdad, black);
+  marks(img)(length Sdad);
+endfig;
+\endmplibcode$$
 \figcap{$T$ 안에 자리 잡은 $S$. 굵게 그린 부분이 심긴 자리다.}
 
 @ 이 그림에는 사연이 있다. 처음에 나는 이것을 연습문제~213의 답(fasc7a의 2024년
@@ -970,7 +991,6 @@ $T$는 $62$개까지, 가지 뻗는 정도도 여러 가지로 두었다. 답도
 하나 더 들었다. 크누스의 새 판도 그 칸을 채우니, 이제 그 차이마저 없다. 이를테면
 $S=\.{.01}$에 별 모양 $T$를 주면 옛 판은 $2043+903$, 새 판과 우리 판은 나란히
 $2044+903$이다.
-
 @y
 @* 거둬들이기.
 짝 하나를 풀 때마다 그 결과와 걸린 시간을 갈무리한다.

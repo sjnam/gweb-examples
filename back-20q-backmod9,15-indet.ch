@@ -215,9 +215,35 @@ $$\.{\$ back-20q 0 0}$$
 20번을 틀렸을 때 두 장. 그러니 이 시험의 최고 점수는 {\it 19점\/}이다.
 
 그 세 장 가운데 20번까지 맞힌 것은 딱 한 장이다.
-$$\mplibcode sheet := "DCEABEBCEABEAEDBDABB"; wrongq := 19; fig_answer;
-  \endmplibcode$$
-\figcap{{\it 그림\/} 3: \.{back-20q 19 0}이 찾아낸 단 하나의 답안지.
+$$\mplibcode
+sheet := "DCEABEBCEABEAEDBDABB"; wrongq := 19; beginfig(3);
+  numeric R, W, V, X; R := 4.6bp; W := 15bp; V := 17bp; X := 128bp;
+  for t=1 upto 20:
+    numeric col, row, bx, by;
+    col := if t <= 10: 0 else: 1 fi;
+    row := if t <= 10: t-1 else: t-11 fi;
+    bx := col*X;  by := -row*V;
+    draw thelabel.lft(dg[t], (bx-7bp, by));
+    for c=0 upto 4:
+      draw fullcircle scaled 2R shifted (bx + c*W, by);
+      if (substring (t-1,t) of sheet) = (substring (c,c+1) of "ABCDE"):
+        fill fullcircle scaled (2R-1.6bp) shifted (bx + c*W, by);
+      fi
+    endfor
+    if t = wrongq:
+      draw (bx-36bp, by+4bp) -- (bx-28bp, by-4bp);
+      draw (bx-36bp, by-4bp) -- (bx-28bp, by+4bp);
+    fi
+  endfor
+  for c=0 upto 4:
+    draw thelabel(al[c], (c*W, V-5bp));
+    draw thelabel(al[c], (X + c*W, V-5bp));
+  endfor
+  label.bot(btex $\times$ 가 붙은 하나만 틀렸다---$19$점 etex,
+    (.5X+2W, -9*V - 14bp));
+endfig;
+\endmplibcode$$
+\figcap{{\it 그림\/} 3: \.{back-20q 19 0}이 찾아낸 단 하나의 답안지
 \.{DCEABEBCEABEAEDBDABB}. 20번의 답 B는 ``최고 점수는 19''라는 뜻이고,
 실제로 이 답안지의 점수가 19다---앞뒤가 맞는다.}
 
@@ -249,8 +275,34 @@ $$\.{\$ back-20q 0 0}$$
 {\it 19점\/}이다.
 
 두 장 가운데 20번까지 맞힌 것은 이쪽이다.
-$$\mplibcode sheet := "DCEABEDCEAEBAEDBDADD"; wrongq := 19; fig_answer;
-  \endmplibcode$$
+$$\mplibcode
+sheet := "DCEABEDCEAEBAEDBDADD"; wrongq := 19; beginfig(3);
+  numeric R, W, V, X; R := 4.6bp; W := 15bp; V := 17bp; X := 128bp;
+  for t=1 upto 20:
+    numeric col, row, bx, by;
+    col := if t <= 10: 0 else: 1 fi;
+    row := if t <= 10: t-1 else: t-11 fi;
+    bx := col*X;  by := -row*V;
+    draw thelabel.lft(dg[t], (bx-7bp, by));
+    for c=0 upto 4:
+      draw fullcircle scaled 2R shifted (bx + c*W, by);
+      if (substring (t-1,t) of sheet) = (substring (c,c+1) of "ABCDE"):
+        fill fullcircle scaled (2R-1.6bp) shifted (bx + c*W, by);
+      fi
+    endfor
+    if t = wrongq:
+      draw (bx-36bp, by+4bp) -- (bx-28bp, by-4bp);
+      draw (bx-36bp, by-4bp) -- (bx-28bp, by+4bp);
+    fi
+  endfor
+  for c=0 upto 4:
+    draw thelabel(al[c], (c*W, V-5bp));
+    draw thelabel(al[c], (X + c*W, V-5bp));
+  endfor
+  label.bot(btex $\times$ 가 붙은 하나만 틀렸다---$19$점 etex,
+    (.5X+2W, -9*V - 14bp));
+endfig;
+\endmplibcode$$
 \figcap{{\it 그림\/} 3: \.{back-20q 19 0}이 찾아낸 답안지
 \.{DCEABEDCEAEBAEDBDADD}. 20번의 답 D는 ``정해지지 않는다''인데, 이 변종에서는
 그것을 참으로 놓았으니 앞뒤가 맞는다. 원래 판에서 같은 자리를 차지했던 답안지와
@@ -262,7 +314,7 @@ $$\mplibcode sheet := "DCEABEDCEAEBAEDBDADD"; wrongq := 19; fig_answer;
 @z
 @x
 첫째, 위의 두 자리를 고친 \.{CWEB} 원본과 211가지 무늬를 모두 견주었다.
-답안지도, 검색나무의 노드 수도 한 자리 다르지 않았다. mem 수는 두 경우에서
+답안지도, 검색나무의 노드 수도 한 자리 다르지 않았다. 다만 mem 수는 두 경우에서
 $1$과 $3$만큼 달랐는데, 19번의 미룬 확인에서 원문이 논리곱 대신 비트곱을 써
 짧은 회로가 끊기지 않는 자리 때문이다.
 @y

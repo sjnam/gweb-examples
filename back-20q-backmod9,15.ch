@@ -181,9 +181,35 @@ $$\.{\$ back-20q 0 0}$$
 20번을 틀렸을 때 두 장. 그러니 이 시험의 최고 점수는 {\it 19점\/}이다.
 
 그 세 장 가운데 20번까지 맞힌 것은 딱 한 장이다.
-$$\mplibcode sheet := "DCEABEBCEABEAEDBDABB"; wrongq := 19; fig_answer;
-  \endmplibcode$$
-\figcap{{\it 그림\/} 3: \.{back-20q 19 0}이 찾아낸 단 하나의 답안지.
+$$\mplibcode
+sheet := "DCEABEBCEABEAEDBDABB"; wrongq := 19; beginfig(3);
+  numeric R, W, V, X; R := 4.6bp; W := 15bp; V := 17bp; X := 128bp;
+  for t=1 upto 20:
+    numeric col, row, bx, by;
+    col := if t <= 10: 0 else: 1 fi;
+    row := if t <= 10: t-1 else: t-11 fi;
+    bx := col*X;  by := -row*V;
+    draw thelabel.lft(dg[t], (bx-7bp, by));
+    for c=0 upto 4:
+      draw fullcircle scaled 2R shifted (bx + c*W, by);
+      if (substring (t-1,t) of sheet) = (substring (c,c+1) of "ABCDE"):
+        fill fullcircle scaled (2R-1.6bp) shifted (bx + c*W, by);
+      fi
+    endfor
+    if t = wrongq:
+      draw (bx-36bp, by+4bp) -- (bx-28bp, by-4bp);
+      draw (bx-36bp, by-4bp) -- (bx-28bp, by+4bp);
+    fi
+  endfor
+  for c=0 upto 4:
+    draw thelabel(al[c], (c*W, V-5bp));
+    draw thelabel(al[c], (X + c*W, V-5bp));
+  endfor
+  label.bot(btex $\times$ 가 붙은 하나만 틀렸다---$19$점 etex,
+    (.5X+2W, -9*V - 14bp));
+endfig;
+\endmplibcode$$
+\figcap{{\it 그림\/} 3: \.{back-20q 19 0}이 찾아낸 단 하나의 답안지
 \.{DCEABEBCEABEAEDBDABB}. 20번의 답 B는 ``최고 점수는 19''라는 뜻이고,
 실제로 이 답안지의 점수가 19다---앞뒤가 맞는다.}
 
@@ -213,8 +239,34 @@ $$\.{\$ back-20q 0 0}$$
 여기서도 답이 하나도 없다. 열아홉 개까지 내려가면 답이 나오는 것은 한 경우뿐,
 20번을 틀렸을 때 한 장이다. 그러니 이 변종에서도 최고 점수는 {\it 19점\/}이고,
 그 점수를 받는 답안지는 통틀어 딱 하나다.
-$$\mplibcode sheet := "DCEABADCDAEDAEDBDBEE"; wrongq := 20; fig_answer;
-  \endmplibcode$$
+$$\mplibcode
+sheet := "DCEABADCDAEDAEDBDBEE"; wrongq := 20; beginfig(3);
+  numeric R, W, V, X; R := 4.6bp; W := 15bp; V := 17bp; X := 128bp;
+  for t=1 upto 20:
+    numeric col, row, bx, by;
+    col := if t <= 10: 0 else: 1 fi;
+    row := if t <= 10: t-1 else: t-11 fi;
+    bx := col*X;  by := -row*V;
+    draw thelabel.lft(dg[t], (bx-7bp, by));
+    for c=0 upto 4:
+      draw fullcircle scaled 2R shifted (bx + c*W, by);
+      if (substring (t-1,t) of sheet) = (substring (c,c+1) of "ABCDE"):
+        fill fullcircle scaled (2R-1.6bp) shifted (bx + c*W, by);
+      fi
+    endfor
+    if t = wrongq:
+      draw (bx-36bp, by+4bp) -- (bx-28bp, by-4bp);
+      draw (bx-36bp, by-4bp) -- (bx-28bp, by+4bp);
+    fi
+  endfor
+  for c=0 upto 4:
+    draw thelabel(al[c], (c*W, V-5bp));
+    draw thelabel(al[c], (X + c*W, V-5bp));
+  endfor
+  label.bot(btex $\times$ 가 붙은 하나만 틀렸다---$19$점 etex,
+    (.5X+2W, -9*V - 14bp));
+endfig;
+\endmplibcode$$
 \figcap{{\it 그림\/} 3: \.{back-20q 20 0}이 찾아낸 단 하나의 19점짜리 답안지.
 \.{DCEABADCDAEDAEDBDBEE}. 20번의 답 E는 ``이 문제를 틀려야만 얻을 수 있다''인데
 실제로 20번이 틀렸으니, 스스로에 대해 말하는 방식으로만 앞뒤가 맞는다.}
@@ -231,7 +283,7 @@ $[44\dts53]$이라는 헐거운 구간에서 $[39\dts43]$이라는 좁은 구간
 @z
 @x
 첫째, 위의 두 자리를 고친 \.{CWEB} 원본과 211가지 무늬를 모두 견주었다.
-답안지도, 검색나무의 노드 수도 한 자리 다르지 않았다. mem 수는 두 경우에서
+답안지도, 검색나무의 노드 수도 한 자리 다르지 않았다. 다만 mem 수는 두 경우에서
 $1$과 $3$만큼 달랐는데, 19번의 미룬 확인에서 원문이 논리곱 대신 비트곱을 써
 짧은 회로가 끊기지 않는 자리 때문이다.
 @y
