@@ -19,3 +19,4 @@
 @s Vertex int
 @s Graph int
 @s Util int
+@s gbflip.RNG int
