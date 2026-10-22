@@ -273,10 +273,10 @@ var (
 )
 
 @ @<워커가 지니는 것@>=
-perm  [3][26]int // 고른 회전자 셋의 치환
-iperm [3][26]int // 그 역치환
-pos   [3]int     // 느린 것, 가운데 것, 빠른 것의 자리
-off   [3]int     // 링 설정을 뺀 회전량
+@!perm  [3][26]int // 고른 회전자 셋의 치환
+@!iperm [3][26]int // 그 역치환
+@!pos   [3]int     // 느린 것, 가운데 것, 빠른 것의 자리
+@!off   [3]int     // 링 설정을 뺀 회전량
 
 @ 이제 기계의 심장이다. 오른쪽(빠른 회전자)부터 왼쪽으로 훑고, 반사한 뒤,
 왼쪽에서 오른쪽으로 거슬러 나온다. 회전량 |off[k]|만큼 돌아간 회전자를 지나는
@@ -448,7 +448,7 @@ $26^4=456{,}976$칸이다. 값이 모두 $0\dts25$이므로 바이트 하나면 
 표는 안쪽 고리에서 쉼 없이 읽히므로 작게 만들어 캐시에 앉히는 것이 실제로 값을 한다.
 
 @<워커가 지니는 것@>=
-enc [26][26][26][26]uint8 // 지금 로터로 만든 치환들
+@!enc [26][26][26][26]uint8 // 지금 로터로 만든 치환들
 
 @ @<지금 로터로 치환표를 만든다@>=
 for off[0] = 0; off[0] < 26; off[0]++ {
@@ -561,10 +561,10 @@ $-1$인 류는 이미 모순이다.
 var name [nn]string
 
 @ @<워커가 지니는 것@>=
-rep  [nn]int // 이 원소가 든 류의 대표
-size [nn]int // 대표가 이끄는 류의 크기
-bits [nn]int // 류에 나오는 글자들. 겹치면 $-1$
-link [nn]int // 같은 류의 다음 원소
+@!rep  [nn]int // 이 원소가 든 류의 대표
+@!size [nn]int // 대표가 이끄는 류의 크기
+@!bits [nn]int // 류에 나오는 글자들. 겹치면 $-1$
+@!link [nn]int // 같은 류의 다음 원소
 
 @ 합치기는 작은 쪽을 큰 쪽에 붙이는 흔한 방식이다. 크누스는 이 함수에 |yewnion|
 이라는 이름을 붙였는데, \CEE/에서 |union|이 예약어라 소리 나는 대로 적은 장난이다.
@@ -609,8 +609,8 @@ var (
 )
 
 @ @<워커가 지니는 것@>=
-fullswap [maxm][26]int // 지금 다루는 치환들
-used     [26]int       // 지금 다루는 글자들에 몇 번 나오는가
+@!fullswap [maxm][26]int // 지금 다루는 치환들
+@!used     [26]int       // 지금 다루는 글자들에 몇 번 나오는가
 
 @ @<명령줄을 처리한다@>=
 args := os.Args[1:]
@@ -882,10 +882,10 @@ $\bigl(\bigvee\{x_j\mid l\in C_j\}\bigr)$가 생긴다. 이것을 다 풀면 쓸
 플러그보드가 남김없이 나온다.
 
 @ @<워커가 지니는 것@>=
-klass      [nn]int
-kbits      [nn]int
-konstraint [26]uint64
-nvars      int
+@!klass      [nn]int
+@!kbits      [nn]int
+@!konstraint [26]uint64
+@!nvars      int
 
 @ @<해를 살펴본다@>=
 w.cases++
@@ -961,12 +961,12 @@ type clauseRec struct {
 }
 
 @ @<워커가 지니는 것@>=
-mem     [memsize]uint32 // 리터럴 번호를 담는 칸들
-cmem    [clausesize]clauseRec
-nonspec int         // 진짜 절이 시작하는 자리
-move    [nn + 2]int // 지금까지의 선택
-sols    int         // 찾은 해의 수
-plugs   [maxsols][27]int
+@!mem     [memsize]uint32 // 리터럴 번호를 담는 칸들
+@!cmem    [clausesize]clauseRec
+@!nonspec int         // 진짜 절이 시작하는 자리
+@!move    [nn + 2]int // 지금까지의 선택
+@!sols    int         // 찾은 해의 수
+@!plugs   [maxsols][27]int
 
 @ 원본은 |move|를 예순네 칸으로 잡아 두었다. 그런데 변수의 수가 예순넷을 넘는
 경우가 있다는 것을 크누스 자신이 적어 두었고(``$1500$번에 한 번쯤''), 그때
@@ -1205,13 +1205,13 @@ for c := 0; c <= clauses; c++ {
 const maxsetups = 500
 
 @ @<워커가 지니는 것@>=
-startpos [maxsetups][3]int
-rings    [maxsetups][3]int
-start    [3]int
-now      [3]int
-root     [3]int
-prefix   int
-setups   int
+@!startpos [maxsetups][3]int
+@!rings    [maxsetups][3]int
+@!start    [3]int
+@!now      [3]int
+@!root     [3]int
+@!prefix   int
+@!setups   int
 
 @ 경로의 첫 성분이 $1$이면 크립을 찍는 동안 큰 자리올림이 있었다는 뜻이고, 그 시각이
 정확히 언제인지도 알 수 있다. 가운데 성분만 $1$이면 작은 자리올림의 시각만 알고,
@@ -1350,10 +1350,10 @@ var (
 )
 
 @ @<워커가 지니는 것@>=
-bestscore int
-plntxt    [maxmc]int
-plugboard [26]int
-tally     [maxscore]int
+@!bestscore int
+@!plntxt    [maxmc]int
+@!plugboard [26]int
+@!tally     [maxscore]int
 
 @ 원문을 한 번 훑으며 창을 다섯 글자씩 미끄러뜨린다. 창의 값은 $26$진수 다섯 자리로
 읽으면 되니, 맨 앞자리를 떼고 새 글자를 붙이는 일만 되풀이하면 된다.
@@ -1567,9 +1567,9 @@ var (
 @ 워커도 같은 것을 제 몫만큼 센다. 마지막에 더하거나 최댓값을 취해 위의 것에 모은다.
 
 @<워커가 지니는 것@>=
-cases, fails, hardcases, hardfails  int
-varsmax, clausesmax, cellsmax       int
-solsmax, setupsmax, solsbysetupsmax int
+@!cases, @!fails, @!hardcases, @!hardfails  int
+@!varsmax, @!clausesmax, @!cellsmax       int
+@!solsmax, @!setupsmax, @!solsbysetupsmax int
 
 @ @<셈한 것을 알린다@>=
 for s := 0; s < maxscore; s++ {
