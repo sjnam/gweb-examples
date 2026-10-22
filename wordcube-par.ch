@@ -46,65 +46,65 @@
 @z
 
 @x
-	var wk worker
-	for w := 0; w < len(words); w++ {
-		wk.searchFrom(w)
-		fmt.Fprintf(os.Stderr, "\r진행: 시작 낱말 %d/%d, 노드 %d ", w+1, len(words), wk.nodes)
-	}
-	fmt.Fprintln(os.Stderr)
-	count, distinct, nodes, profile = wk.count, wk.distinct, wk.nodes, wk.profile
+var wk worker
+for w := 0; w < len(words); w++ {
+	wk.searchFrom(w)
+	fmt.Fprintf(os.Stderr, "\r진행: 시작 낱말 %d/%d, 노드 %d ", w+1, len(words), wk.nodes)
+}
+fmt.Fprintln(os.Stderr)
+count, distinct, nodes, profile = wk.count, wk.distinct, wk.nodes, wk.profile
 @y
-	pool := make([]worker, workers)
-	var next int64 = -1
-	var wg sync.WaitGroup
-	for g := range pool {
-		wg.Add(1)
-		go func(wk *worker) {
-			defer wg.Done()
-			for {
-				w := int(atomic.AddInt64(&next, 1))
-				if w >= len(words) {
-					return
-				}
-				wk.searchFrom(w)
+pool := make([]worker, workers)
+var next int64 = -1
+var wg sync.WaitGroup
+for g := range pool {
+	wg.Add(1)
+	go func(wk *worker) {
+		defer wg.Done()
+		for {
+			w := int(atomic.AddInt64(&next, 1))
+			if w >= len(words) {
+				return
 			}
-		}(&pool[g])
-	}
-	wg.Wait()
-	for g := range pool {
-		count += pool[g].count
-		distinct += pool[g].distinct
-		nodes += pool[g].nodes
-		for t := range profile {
-			profile[t] += pool[g].profile[t]
+			wk.searchFrom(w)
 		}
+	}(&pool[g])
+}
+wg.Wait()
+for g := range pool {
+	count += pool[g].count
+	distinct += pool[g].distinct
+	nodes += pool[g].nodes
+	for t := range profile {
+		profile[t] += pool[g].profile[t]
 	}
+}
 @z
 
 @x
 @ 명령줄 인자로 낱말 파일을 받되, 없으면 \.{sgb-words.txt}를 쓴다.
 
 @<명령줄을 처리한다@>=
-	wordFile = "sgb-words.txt"
-	if len(os.Args) >= 2 {
-		wordFile = os.Args[1]
-	}
+wordFile = "sgb-words.txt"
+if len(os.Args) >= 2 {
+	wordFile = os.Args[1]
+}
 @y
 @ 명령줄 인자로 낱말 파일을 받되, 없으면 \.{sgb-words.txt}를 쓰고,
 워커의 수(숫자)도 읽는다. 파일과 워커 수는 순서에 상관없이 준다. 워커 수를
 안 주면 CPU 코어 갯수로 한다---곧 순차 실행이다.
 
 @<명령줄을 처리한다@>=
-	wordFile = "sgb-words.txt"
-	workers := runtime.NumCPU()
-	for _, a := range os.Args[1:] {
-		if k, err := strconv.Atoi(a); err == nil {
-			workers = k
-		} else {
-			wordFile = a
-		}
+wordFile = "sgb-words.txt"
+workers := runtime.NumCPU()
+for _, a := range os.Args[1:] {
+	if k, err := strconv.Atoi(a); err == nil {
+		workers = k
+	} else {
+		wordFile = a
 	}
-	if workers < 1 {
-		workers = 1
-	}
+}
+if workers < 1 {
+	workers = 1
+}
 @z
