@@ -1,4 +1,4 @@
-이 변경 파일은 크누스의 floorplan-to-twintree-ttform.ch를 옮긴 것이다.
+이 변경 파일은 커누스의 floorplan-to-twintree-ttform.ch를 옮긴 것이다.
 출력을 짝 프로그램 TWINTREE-TO-BAXTER가 읽는 형식으로 바꾼다.
 
 @x
