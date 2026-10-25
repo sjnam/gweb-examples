@@ -679,14 +679,14 @@ MetaPost를 그 자리에서 돌린다. 따로 도는 `mpost` 단계도, 중간 
   77개)와 무작위 방향 그래프 1615개에서 맞춰 보았고, 증서는 다시 1500개에서 뜻이
   맞는지 따로 검사했다. [go-sgb](https://github.com/sjnam/go-sgb)를 쓴다.
   MetaPost 그림 셋.
-* [topswops.w](topswops.w) — 콘웨이의 *톱스왑스* 놀이를 페퍼다인의 거꾸로
-  탐색(끝난 자리에서 놀이를 거꾸로 돌린다)으로 푼다. 커누스의 CWEB
-  `topswops.w`를 다시 풀어 쓴 한글 문학적 에세이이고, MetaPost 그림(놀이 한 판과
-  n=3의 거꾸로 탐색 나무 전체)과 콘웨이의 멈춤 논증에 대한 증명이 딸려 있다.
-* [topswops_fwd.w](topswops_fwd.w) — 같은 놀이를 *앞으로* 푼다. 자리 표시 카드와
-  `f(m)` 가지치기 한계를 쓰는 분기 한정 탐색이고, `goto` 상태 기계로 썼다.
-  커누스의 CWEB `topswops-fwd.w`를 다시 풀어 쓴 한글 문학적 에세이이고, MetaPost
-  그림(이름표 다섯 개짜리 상태 기계와 가지치기 한계)이 딸려 있다.
+* [topswops.w](topswops.w) — 콘웨이의 *톱스왑스* 놀이에서 가장 오래 버티는 패를
+  두 길로 찾는다. 기본은 페퍼다인의 거꾸로 탐색(끝난 자리에서 놀이를 거꾸로
+  돌린다)이고, `-fwd`를 주면 자리 표시 카드와 `f(m)` 가지치기 한계를 쓰는 앞으로
+  가는 분기 한정 탐색(`goto` 상태 기계)을 한다. 덱 크기는 `-n`으로 바꾼다.
+  커누스의 CWEB `topswops.w`와 `topswops-fwd.w`를 하나로 합쳐 다시 풀어 쓴 한글
+  문학적 에세이이고, MetaPost 그림 넷(놀이 한 판, n=3의 거꾸로 탐색 나무 전체,
+  이름표 다섯 개짜리 상태 기계, 가지치기 한계)과 콘웨이의 멈춤 논증에 대한 증명이
+  딸려 있다.
 * [twintree-to-baxter.w](twintree-to-baxter.w) — 쌍둥이 나무에서 그것을 낳는 백스터
   순열을 찾는다. 커누스의 2021년 삼부작의 둘째 편으로,
   [floorplan-to-twintree.w](floorplan-to-twintree.w)에 ttform 변경 파일을 적용한
