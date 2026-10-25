@@ -13,6 +13,7 @@
 @s Context int
 @s WaitGroup int
 @s CancelFunc int
+@s testing.T int
 
 % from SGB
 @s Arc int
