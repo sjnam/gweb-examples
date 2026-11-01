@@ -676,17 +676,3 @@ MetaPost를 그 자리에서 돌린다. 따로 도는 `mpost` 단계도, 중간 
   * `segment/` — HEOI 2013 *Segment*. 온라인이 강제되어(좌표가 앞선 답으로
     암호화되어 온다) CDQ도 좌표 압축도 막히고, 리차오 트리만 제 집인 선분 삽입
     문제에 홀로 선다.
-* [guitar-tuner](https://github.com/sjnam/guitar-tuner) — 맥의 마이크를 읽어
-  음높이를 바늘 계기로 실시간에 보이는 기타 튜너. 음높이 검출은 DSP 라이브러리
-  없이 **YIN 알고리즘을 맨손으로 구현한 것**이고, 콘솔과
-  [Gio](https://gioui.org) 창, 두 프런트엔드가 같은 핵심을 함께 쓴다. 프로그램
-  하나를 문서 셋으로 자른 것이라 2026년 11월에 따로 저장소로 떼어 냈다.
-* [life-game](https://github.com/sjnam/life-game) — 터미널에서 도는 콘웨이의
-  **생명 게임**. 그래픽 라이브러리 없이 ANSI 이스케이프 부호만으로 원환면 우주를
-  그린다. 파일 `.w` 하나가 프로그램이자 에세이이고, 제목은 노자의 *천지불인*에서
-  왔다. 2026년 11월에 따로 저장소로 떼어 냈다.
-* [skew-ternary](https://github.com/sjnam/skew-ternary) — 커누스의
-  **skew-ternary-calc**와, 누군가 만들어 주기를 그가 바랐던 대화형 장난감. 여기
-  한 디렉터리로 있다가, 대화형 페이지와 검사 스크립트를 거느리며 커져 2026년
-  11월에 따로 저장소로 떼어 냈다. 페이지는 <https://sjnam.github.io/skew-ternary/>에서
-  볼 수 있다.
