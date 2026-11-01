@@ -199,11 +199,6 @@ MetaPost를 그 자리에서 돌린다. 따로 도는 `mpost` 단계도, 중간 
   모두와 길이 105까지의 무작위 수열 4000개인데, 일부러 다르게 한 것이 하나 있다.
   함수 `strconv.Atoi`는 `sscanf("%d")`가 조용히 받아들이던 뒤쪽 쓰레기를
   거절한다. MetaPost 그림 하나.
-* [dlx-pre](https://github.com/sjnam/dancing-cells/tree/main/examples/dlx-pre) —
-  정확한 덮개 연작의 *전처리기*. 커누스의 DLX-PRE를 옮겨 원본과 바이트까지 맞춰
-  보았고, 원본 §3의 미끄러짐 둘도 적어 두었다. DLX 텍스트를 다루는 짝을 찾아
-  2026년 11월에 [dancing-cells](https://github.com/sjnam/dancing-cells)의 예제로
-  옮겼다.
 * [dragon-calc.w](dragon-calc.w) — 데킹의 일반화된 용
   곡선과, 그의 *다이아몬드와 용* 노트에 나오는 타일 계산을 위한 대화형 계산기다.
   글자 `D`와 `U`로 된 접기 수열, 곡선을 두 배(또는 다섯 배)로 만드는 접기 곱,
@@ -601,10 +596,6 @@ MetaPost를 그 자리에서 돌린다. 따로 도는 `mpost` 단계도, 중간 
   부분 순열 표현의 예와 λ_t의 식 등 설명의 잘못도 고쳤다. 전수 탐색과 열한
   가지에서 맞춰 보았고, 원본과 크기 29가지에서 바이트까지 같다. MetaPost 그림
   하나.
-* [word-cube-dlx](https://github.com/sjnam/dancing-cells/tree/main/examples/word-cube-dlx)
-  — 아래 `wordcube.w`와 똑같은 대칭 낱말 정육면체를 **정확한 덮개(XCC) 문제
-  하나로 옮겨** 범용 해결기에게 맡기고, 둘을 겨루게 한다. 2026년 11월에
-  [dancing-cells](https://github.com/sjnam/dancing-cells)의 예제로 옮겼다.
 * [wordcube.w](wordcube.w) — 스탠퍼드 그래프베이스의 다섯 글자 낱말 5757개로
   **대칭 5×5×5 낱말 정육면체**를 몇 개나 지을 수 있는가? 완전히 대칭인
   정육면체는 세 축 어느 쪽으로 읽어도 같은 낱말이 나온다. 말끔한 백트래킹이
