@@ -12,21 +12,22 @@ PDF부터 보기를 권한다. 그쪽이 사람의 눈을 위한 면이다.
 
 ## 구성
 
-예제는 저마다 제 이름의 디렉터리에 있다. 디렉터리에는 `.w` 원본과 그 README,
-Makefile이 있고, 딸린 변경 파일(`.ch`), MetaPost 파일(`.mp`), 자료 파일도 함께
-둔다. 루트의 `types.w`는 예제가 아니라 여러 문서가 `@i ../types.w`로 읽어들이는
-공용 포함 파일이고, [gweb.mk](gweb.mk)는 디렉터리의 Makefile들이 함께 쓰는 빌드
-규칙이다.
+예제는 저마다 제 이름의 디렉터리에 있다. 디렉터리에는 `.w` 원본과 그 README가
+있고, 딸린 변경 파일(`.ch`), MetaPost 파일(`.mp`), 자료 파일도 함께 둔다. 루트의
+`types.w`는 예제가 아니라 여러 문서가 `@i ../types.w`로 읽어들이는 공용 포함
+파일이다.
 
 ## 빌드
 
-`gtangle`, `gweave`, 그리고 luatex(luamplib 포함)이 있어야 한다.
+`gtangle`, `gweave`, 그리고 luatex(luamplib 포함)이 있어야 한다. 루트의
+[Makefile](Makefile) 하나가 모든 예제를 빌드하므로, `make`는 저장소 루트에서
+부른다. 예제와 변경 파일은 `*/*.w`와 `*/*.ch`를 훑어 찾는다.
 
 ```sh
-make ziptree          # ziptree/ 에서 ziptree.go + ziptree.pdf (cd ziptree && make 와 같다)
-make all              # 모든 예제
-make clean            # 생성물 삭제
-cd matula && make matula-big   # 변경 파일 판: matula-big/matula.go + matula-big/matula.pdf
+make ziptree      # ziptree/ziptree.go + ziptree/ziptree_test.go + ziptree/ziptree.pdf
+make matula-big   # 변경 파일 판: matula/matula-big/matula.go + matula/matula-big/matula.pdf
+make all          # 모든 예제 (변경 파일 판은 빼고)
+make clean        # 생성물 삭제
 ```
 
 저장소 전체가 Go 모듈 하나(`go.mod`)이고, 디렉터리마다 패키지 하나가 된다.

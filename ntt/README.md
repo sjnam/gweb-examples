@@ -18,9 +18,9 @@ O(n log n)의 다항식 곱셈을 푼다.
 
 ## 빌드
 
-```sh
-make        # ntt.go + ntt.pdf
-make clean  # 생성물 삭제
-```
+저장소 루트에서 부른다. 규칙은 [../Makefile](../Makefile)에 있다.
 
-규칙은 [../gweb.mk](../gweb.mk)에 있다.
+```sh
+make ntt    # ntt/ntt.go + ntt/ntt.pdf
+make clean  # 모든 예제의 생성물 삭제
+```

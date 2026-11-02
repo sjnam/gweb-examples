@@ -23,9 +23,9 @@ CWEB 원본과 (N, n) 쌍 649가지에서 표준 출력과 뽑아낸 `.mp`와 �
 
 ## 빌드
 
-```sh
-make        # queenon-partition.go + queenon-partition.pdf
-make clean  # 생성물 삭제
-```
+저장소 루트에서 부른다. 규칙은 [../Makefile](../Makefile)에 있다.
 
-규칙은 [../gweb.mk](../gweb.mk)에 있다.
+```sh
+make queenon-partition  # queenon-partition/queenon-partition.go + queenon-partition/queenon-partition.pdf
+make clean              # 모든 예제의 생성물 삭제
+```

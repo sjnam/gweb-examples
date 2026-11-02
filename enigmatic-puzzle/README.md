@@ -69,9 +69,9 @@ TAOCP 7.2.2.8에 나오는 125글자짜리 에니그마 암호문을 깬다. 암
 
 ## 빌드
 
-```sh
-make        # enigmatic-puzzle.go + enigmatic-puzzle.pdf
-make clean  # 생성물 삭제
-```
+저장소 루트에서 부른다. 규칙은 [../Makefile](../Makefile)에 있다.
 
-규칙은 [../gweb.mk](../gweb.mk)에 있다.
+```sh
+make enigmatic-puzzle  # enigmatic-puzzle/enigmatic-puzzle.go + enigmatic-puzzle/enigmatic-puzzle.pdf
+make clean             # 모든 예제의 생성물 삭제
+```

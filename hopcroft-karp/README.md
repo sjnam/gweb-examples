@@ -56,9 +56,9 @@ C 원본과 무작위 1200개에서 맞춰 보았다.
 
 ## 빌드
 
-```sh
-make        # hopcroft-karp.go + hopcroft-karp.pdf
-make clean  # 생성물 삭제
-```
+저장소 루트에서 부른다. 규칙은 [../Makefile](../Makefile)에 있다.
 
-규칙은 [../gweb.mk](../gweb.mk)에 있다.
+```sh
+make hopcroft-karp  # hopcroft-karp/hopcroft-karp.go + hopcroft-karp/hopcroft-karp.pdf
+make clean          # 모든 예제의 생성물 삭제
+```

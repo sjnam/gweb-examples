@@ -28,9 +28,9 @@
 
 ## 빌드
 
-```sh
-make        # back-warnsdorf.go + back-warnsdorf.pdf
-make clean  # 생성물 삭제
-```
+저장소 루트에서 부른다. 규칙은 [../Makefile](../Makefile)에 있다.
 
-규칙은 [../gweb.mk](../gweb.mk)에 있다.
+```sh
+make back-warnsdorf  # back-warnsdorf/back-warnsdorf.go + back-warnsdorf/back-warnsdorf.pdf
+make clean           # 모든 예제의 생성물 삭제
+```

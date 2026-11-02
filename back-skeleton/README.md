@@ -39,9 +39,9 @@ o,constr[k][l+1])`에서 쉼표가 `?:`보다 느슨하게 묶여 길이 검사�
 
 ## 빌드
 
-```sh
-make        # back-skeleton.go + back-skeleton.pdf
-make clean  # 생성물 삭제
-```
+저장소 루트에서 부른다. 규칙은 [../Makefile](../Makefile)에 있다.
 
-규칙은 [../gweb.mk](../gweb.mk)에 있다.
+```sh
+make back-skeleton  # back-skeleton/back-skeleton.go + back-skeleton/back-skeleton.pdf
+make clean          # 모든 예제의 생성물 삭제
+```

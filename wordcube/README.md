@@ -26,10 +26,10 @@
 
 ## 빌드
 
-```sh
-make               # wordcube.go + wordcube.pdf
-make wordcube-par  # wordcube-par.ch 판 -> wordcube-par/
-make clean         # 생성물 삭제
-```
+저장소 루트에서 부른다. 규칙은 [../Makefile](../Makefile)에 있다.
 
-규칙은 [../gweb.mk](../gweb.mk)에 있다.
+```sh
+make wordcube      # wordcube/wordcube.go + wordcube/wordcube.pdf
+make wordcube-par  # wordcube-par.ch 판 -> wordcube/wordcube-par/
+make clean         # 모든 예제의 생성물 삭제
+```

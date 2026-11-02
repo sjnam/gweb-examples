@@ -97,12 +97,12 @@ mem 수가 모두 같다.
 
 ## 빌드
 
-```sh
-make                     # matula.go + matula.pdf
-make matula-big          # matula-big.ch 판 -> matula-big/
-make matula-big-planted  # matula-big-planted.ch 판 -> matula-big-planted/
-make matula-exhaustive   # matula-exhaustive.ch 판 -> matula-exhaustive/
-make clean               # 생성물 삭제
-```
+저장소 루트에서 부른다. 규칙은 [../Makefile](../Makefile)에 있다.
 
-규칙은 [../gweb.mk](../gweb.mk)에 있다.
+```sh
+make matula              # matula/matula.go + matula/matula.pdf
+make matula-big          # matula-big.ch 판 -> matula/matula-big/
+make matula-big-planted  # matula-big-planted.ch 판 -> matula/matula-big-planted/
+make matula-exhaustive   # matula-exhaustive.ch 판 -> matula/matula-exhaustive/
+make clean               # 모든 예제의 생성물 삭제
+```

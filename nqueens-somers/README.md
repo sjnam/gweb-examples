@@ -32,10 +32,10 @@ N 여왕 문제의 해를 세는 **제프 소머즈의 기법**(2002)을 옮기�
 
 ## 빌드
 
-```sh
-make                     # nqueens-somers.go + nqueens-somers.pdf
-make nqueens-somers-par  # nqueens-somers-par.ch 판 -> nqueens-somers-par/
-make clean               # 생성물 삭제
-```
+저장소 루트에서 부른다. 규칙은 [../Makefile](../Makefile)에 있다.
 
-규칙은 [../gweb.mk](../gweb.mk)에 있다.
+```sh
+make nqueens-somers      # nqueens-somers/nqueens-somers.go + nqueens-somers/nqueens-somers.pdf
+make nqueens-somers-par  # nqueens-somers-par.ch 판 -> nqueens-somers/nqueens-somers-par/
+make clean               # 모든 예제의 생성물 삭제
+```

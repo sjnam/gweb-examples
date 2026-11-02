@@ -27,9 +27,9 @@
 
 ## 빌드
 
-```sh
-make        # ziptree.go + ziptree_test.go + ziptree.pdf
-make clean  # 생성물 삭제
-```
+저장소 루트에서 부른다. 규칙은 [../Makefile](../Makefile)에 있다.
 
-규칙은 [../gweb.mk](../gweb.mk)에 있다.
+```sh
+make ziptree  # ziptree/ziptree.go + ziptree/ziptree_test.go + ziptree/ziptree.pdf
+make clean    # 모든 예제의 생성물 삭제
+```
