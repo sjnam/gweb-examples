@@ -1,58 +1,30 @@
 # GWEB 예제 빌드용 Makefile.
 #
-#   make <이름>    # <이름>.w 를 tangle+weave 하여 <이름>.go(들)과 <이름>.pdf 생성
-#                  #   예) make ziptree
-#   make clean     # 원본(.w/.ch)만 남기고 생성물 모두 삭제
+# 예제는 저마다 제 디렉토리에 있고, 그 디렉토리의 Makefile 이 빌드한다(규칙은
+# gweb.mk). 이 파일은 그쪽으로 넘겨 줄 뿐이다.
 #
-# 예제마다 한 번에 하나씩 빌드한다(`make all`은 없다). 거의 모든 .go 가 package main
-# 의 main() 을 가져, 한 디렉토리에 동시에 풀면 Go 가 main 중복으로 컴파일을 거부한다.
+#   make <이름>    # <이름>/ 에서 make: <이름>.go(들)과 <이름>.pdf 생성
+#                  #   예) make ziptree   (cd ziptree && make 와 같다)
+#   make all       # 모든 예제 빌드
+#   make clean     # 모든 예제의 생성물 삭제
 #
-# 조판은 luatex 하나로 한다. 한글 문서(\input kotexgweb.tex)와 그림 있는
-# 문서(\input luamplib.sty)가 luatex 를 요구하고---luamplib 은 \directlua 를 쓰므로
-# pdftex 로는 돌지 않는다---여기 있는 문서는 모두 그 둘 가운데 하나다.
-# 매크로(gwebmac.tex, kotexgweb.tex)는 설치된 texmf 트리에서 자동으로 찾는다.
-# 변경 파일 .ch 를 적용하려면 수작업으로 부른다(예: gtangle matula.w matula-big.ch).
+# 변경 파일 판은 그 디렉토리에서 부른다(예: cd matula && make matula-big).
 
-GTANGLE ?= gtangle
-GWEAVE  ?= gweave
-# 이름을 TEX 로 두면 안 된다. make 의 내장 변수(TEX=tex)라 ?= 가 먹지 않는다.
-LUATEX  ?= luatex
+DIRS := $(patsubst %/Makefile,%,$(wildcard */Makefile))
 
-WFILES := $(wildcard *.w)
-NAMES  := $(WFILES:.w=)
-
-.PHONY: help clean $(NAMES)
+.PHONY: help all clean $(DIRS)
 .DEFAULT_GOAL := help
 
 help:
 	@echo 'usage:'
-	@echo '  make <name>   # <name>.w -> <name>.go(들) + <name>.pdf   (예: make ziptree)'
+	@echo '  make <name>   # <name>/ 에서 <name>.go(들) + <name>.pdf   (예: make ziptree)'
+	@echo '  make all      # 모든 예제 빌드'
 	@echo '  make clean    # 생성물 삭제 (.w/.ch 원본은 남김)'
 
-# `make ziptree` 처럼 확장자 없는 이름으로 .go 와 .pdf 를 함께 만든다.
-$(NAMES): %: %.go %.pdf
+$(DIRS):
+	$(MAKE) -C $@
 
-# Tangle: <name>.w -> <name>.go  (@( ) 로 뽑는 부수 파일도 함께 생성)
-%.go: %.w
-	$(GTANGLE) $<
+all: $(DIRS)
 
-# Weave + 조판: <name>.w -> <name>.tex -> <name>.pdf
-#
-# 그림은 따로 만들 것이 없다. MetaPost 는 luamplib 이 조판 중에 직접 돌린다. 그림은
-# .w 안에 그대로 들어 있고, 문서 둘이 나눠 쓰는 도우미와 프로그램이 뱉는 좌표만
-# <name>.mp 에 남아 `input <name>;` 으로 읽힌다.
-%.pdf: %.w
-	$(GWEAVE) $<
-	$(LUATEX) $*.tex </dev/null
-
-# 생성물만 삭제한다. 소스(.w, .ch, .mp)는 남긴다. 특히 woven 출력만 골라 지운다:
-# `*.tex`로 싹 지우면 손으로 쓴 .tex 가 있을 때 함께 날아가므로, .w 에 대응하는
-# <name>.tex 만 지운다.
-#
-# `*.[0-9]*` 는 예전에 mpost 를 쓰던 시절의 찌꺼기(<name>.1, <name>.2, ...)를 쓸어
-# 담는다. 지금은 luamplib 이 조판 중에 그리므로 새로 생기지는 않는다. 소스 이름에는
-# 점 뒤에 숫자가 오는 것이 없으니 이 글로브에 걸릴 것도 없다.
 clean:
-	rm -f *.go $(WFILES:.w=.tex) *.log *.toc *.pdf *.idx *.scn *.dvi *.out
-	rm -f *.[0-9]* *.mpx
-	rm -f $(NAMES)
+	@for d in $(DIRS); do $(MAKE) -C $$d clean || exit 1; done
