@@ -1,13 +1,22 @@
 # squint
 
-[squint.w](squint.w) — 게으른 거듭제곱 급수를 요구에 따라 움직이는 채널 그물로
-본다(합, 곱, 합성, 역수, 함수의 역, 그리고 `exp` 같은 미분 방정식). 매킬로이의
+게으른 거듭제곱 급수를 요구에 따라 움직이는 채널 그물로 본다. 매킬로이의
 *Squinting at Power Series*를 따른다.
+
+- 문서: [squint.w](squint.w)
+- 꾸러미: 라이브러리 `squint`(`main`이 없다). 시험 파일 `squint_test.go`를 함께
+  짜 `go test`로 돌린다.
+
+## 다루는 연산
+
+- 합, 곱, 합성
+- 역수, 함수의 역
+- 미분 방정식(`exp` 같은 것)
 
 ## 빌드
 
 ```sh
-make        # squint.w -> squint.go + squint_test.go + squint.pdf
+make        # squint.go + squint_test.go + squint.pdf
 make clean  # 생성물 삭제
 ```
 
