@@ -571,7 +571,7 @@ beginfig(2);
   col[6]:=(0.76,0.63,0.91); col[7]:=(0.97,0.71,0.86); col[8]:=(0.81,0.66,0.51);
   col[9]:=(0.82,0.82,0.84);
   pair TL, TR, BL, BR;
-  defaultscale := 0.5;
+  defaultscale := 0.8;
   for i=0 upto 9:
     for j=0 upto 9:
       TL := (j*u, -i*u); TR := ((j+1)*u, -i*u);
@@ -724,4 +724,4 @@ PEREC: 10차 그레코라틴 방진
 !endgroup
 \endgroup
 
-@* Index.
+@* 찾아보기.
