@@ -35,6 +35,8 @@ input hyperbolic-arcs;
 \def\figcap#1{\smallskip{\narrower\noindent #1\par}\medskip}
 \def\dts{\mathinner{\ldotp\ldotp}}
 
+@s os.File int
+
 @* 들어가며.
 유클리드의 다섯째 공준---한 직선과 그 밖의 한 점이 주어지면 그 점을 지나면서
 직선과 만나지 않는 직선은 오직 하나라는 것---은 이천 년 동안 기하학자들을
