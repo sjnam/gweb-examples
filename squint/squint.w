@@ -876,7 +876,7 @@ func checkTerms(t *testing.T, name string, F PS, want []string) {
 }
 
 @* 놀이터.
-이제 놀아 보자. \GO/의 시험 꾸러미는 이름이 \.{Example}로 시작하는 함수를 {\it
+이제 놀아 보자. \GO/의 시험 패키지는 이름이 \.{Example}로 시작하는 함수를 {\it
 보기\/}로 다룬다. 보기가 표준 출력에 찍은 것을 함수 끝의 주석 \.{// Output:}과
 견주므로, 보기는 문서이면서 시험이기도 하다. 보기마다 문맥을 만들고 끝날 때 |cancel|로
 그물을 거두는 것도 눈여겨보자. 함수 |printTerms|는 급수의 앞쪽 계수 |n|개를 한 줄에

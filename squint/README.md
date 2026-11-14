@@ -4,7 +4,7 @@
 *Squinting at Power Series*를 따른다.
 
 - 문서: [squint.w](squint.w)
-- 꾸러미: 라이브러리 `squint`(`main`이 없다). 시험 파일 `squint_test.go`를 함께
+- 패키지: 라이브러리 `squint`(`main`이 없다). 시험 파일 `squint_test.go`를 함께
   짜 `go test`로 돌린다.
 
 ## 다루는 연산

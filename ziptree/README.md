@@ -5,7 +5,7 @@
 *지퍼처럼 열고 닫아* 갱신한다.
 
 - 문서: [ziptree.w](ziptree.w)
-- 꾸러미: 라이브러리 `ziptree`(`main`이 없다)
+- 패키지: 라이브러리 `ziptree`(`main`이 없다)
 
 ## 세 표현
 
