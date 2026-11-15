@@ -278,6 +278,9 @@ $$\vcenter{\halign{\tt#\hfil\cr
 
 $$\mplibcode
 u := 4mm;
+color piece[];
+piece1 := (1, 1, 0); piece2 := (0, 1, 0);
+piece3 := (1, 0, 0); piece4 := (.24, .13, .13);
 def cellbox(expr i, j, o) =
   (unitsquare scaled u shifted (o + (j*u, -(i+1)*u)))
 enddef;
@@ -288,26 +291,25 @@ enddef;
 def grid(expr s, w, h, o) =
   for i = 0 upto h - 1: for j = 0 upto w - 1:
     if pat(s, w, i, j) <> ".":
-      fill cellbox(i, j, o) withcolor (1.02 - .16 * scantokens pat(s, w, i, j)) * white;
-      draw cellbox(i, j, o) withpen pencircle scaled .2pt;
+      fill cellbox(i, j, o) withcolor piece[scantokens pat(s, w, i, j)];
     fi
   endfor endfor
   for i = 0 upto h - 1: for j = 0 upto w - 1:
     if pat(s, w, i, j) <> ".":
       if pat(s, w, i - 1, j) <> pat(s, w, i, j):
-        draw (o + (j*u, -i*u)) -- (o + ((j+1)*u, -i*u)) withpen pencircle scaled 1.2pt; fi
+        draw (o + (j*u, -i*u)) -- (o + ((j+1)*u, -i*u)) withpen pencircle scaled .4pt; fi
       if pat(s, w, i + 1, j) <> pat(s, w, i, j):
-        draw (o + (j*u, -(i+1)*u)) -- (o + ((j+1)*u, -(i+1)*u)) withpen pencircle scaled 1.2pt; fi
+        draw (o + (j*u, -(i+1)*u)) -- (o + ((j+1)*u, -(i+1)*u)) withpen pencircle scaled .4pt; fi
       if pat(s, w, i, j - 1) <> pat(s, w, i, j):
-        draw (o + (j*u, -i*u)) -- (o + (j*u, -(i+1)*u)) withpen pencircle scaled 1.2pt; fi
+        draw (o + (j*u, -i*u)) -- (o + (j*u, -(i+1)*u)) withpen pencircle scaled .4pt; fi
       if pat(s, w, i, j + 1) <> pat(s, w, i, j):
-        draw (o + ((j+1)*u, -i*u)) -- (o + ((j+1)*u, -(i+1)*u)) withpen pencircle scaled 1.2pt; fi
+        draw (o + ((j+1)*u, -i*u)) -- (o + ((j+1)*u, -(i+1)*u)) withpen pencircle scaled .4pt; fi
     fi
   endfor endfor
 enddef;
 def sol(expr sq, n, sh, w, h, o) =
   grid(sq, n, n, o);
-  drawarrow (o + ((n+.3)*u, -.5n*u)) -- (o + ((n+1.5)*u, -.5n*u));
+  label(btex $\leftrightarrow$ etex, o + ((n+.9)*u, -.5n*u));
   grid(sh, w, h, o + ((n+1.8)*u, 0));
 enddef;
 beginfig(1);
@@ -319,8 +321,9 @@ beginfig(1);
   label(btex 해~3 etex, (26u, -3.8u));
 endfig;
 \endmplibcode$$
-\figcap{예제의 세 해. 왼쪽이 정사각형, 오른쪽이 다른 모양이다. 색 번호가 클수록
-칸이 짙고, 굵은 선이 자르는 선이다.}
+\figcap{예제의 세 해. 왼쪽이 정사각형, 오른쪽이 다른 모양이다. 색~\.1, \.2, \.3,
+\.4는 커누스가 {\sl The Art of Computer Programming}의 7.2.2.8절 원고에서 쓴
+대로 노랑, 초록, 빨강, 짙은 갈색이다. 번호가 클수록 짙다. 선은 색이 바뀌는 곳, 곧 자르는 곳과 모양의 테두리에만 긋는다.}
 
 @ 해의 수가 대략 $d!$분의 일로 준다. 색들을 서로 바꾸어도 해는 달라지지 않으니
 $$(s_1,t_1)\le (s_2,t_2)\le\cdots\le (s_d,t_d)\qquad\hbox{(사전식으로)}$$
