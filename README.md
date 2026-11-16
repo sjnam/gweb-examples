@@ -57,6 +57,7 @@ make clean        # 생성물 삭제
 * [enigmatic-puzzle](enigmatic-puzzle) — TAOCP 7.2.2.8의 125글자짜리 에니그마 암호문을 깬다.
 * [floyd](floyd) — √1…√50을 거의 같은 두 몫으로 가르는 플로이드의 분할 문제.
 * [grayspan](grayspan) — 그래프의 신장 나무를 이웃끼리 변 하나만 다르게 모두 늘어놓는다.
+* [grayspspan](grayspspan) — `grayspan`과 `spspan`을 합쳐 신장 나무를 O(m+n+t) 시간에 그레이 순서로 늘어놓는다.
 * [hopcroft-karp](hopcroft-karp) — 이분 그래프의 최대 매칭을 홉크로프트와 카프의 알고리즘으로 찾는다.
 * [hyperbolic](hyperbolic) — 36°-45°-90° 삼각형으로 쌍곡 평면을 덮는 타일링을 셈한다.
 * [infty-queens](infty-queens) — 끝없는 체스판에 여왕을 탐욕스럽게 놓아 가는 수열(OEIS A065188)을 계산한다.
