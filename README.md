@@ -76,6 +76,7 @@ make clean        # 생성물 삭제
 * [queenon-partition](queenon-partition) — 심킨이 n-퀸 개수의 점근에 쓴 칸 나누기를 그린다.
 * [sliding](sliding) — 미닫이 블록 퍼즐을 두루 푸는 엔진.
 * [spiders](spiders) — `koda-ruskey`와 `li-ruskey`의 문제를 다른 쪽에서 풀어 삼부작을 닫는다.
+* [spspan](spspan) — 직병렬 그래프의 신장 나무를 이웃끼리 변 하나만 다르게 모두 늘어놓는다.
 * [squint](squint) — 게으른 거듭제곱 급수를 채널 그물로 다룬다.
 * [tarjan-strong](tarjan-strong) — 타잔의 강한 성분(알고리즘 7.4.1.2T).
 * [tarjan-strong-and-weak](tarjan-strong-and-weak) — 강한 성분과 커누스의 *약한 성분*(알고리즘 7.4.1.2W).
