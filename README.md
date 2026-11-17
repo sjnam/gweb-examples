@@ -71,6 +71,7 @@ make clean        # 생성물 삭제
 * [perec](perec) — 조르주 페렉의 *인생 사용법*을 그 두 제약에서 다시 짓는다.
 * [perfect-partition-square](perfect-partition-square) — 7의 분할 14가지를 7×7 정사각형에 담는 마이클 켈러의 퍼즐.
 * [perm](perm) — 플로이드의 무작위 뽑기 알고리즘.
+* [pipe-organ](pipe-organ) — 커누스 집의 파이프 오르간으로 낼 수 있는 소리를 세어 TAOCP 연습문제 7.2.2-79의 해답과 견준다.
 * [polynum](polynum) — 고정 다항체를 세는 Jensen의 전이 행렬 방법.
 * [prime-sieve](prime-sieve) — 구간마다 돌리는 에라토스테네스의 체로 소수 간격의 기록을 찾는다.
 * [prjeuler152](prjeuler152) — Project Euler 152번 문제를 정확한 유리수 연산으로 푼다.
