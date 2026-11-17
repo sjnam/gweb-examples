@@ -84,6 +84,7 @@ $(foreach f,$(CHFILES),$(eval $(call change-rules,$(patsubst %/,%,$(dir $f)),$(n
 
 # 다른 예제 디렉토리에서 읽어 오는 파일.
 tarjan-strong-and-weak/tarjan-strong-and-weak.pdf: tarjan-strong/tarjan-strong.mp
+spgraph/spgraph.pdf: spspan/spspan.mp
 
 # 생성물만 지운다. woven 출력은 <이름>/<이름>.tex 만 골라 지운다: `*.tex`로 싹
 # 지우면 손으로 쓴 .tex 가 있을 때 함께 날아간다.
