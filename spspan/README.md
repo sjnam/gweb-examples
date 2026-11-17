@@ -5,6 +5,7 @@
 
 - 문서: [spspan.w](spspan.w)
 - 바탕: 커누스의 CWEB 프로그램 `spspan.w`(2017)와 그 그림 `spspan.mp`(2003)
+- 그림: [spspan.mp](spspan.mp) — 커누스의 그림 파일을 고쳐 쓴 것. 첫 그림은 [spgraph](../spgraph)도 쓴다.
 
 ## 방법
 

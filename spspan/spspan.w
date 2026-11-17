@@ -1,12 +1,12 @@
 \input kotexgweb
 \input luamplib.sty
+\everymplib{input spspan;} % 그림 둘은 spspan.mp 안에 있다.
 @i ../types.w
 \datethis
 
 \def\title{직병렬 그래프의 신장 나무}
 \def\adj{\mathrel{\!\mathrel-\mkern-8mu\mathrel-\mkern-8mu\mathrel-\!}}
    % 이웃한 꼭짓점
-\def\spbox#1{\hbox to1em{\hfil$#1\mathstrut$\hfil}} % 그림의 노드 이름표
 
 @* 들어가며.
 이 프로그램은 주어진 직병렬 그래프(series-parallel graph)의 신장 나무를 모두
@@ -20,85 +20,9 @@ $$
 변 하나가 \.-이고, 그래프 둘을 이어 붙이는 것이 \.s(직렬), 나란히 놓는 것이
 \.p(병렬)다. 이를테면 식 \.{----ps-sp--sp}와 \.{----p-ss--spp}는 둘 다 다음
 그래프를 나타낸다.
-$$
-\mplibcode
-beginfig(1)
-numeric h,w; h=.4in; w=.5in;
-z1-z0=z2-z1=z3-z2=(w,0);
-z1=-z2; z4=-z5;
-z4-z5=z6=-z7=(0,h);
-path p; p= z0{up}...z6{right}...z3{down}...z7{left}...cycle;
-draw p;
-draw z1{up}...z4{right}...z2{down}...z5{left}...cycle;
-draw z0--z1; draw z2--z3;
-pickup pencircle scaled 3pt;
-for j=0,1,2,3,7: drawdot z[j]; endfor
-label.top(btex$a$etex,z6);
-label.top(btex$b$etex,.5[z0,z1]);
-label.top(btex$c$etex,z4);
-label.top(btex$d$etex,z5);
-label.top(btex$e$etex,.5[z2,z3]);
-label.top(btex$f$etex,point 3.3 of p);
-label.top(btex$g$etex,point 2.7 of p);
-endfig;
-\endmplibcode
-$$
+$$\mplibcode fig_graph; \endmplibcode$$
 이 그래프는 나무로도 나타낼 수 있다.
-$$
-\mplibcode
-% 커누스의 상자 정의 가운데 이 그림이 쓰는 것
-def box(expr wd,ht)(suffix $) =
-  z$ne-z$nw=z$se-z$sw=(wd,0);
-  z$ne-z$se=z$nw-z$sw=(0,ht);
-  z$n=.5[z$nw,z$ne];
-  z$e=.5[z$se,z$ne];
-  z$s=.5[z$se,z$sw];
-  z$w=.5[z$nw,z$sw];
-  z$=.5[z$nw,z$se];
-enddef;
-picture pic[];
-vardef picbox@@# =
-  box(xpart(urcorner pic@@#-llcorner pic@@#)+3pt,
-      ypart(urcorner pic@@#-llcorner pic@@#)+3pt)(@@#)
-enddef;
-vardef oval@@# = z@@#se-(.5ypart(z@@#n-z@@#s),0){right}..
-  z@@#e{up}..{left}z@@#ne-(.5ypart(z@@#n-z@@#s),0)--
-  z@@#nw+(.5ypart(z@@#n-z@@#s),0){left}..
-  z@@#w{down}..{right}z@@#sw+(.5ypart(z@@#n-z@@#s),0)--cycle enddef;
-def drawobox (expr lbl)(suffix $) =
-  erase fill oval$;
-  draw oval$;
-  label(lbl,z$);
-enddef;
-beginfig(2)
-w:=20pt; h:=18pt;
-z0=origin;
-z2=z0-(5pt,h);
-y1=y2=y3; x3=.5[x7,x8]; x2-x1=4/5(x3-x2);
-z5=z2-(0,h);
-z6-z5=z5-z4=z7-z6=z8-z7=z10-z9=(w,0);
-.5[z9,z10]=z5-(0,h);
-draw z0--z1; draw z0--z2; draw z0--z3;
-draw z2--z4; draw z2--z5; draw z2--z6; draw z3--z7; draw z3--z8;
-draw z5--z9; draw z5--z10;
-pic0=btex\spbox A etex;
-pic1=btex\spbox a etex;
-pic2=btex\spbox B etex;
-pic3=btex\spbox D etex;
-pic4=btex\spbox b etex;
-pic5=btex\spbox C etex;
-pic6=btex\spbox e etex;
-pic7=btex\spbox f etex;
-pic8=btex\spbox g etex;
-pic9=btex\spbox c etex;
-pic10=btex\spbox d etex;
-for j=0 upto 10:
-  picbox[j];
-  drawobox(pic[j],[j]);
-endfor
-endfig;
-\endmplibcode
-$$
+$$\mplibcode fig_tree; \endmplibcode$$
 나무의 가지 노드는 $S$ 노드 아니면 $P$ 노드이고, 층마다 번갈아 나온다.
 
 계산하면서 만들어 낸 신장 나무의 수와 그러는 데 든 메모리 참조의 수를 센다.
@@ -109,9 +33,8 @@ $$
 \.{Tue, 08 Aug 2017 23:41:46 GMT}다. 위의 두 그림은 커누스가 함께 내놓은
 MetaPost 파일 \pdfURL{\.{spspan.mp}}%
 {https://www-cs-faculty.stanford.edu/\TILDE/knuth/programs/spspan.mp}(2003년
-8월 28일)를 이 문서 안에 옮겨 조판하면서 그린다. 원본은 그림 2의 이름표
-매크로를 \.{verbatimtex}로 정의하지만 여기서는 문서의 림보에 \.{\\spbox}로 두었고,
-상자 정의 가운데 그림이 쓰지 않는 것(네모, 마름모, \.{cutat})은 뺐다.
+8월 28일)를 고쳐 쓴 같은 이름의 파일에 있다. 첫 그림은 이 저장소의 \.{spgraph}도
+함께 쓴다. 원본과 다른 점은 \.{spspan.mp}의 머리에 적었다.
 
 프로그램이 찍는 말과 종료 부호는 원본 그대로 두었다. 두 프로그램의 출력을 바이트
 단위로 견주려는 것이다. 옮기다가 원본의 결함 하나를 만났다. 고쳤고, 이야기는 맨
@@ -853,7 +776,7 @@ $p_{k-1}$ 가운데 쉬운 것들은 잇달아 놓이지 않고, 쉽지 않은 �
 때문이다. 결정적 노드를 |p|, 그 왼쪽의 첫 활성 노드를 |q|라 하자. 노드 |p|에서
 |parent| 포인터를 따라 한두 층 올라가 쉽지 않은 노드, 이를테면 |u|에 닿는다. 다만
 올라가는 걸음이 맨 오른쪽 가지 자식에서 부모로 가는 것이 아니면 멈춘다. 그렇지
-않을 때 |q==u|이면 잘됐다. |q.scope|를 고치고 끝이다. 또 |q==u.registry|이면(필드
+않을 때 |q==u|이면 잘됐다. 필드 |q.scope|를 고치고 끝이다. 또 |q==u.registry|이면(필드
 |registry|는 새것인데, 곧 더 이야기한다) 역시 |q.scope|를 고친다. 둘 다 아니면
 노드 |q|는 |p|에 이르는 먹이 사슬의 꼭대기가 아니라고 결론짓는다.
 
